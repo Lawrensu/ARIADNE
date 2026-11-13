@@ -1,0 +1,39 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+
+# Node
+node_modules/
+dist/
+.vite/
+
+
+# Environment files
+.env
+.env.*
+
+
+# OS and editor junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+
+# QGIS temporary files
+*.qgs~
+*.aux.xml
+
+
+# Data: raw downloads are never committed (keep the placeholder)
+data/raw/*
+!data/raw/.gitkeep
+
+
+# Data: processed outputs
+# Uncomment if Stage 0 chooses a shared drive instead of Git LFS
+# data/processed/*
+# !data/processed/.gitkeep
