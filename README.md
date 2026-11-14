@@ -200,11 +200,11 @@ Tagline:
 
 > ARIADNE: the Marswalk map with a thread that always leads the astronaut home.
 
-Project summary (189 words; the form suggests 50 to 200):
+Project summary (171 words; the form suggests 50 to 200):
 
-> Imagine the first astronaut stepping onto Mars. Ahead lies a maze of rock ridges in Gale Crater, where Curiosity found pure sulfur and signs of ancient groundwater. Oxygen is limited, a fifth of the ground is too steep to walk, and a solar storm can arrive without warning. Every Mars map today was made for scientists studying a whole planet. None answers the question that keeps an explorer alive: can I still get home?
+> Imagine the first astronaut walking on Mars. Oxygen is limited, the ground is steep and broken, and a solar storm can strike without warning. Yet every Mars map today was made for scientists studying a whole planet, not for one explorer asking: where can I safely go, and can I still get home?
 >
-> So we built ARIADNE, named after the myth of the thread that led Theseus out of the labyrinth. Our pipeline fuses real NASA data (HiRISE terrain and imagery, Curiosity weather, radiation and photos, CRISM minerals, THEMIS thermal inertia) into one map of a 2 km Marswalk. On it we are building a habitat planning table, a 3D view and a simple suit display. ARIADNE marks no-go ground, plans routes with a walking model tied to Apollo suit speeds, and draws The Thread: the line beyond which the crew could no longer walk back to their rover. It shrinks as they walk.
+> So we built ARIADNE, named after the myth of the thread that led Theseus out of the labyrinth. Our pipeline fuses real NASA data (HiRISE terrain and imagery, Curiosity weather, radiation and photos, CRISM minerals, THEMIS thermal inertia) into one map of a 2 km Marswalk in Gale Crater. On it we are building a habitat planning table, a 3D view and a simple suit display. ARIADNE marks no-go ground, plans routes with a walking model tied to Apollo suit speeds, and draws The Thread: the line beyond which the crew could no longer walk back to their rover. It shrinks as they walk.
 >
 > Exploration succeeds only if explorers come back. ARIADNE shows that answer at every step.
 
