@@ -6,12 +6,14 @@
 // the traversal_penalty layer that is already loaded.
 
 import { useLoader, useThree } from "@react-three/fiber";
+import type { ThreeEvent } from "@react-three/fiber";
 import { useEffect, useLayoutEffect, useMemo } from "react";
 import * as THREE from "three";
 
 import type { LuminanceStretch } from "../terrain/phosphorTerrain";
 import { luminanceHistogram, luminanceStretchFromHistogram } from "../terrain/phosphorTerrain";
 import { createNoGoMaskTexture, createPhosphorTerrainMaterial } from "../terrain/phosphorTerrainMaterial";
+import { useAriadneStore } from "../state/store";
 import { useTerrain } from "../terrain/TerrainContext";
 import { sunDirectionVector } from "./sceneMath";
 
@@ -20,6 +22,8 @@ import { sunDirectionVector } from "./sceneMath";
 // The contrast stretch is measured on a small copy of the photo: enough for a histogram, a few ms.
 const HISTOGRAM_SAMPLE_WIDTH_PX = 512;
 const FULL_RANGE_STRETCH: LuminanceStretch = { low: 0, high: 1 };
+// A pointer that moved more than this between press and release was a drag, not a tap.
+const TERRAIN_TAP_MAX_MOVE_PX = 5;
 
 let hasLoggedBuildTime = false;
 
@@ -108,5 +112,15 @@ export function TerrainMesh() {
         };
     }, [material]);
 
-    return <mesh geometry={geometry} material={material} />;
+    // A tap on the terrain shows that point's data in the Here card (shell/HereCard.tsx). Drags that
+    // pan or rotate the map end with a click too, so taps that moved more than a few pixels are ignored.
+    function onTerrainTap(event: ThreeEvent<MouseEvent>) {
+        if (event.delta > TERRAIN_TAP_MAX_MOVE_PX) {
+            return;
+        }
+        event.stopPropagation();
+        useAriadneStore.getState().setInspectedPosition({ x_m: event.point.x, z_m: event.point.z });
+    }
+
+    return <mesh geometry={geometry} material={material} onClick={onTerrainTap} />;
 }

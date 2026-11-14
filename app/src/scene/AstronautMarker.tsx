@@ -1,6 +1,8 @@
 // The simulated astronaut ("you are here"): a circle marker with a heading arrow plus a dotted
 // breadcrumb trail of where they have walked. Owner: Lawrence, Stage 3 takeover, D-030; phosphor map
 // look, D-031. The short label always says the position is simulated ("YOU (SIM.)").
+// In the Labyrinth view (3D) the glyph is replaced by a small standing figure (AstronautFigure.tsx)
+// with the label above its head; the Planning Table (2D) keeps the glyph. The trail shows in both.
 // The position is simulated (Mars has no GPS); it comes from the walk driver through the walk slice.
 // Local grid only: x_m east, z_m south. Render inside the scene's TerrainProvider.
 
@@ -12,6 +14,7 @@ import type { WalkPhase } from "../state/walkSlice";
 import { useAriadneStore } from "../state/store";
 import { useTerrain } from "../terrain/TerrainContext";
 import { sampleTerrainSceneY } from "../terrain/terrainFrame";
+import { AstronautFigure } from "./AstronautFigure";
 import { MapLabel } from "./MapLabel";
 import { LINE_RENDER_ORDER, MAP_COLOURS } from "./mapStyle";
 import { useScreenSpaceDashes } from "./useScreenSpaceDashes";
@@ -64,6 +67,8 @@ export function AstronautMarker() {
     const walkPhase = useAriadneStore((state) => state.walkPhase);
     const walkStartedAtSimSeconds = useAriadneStore((state) => state.walkStartedAtSimSeconds);
     const walkTrail = useAriadneStore((state) => state.walkTrail);
+    const viewMode = useAriadneStore((state) => state.viewMode);
+    const isSimPlaying = useAriadneStore((state) => state.isSimPlaying);
 
     const position: LocalPosition = astronautPosition ?? processedData.meta.staging_point;
     const trailGroupRef = useScreenSpaceDashes();
@@ -76,12 +81,19 @@ export function AstronautMarker() {
         });
     }, [walkTrail, position, frame]);
 
-    // Still waiting at the rover: the rover marker already shows there.
-    if (walkStartedAtSimSeconds === null && walkPhase === "at_rover") {
+    const isWaitingAtRover = walkStartedAtSimSeconds === null && walkPhase === "at_rover";
+    const isLabyrinthView = viewMode === "labyrinth_view";
+
+    // 2D, still waiting at the rover: the rover glyph already shows there. In 3D the figure stands
+    // at the rover from the start, so the walker is visible before the walk begins.
+    if (isWaitingAtRover && isLabyrinthView === false) {
         return null;
     }
 
-    const markerY = sampleTerrainSceneY(frame, position.x_m, position.z_m) + MARKER_LIFT_ABOVE_TERRAIN_M;
+    const groundY = sampleTerrainSceneY(frame, position.x_m, position.z_m);
+    const markerY = groundY + MARKER_LIFT_ABOVE_TERRAIN_M;
+    const labelText = `You (sim.) ${PHASE_WORDS[walkPhase]}`;
+    const titleText = `You (simulated position), ${PHASE_WORDS[walkPhase]}`;
 
     return (
         <group ref={trailGroupRef}>
@@ -100,30 +112,41 @@ export function AstronautMarker() {
                     toneMapped={false}
                 />
             ) : null}
-            <Html
-                position={[position.x_m, markerY, position.z_m]}
-                center
-                zIndexRange={[30, 0]}
-                style={{ pointerEvents: "none" }}
-            >
-                <div
-                    title={`You (simulated position), ${PHASE_WORDS[walkPhase]}`}
-                    style={{ position: "relative", width: MARKER_SIZE_PX, height: MARKER_SIZE_PX, pointerEvents: "none" }}
+            {isLabyrinthView ? (
+                <AstronautFigure
+                    position={position}
+                    groundY={groundY}
+                    headingDeg={headingDeg}
+                    walkPhase={walkPhase}
+                    isSimPlaying={isSimPlaying}
+                    label={<MapLabel emphasis="emphasis">{labelText}</MapLabel>}
+                />
+            ) : (
+                <Html
+                    position={[position.x_m, markerY, position.z_m]}
+                    center
+                    zIndexRange={[30, 0]}
+                    style={{ pointerEvents: "none" }}
                 >
-                    <AstronautShape headingDeg={headingDeg} />
-                    <MapLabel
-                        emphasis="emphasis"
-                        style={{
-                            position: "absolute",
-                            left: MARKER_SIZE_PX + LABEL_GAP_PX,
-                            top: "50%",
-                            transform: "translateY(-50%)",
-                        }}
+                    <div
+                        title={titleText}
+                        style={{ position: "relative", width: MARKER_SIZE_PX, height: MARKER_SIZE_PX, pointerEvents: "none" }}
                     >
-                        {`You (sim.) ${PHASE_WORDS[walkPhase]}`}
-                    </MapLabel>
-                </div>
-            </Html>
+                        <AstronautShape headingDeg={headingDeg} />
+                        <MapLabel
+                            emphasis="emphasis"
+                            style={{
+                                position: "absolute",
+                                left: MARKER_SIZE_PX + LABEL_GAP_PX,
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                            }}
+                        >
+                            {labelText}
+                        </MapLabel>
+                    </div>
+                </Html>
+            )}
         </group>
     );
 }

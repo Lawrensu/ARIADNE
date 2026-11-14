@@ -25,12 +25,14 @@ import {
     bearingWord,
     computeHudNumbers,
     emptyHudNumbers,
+    formatCountdownMinutes,
     formatDistanceMetres,
     formatMeasurement,
     formatMinutesEstimate,
     formatScienceBudgetChip,
     nearestEnvironmentSample,
     normalizeBearing,
+    remainingDetourWalkSeconds,
     selectNextKnot,
 } from "./hudMath";
 
@@ -441,6 +443,18 @@ export function SuitHud({ alertSlot }: SuitHudProps) {
         bearingWordText = selection.bearingWord;
     }
 
+    // Shelter walk countdown while rerouted: routed walking time minus the time walked since the
+    // reroute (constant speed along the detour, D-030), est.
+    let shelterCountdownText = "";
+    if (walkDetour !== null) {
+        const remainingSeconds = remainingDetourWalkSeconds(walkDetour, simElapsedSeconds);
+        if (remainingSeconds > 0) {
+            shelterCountdownText = `IN ${formatCountdownMinutes(remainingSeconds)}`;
+        } else {
+            shelterCountdownText = "ARRIVED";
+        }
+    }
+
     let bearingText = "";
     if (nextKnotBearingDeg !== null) {
         bearingText = `${bearingWordText} ${Math.round(normalizeBearing(nextKnotBearingDeg))}°`;
@@ -554,6 +568,12 @@ export function SuitHud({ alertSlot }: SuitHudProps) {
                                 {walkDetour === null && selection.knot !== null && (
                                     <span className="flex items-baseline gap-1">
                                         WALK {formatMinutesEstimate(selection.walkTimeSeconds)}
+                                        <EstimateBadge />
+                                    </span>
+                                )}
+                                {walkDetour !== null && shelterCountdownText !== "" && (
+                                    <span className="flex items-baseline gap-1" aria-live="polite">
+                                        {shelterCountdownText}
                                         <EstimateBadge />
                                     </span>
                                 )}

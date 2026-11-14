@@ -2,14 +2,14 @@
 // (rover or Knots), choose fast / safe / smooth, see estimated walking times, and try a reroute around a
 // blocked passage. Width-fluid, no outer frame and no title (the sheet supplies both).
 
-import { useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import { useMemo } from "react";
 
 import type { ProcessedData } from "../data/loadProcessed";
 import { cellFromPosition, cellIndex, isInsideGrid } from "../data/grid";
 import type { RouteEndpoint, RouteOptionId, RoutePlan } from "../state/routeSlice";
 import { useAriadneStore } from "../state/store";
 import { EstimateBadge } from "../theme/EstimateBadge";
+import { InfoHeadingRow } from "../theme/InfoToggle";
 import { formatDistance, formatWalkingTimeEstimate } from "./formatting";
 import { ROUTE_LINE_COLOURS } from "./RouteLines";
 import { clearBlockedCells, planRoute, rerouteAroundBlockedCells } from "./routingService";
@@ -165,30 +165,6 @@ function RouteOptionSegment({ option, plan }: { option: RouteOptionId; plan: Rou
 }
 
 
-// "?" toggle: the long explanations live behind it.
-function HelpToggle({ children }: { children: ReactNode }) {
-    const [isOpen, setIsOpen] = useState(false);
-    return (
-        <div>
-            <div className="flex items-center justify-between gap-2">
-                <span className={LABEL_CLASS}>Basis</span>
-                <button
-                    type="button"
-                    className="ariadne-tap min-w-12 border border-ariadne-border text-sm text-ariadne-muted hover:border-ariadne-accent"
-                    aria-label="Route types and basis: more info"
-                    aria-expanded={isOpen}
-                    onClick={() => setIsOpen(!isOpen)}
-                >
-                    ?
-                </button>
-            </div>
-            {isOpen && <div className="border-l border-ariadne-border pl-2 text-xs text-ariadne-muted">{children}</div>}
-        </div>
-    );
-}
-
-
-
 export function RoutePlannerPanel() {
     const processedData = useAriadneStore((state) => state.processedData);
     const routeStart = useAriadneStore((state) => state.routeStart);
@@ -278,7 +254,7 @@ export function RoutePlannerPanel() {
                 </div>
             )}
 
-            <HelpToggle>
+            <InfoHeadingRow title="Basis" label="Route types and basis">
                 {ROUTE_OPTION_ORDER.map((option) => (
                     <span key={option} className="block">
                         {ROUTE_OPTION_HELP[option]}
@@ -291,7 +267,7 @@ export function RoutePlannerPanel() {
                         <EstimateBadge />
                     </span>
                 )}
-            </HelpToggle>
+            </InfoHeadingRow>
         </div>
     );
 }

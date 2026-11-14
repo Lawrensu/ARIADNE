@@ -30,17 +30,22 @@ export interface HudTileProps {
 export function HudTile({ label, value, state, ariaLabel, isEstimate = false, detail, provenance }: HudTileProps) {
     const [isProvenanceOpen, setIsProvenanceOpen] = useState(false);
 
+    // The tile is a size container (@container): label and value scale with the tile's own width
+    // (cqi), not the window, so "+330 min" fits in each of the three tiles in the two-column desktop
+    // layout as well as in a full-width phone tile.
     const tileClasses =
-        "flex min-h-16 min-w-0 flex-col justify-between gap-1 border border-ariadne-border bg-ariadne-panel p-2 text-left";
+        "@container flex min-h-16 min-w-0 flex-col justify-between gap-1 border border-ariadne-border bg-ariadne-panel p-2 text-left";
     const tileContent = (
         <>
             <div className="flex min-w-0 items-center justify-between gap-1">
-                <span className="ariadne-display min-w-0 truncate text-xl leading-none text-ariadne-muted">{label}</span>
+                <span className="ariadne-display min-w-0 truncate text-[length:clamp(1rem,9cqi,1.25rem)] leading-none text-ariadne-muted">
+                    {label}
+                </span>
                 {isEstimate && <EstimateBadge />}
             </div>
 
             <div
-                className="ariadne-display ariadne-glow min-w-0 whitespace-nowrap text-[length:clamp(2.5rem,9vw,3.5rem)] leading-none text-ariadne-data"
+                className="ariadne-display ariadne-glow min-w-0 whitespace-nowrap text-[length:clamp(1.75rem,21cqi,3.5rem)] leading-none text-ariadne-data"
                 title={value}
             >
                 {value}

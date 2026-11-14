@@ -55,6 +55,9 @@ export interface WalkSlice {
     setWalkPhase: (phase: WalkPhase) => void;
     startWalk: (atSimSeconds: number, plan: SciencePlan) => void;
     setWalkDetour: (detour: WalkDetour | null) => void;
+    // Moves the frozen plan's start time (negative = earlier). Used to leave a Knot early once every
+    // task there is ticked off (sim/walkTimeline.ts earlyDepartureShiftSeconds); the trail is kept.
+    shiftWalkStart: (deltaSeconds: number) => void;
     setWalkTrail: (trail: LocalPosition[]) => void;
     resetWalk: () => void;
 }
@@ -89,6 +92,14 @@ export const createWalkSlice: StateCreator<AriadneState, [], [], WalkSlice> = (s
         }),
 
     setWalkDetour: (detour) => set({ walkDetour: detour }),
+
+    shiftWalkStart: (deltaSeconds) =>
+        set((state) => {
+            if (state.walkStartedAtSimSeconds === null) {
+                return {};
+            }
+            return { walkStartedAtSimSeconds: state.walkStartedAtSimSeconds + deltaSeconds };
+        }),
 
     setWalkTrail: (trail) => set({ walkTrail: trail }),
 

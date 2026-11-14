@@ -15,6 +15,7 @@
 //   alertsSlice.ts      active alerts (Stage 3)
 //   scenarioSlice.ts    scripted scenario run bookkeeping (Stage 3)
 //   cameraSlice.ts      center-on-me and zoom requests for the camera rig (redesign, D-031)
+//   inspectSlice.ts     tapped map point for the Here card, LAYERS popover open state
 //
 // Never rename or remove fields of the existing slices (deprecate-only, D-012).
 
@@ -28,6 +29,8 @@ import type { DataSlice } from "./dataSlice";
 import { createDataSlice } from "./dataSlice";
 import type { HudSlice } from "./hudSlice";
 import { createHudSlice } from "./hudSlice";
+import type { InspectSlice } from "./inspectSlice";
+import { createInspectSlice } from "./inspectSlice";
 import type { KnotsSlice } from "./knotsSlice";
 import { createKnotsSlice } from "./knotsSlice";
 import type { LayersSlice } from "./layersSlice";
@@ -64,7 +67,8 @@ export type AriadneState = DataSlice &
     KnotsSlice &
     AlertsSlice &
     ScenarioSlice &
-    CameraSlice;
+    CameraSlice &
+    InspectSlice;
 
 
 
@@ -83,4 +87,5 @@ export const useAriadneStore = create<AriadneState>()((...args) => ({
     ...createAlertsSlice(...args),
     ...createScenarioSlice(...args),
     ...createCameraSlice(...args),
+    ...createInspectSlice(...args),
 }));

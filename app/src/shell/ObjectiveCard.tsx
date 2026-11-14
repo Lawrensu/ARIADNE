@@ -8,7 +8,13 @@ import { useMemo, useState } from "react";
 
 import type { Knot, LocalPosition } from "../data/contracts";
 import type { ProcessedData } from "../data/loadProcessed";
-import { formatDistanceMetres, formatMinutesEstimate, selectNextKnot } from "../hud/hudMath";
+import {
+    formatCountdownMinutes,
+    formatDistanceMetres,
+    formatMinutesEstimate,
+    remainingDetourWalkSeconds,
+    selectNextKnot,
+} from "../hud/hudMath";
 import { carriedLoadKg, loadFactor, loadParametersFromMeta } from "../science/loadFactor";
 import { returnFieldSecondsAt } from "../science/sciencePlan";
 import type { SciencePlan } from "../state/scienceSlice";
@@ -75,8 +81,8 @@ function describeDetour(detour: WalkDetour, walkPhase: WalkPhase, simElapsedSeco
         return { objective_kind: "shelter", title, step_text: "ARRIVED", distance_text: "0 m", time_text: "0 min", tasks: [] };
     }
 
-    const elapsedOnDetour = simElapsedSeconds - detour.started_at_sim_seconds;
-    const remainingSeconds = Math.max(0, detour.walking_time_s - Math.max(0, elapsedOnDetour));
+    // Same countdown as the Suit HUD (hudMath), rounded up so it never reads "0 min" while walking.
+    const remainingSeconds = remainingDetourWalkSeconds(detour, simElapsedSeconds);
     let remainingFraction = 0;
     if (detour.walking_time_s > 0) {
         remainingFraction = remainingSeconds / detour.walking_time_s;
@@ -88,7 +94,7 @@ function describeDetour(detour: WalkDetour, walkPhase: WalkPhase, simElapsedSeco
         title,
         step_text: "REROUTE",
         distance_text: formatDistanceMetres(remainingMetres),
-        time_text: formatMinutesEstimate(remainingSeconds),
+        time_text: formatCountdownMinutes(remainingSeconds),
         tasks: [],
     };
 }

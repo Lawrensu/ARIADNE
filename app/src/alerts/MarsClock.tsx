@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 
 import type { EnvironmentTimeline } from "../data/contracts";
 import { EstimateBadge } from "../theme/EstimateBadge";
+import { InfoToggle } from "../theme/InfoToggle";
 import { ProvenanceButton } from "../theme/ProvenancePopover";
 import {
     MARS24_PROVENANCE,
@@ -76,7 +77,6 @@ function useUtcNowMilliseconds(): number {
 
 export function MarsClock({ simElapsedSeconds, environmentTimeline, eastLongitudeDeg, variant = "panel" }: MarsClockProps) {
     const nowMilliseconds = useUtcNowMilliseconds();
-    const [isHelpOpen, setIsHelpOpen] = useState(false);
     const replaySample = replaySampleAt(environmentTimeline, simElapsedSeconds);
     const replaySol = environmentTimeline.replay_source.sol;
     const nowHours = marsLocalMeanSolarTimeHours(new Date(nowMilliseconds), eastLongitudeDeg);
@@ -147,24 +147,13 @@ export function MarsClock({ simElapsedSeconds, environmentTimeline, eastLongitud
                         provenance={MARS24_PROVENANCE}
                         className="ariadne-display text-[length:var(--ariadne-text-hud)] leading-none text-ariadne-data"
                     />
-                    <button
-                        type="button"
-                        className="ariadne-tap ml-auto min-w-12 border border-ariadne-border text-sm text-ariadne-muted hover:border-ariadne-accent"
-                        aria-label="Mars clock: more info"
-                        aria-expanded={isHelpOpen}
-                        onClick={() => setIsHelpOpen(!isHelpOpen)}
-                    >
-                        ?
-                    </button>
-                </div>
-                {isHelpOpen && (
-                    <div className="border-l border-ariadne-border pl-2 text-xs text-ariadne-muted">
+                    <InfoToggle label="Mars clock" pushRight>
                         Replay: not live data
                         {replaySample !== null && <>, sample at {formatReplayElapsed(replaySample.seconds_since_replay_start)} of the replay</>}.
                         Now: Mars24 mean solar time at {longitudeText} (patch centre), UTC {formatUtcTime(nowMilliseconds)}. Mean
                         solar time only, not true solar time. <EstimateBadge />
-                    </div>
-                )}
+                    </InfoToggle>
+                </div>
             </div>
         </section>
     );

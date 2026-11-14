@@ -257,6 +257,84 @@ function planStateAt(timeline: WalkTimeline, simSeconds: number): WalkState {
 
 
 
+// End time of the stay at a Knot: the end of the last of the consecutive science_task segments at
+// knotId that contain simSeconds. Null when simSeconds is not inside a stay at that Knot.
+// Used to leave a Knot early once the crew has ticked off every task there.
+export function knotStayEndSeconds(timeline: WalkTimeline, knotId: string, simSeconds: number): number | null {
+    const segments = timeline.segments;
+    for (let index = 0; index < segments.length; index++) {
+        const segment = segments[index];
+        const isTaskAtKnot = segment.segment_kind === "science_task" && segment.knot_id === knotId;
+        if (!isTaskAtKnot) {
+            continue;
+        }
+        if (simSeconds < segment.start_s || simSeconds >= segment.end_s) {
+            continue;
+        }
+        // Inside this task: walk forward over the following tasks at the same Knot.
+        let stayEnd = segment.end_s;
+        let next = index + 1;
+        while (next < segments.length) {
+            const nextSegment = segments[next];
+            if (nextSegment.segment_kind !== "science_task") {
+                break;
+            }
+            if (nextSegment.knot_id !== knotId) {
+                break;
+            }
+            stayEnd = nextSegment.end_s;
+            next += 1;
+        }
+        return stayEnd;
+    }
+    return null;
+}
+
+
+
+// How many seconds of the current Knot stay to skip because the crew already ticked off every
+// planned task there (by hand, earlier than planned). The walk driver moves the walk start earlier by
+// this amount, so the astronaut leaves the Knot now and the rest of the plan keeps its planned
+// durations. 0 when the astronaut is not at a plan Knot, is on a detour, or a task is still open.
+// Without early ticks it is always 0, so the scripted demo stays exactly as planned.
+export function earlyDepartureShiftSeconds(
+    timeline: WalkTimeline | null,
+    detour: WalkDetour | null,
+    plan: SciencePlan | null,
+    completedTaskIds: string[],
+    stagingPoint: LocalPosition,
+    simSeconds: number,
+): number {
+    if (timeline === null || plan === null) {
+        return 0;
+    }
+    const walk = walkStateAt(timeline, detour, stagingPoint, simSeconds);
+    if (walk.is_on_detour || walk.phase !== "at_knot" || walk.knot_id === null) {
+        return 0;
+    }
+    const knotId = walk.knot_id;
+    const taskIdsAtKnot = plan.tasks.filter((task) => task.knot_id === knotId).map((task) => task.task_id);
+    if (taskIdsAtKnot.length === 0) {
+        return 0;
+    }
+    for (const taskId of taskIdsAtKnot) {
+        if (!completedTaskIds.includes(taskId)) {
+            return 0;
+        }
+    }
+    const stayEnd = knotStayEndSeconds(timeline, knotId, simSeconds);
+    if (stayEnd === null) {
+        return 0;
+    }
+    const remaining = stayEnd - simSeconds;
+    if (remaining > 0) {
+        return remaining;
+    }
+    return 0;
+}
+
+
+
 // Where the astronaut is at simSeconds. Without a timeline the astronaut waits at the rover. A detour
 // takes over from its start time.
 export function walkStateAt(

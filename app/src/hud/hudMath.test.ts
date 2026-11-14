@@ -8,7 +8,9 @@ import {
     bearingWord,
     computeHudNumbers,
     emptyHudNumbers,
+    formatCountdownMinutes,
     formatDistanceMetres,
+    remainingDetourWalkSeconds,
     formatDurationHm,
     formatMeasurement,
     formatMinutesEstimate,
@@ -380,5 +382,25 @@ describe("computeHudNumbers", () => {
         expect(numbers.threadMarginText).toBe("unknown");
         expect(numbers.o2Text).toBe("unknown");
         expect(numbers.threadState).toBe("no_go");
+    });
+});
+
+
+
+describe("shelter walk countdown (D-030 reroute)", () => {
+    const detour = { started_at_sim_seconds: 6760, walking_time_s: 1680 };
+
+    it("counts down from the routed walking time to 0 on arrival", () => {
+        expect(remainingDetourWalkSeconds(detour, 6760)).toBe(1680);
+        expect(remainingDetourWalkSeconds(detour, 6760 + 600)).toBe(1080);
+        expect(remainingDetourWalkSeconds(detour, 6760 + 1680)).toBe(0);
+        expect(remainingDetourWalkSeconds(detour, 6760 + 5000)).toBe(0);
+    });
+
+    it("rounds minutes up so it never reads 0 while still walking", () => {
+        expect(formatCountdownMinutes(1680)).toBe("28 min");
+        expect(formatCountdownMinutes(61)).toBe("2 min");
+        expect(formatCountdownMinutes(5)).toBe("1 min");
+        expect(formatCountdownMinutes(0)).toBe("0 min");
     });
 });

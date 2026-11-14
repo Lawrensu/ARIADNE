@@ -5,9 +5,14 @@
 //   3. taps Reset view and checks the framing returns;
 //   4. collects console errors.
 //
+//   5. (redesign, D-031) taps the zoom buttons and "Center on me" and checks the map reacts;
+//   6. runs the demo scenario twice at 300x, recording each milestone's simulated time, and checks
+//      the follow camera (follows, a drag pauses it, it resumes about 5 s later) during the first run.
+//
 // Usage: start the app first (`npm run dev`), then run `npm run browser-check` from app/.
-// Output: docs/images/stage3/{phone,tablet,desktop}.png and a JSON summary on stdout.
-// CHROME_PATH can override the Chrome executable, APP_URL the page URL.
+// Output: docs/images/stage3/redesign_{phone,tablet,desktop}.png and a JSON summary on stdout.
+// CHROME_PATH can override the Chrome executable, APP_URL the page URL, SCREENSHOT_PREFIX the file
+// name prefix ("redesign_" by default; the Stage 3 shell screenshots before D-031 had none).
 
 import { spawn } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
@@ -24,6 +29,8 @@ const OUTPUT_DIR = path.join(REPO_ROOT, "docs", "images", "stage3");
 const APP_URL = process.env.APP_URL ?? "http://localhost:5173/";
 const CHROME_PATH = process.env.CHROME_PATH ?? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 const DEBUG_PORT = 9333;
+const SCREENSHOT_PREFIX = process.env.SCREENSHOT_PREFIX ?? "redesign_";
+const ROVER_LABEL = "Rover (staging point)";
 
 const VIEWPORTS = [
     { name: "phone", width: 375, height: 812 },
@@ -220,9 +227,183 @@ function markerRectExpression() {
 
 
 
+// Screen rectangle of the marker label with this exact title (null when it is not on screen).
+function labelRectExpression(title) {
+    return `(() => {
+        const button = Array.from(document.querySelectorAll("button[title]")).find((candidate) => candidate.title === ${JSON.stringify(title)});
+        if (button === undefined) {
+            return null;
+        }
+        const rect = button.getBoundingClientRect();
+        return { title: button.title, x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+    })()`;
+}
+
+
+// Distance in screen pixels between two Knot labels: grows when the map zooms in.
+function knotSpacingExpression() {
+    return `(() => {
+        const first = Array.from(document.querySelectorAll("button[title]")).find((button) => button.title === "Boxwork first view");
+        const second = Array.from(document.querySelectorAll("button[title]")).find((button) => button.title === "Boxwork ridge");
+        if (first === undefined || second === undefined) {
+            return null;
+        }
+        const a = first.getBoundingClientRect();
+        const b = second.getBoundingClientRect();
+        return Math.hypot(a.x - b.x, a.y - b.y);
+    })()`;
+}
+
+
+function clickButtonExpression(accessibleName) {
+    return `(() => {
+        const button = Array.from(document.querySelectorAll("button")).find((candidate) => candidate.getAttribute("aria-label") === ${JSON.stringify(accessibleName)});
+        if (button === undefined) {
+            return false;
+        }
+        button.click();
+        return true;
+    })()`;
+}
+
+
+const DEMO_MATCH_TOLERANCE_SIM_SECONDS = 15;
+
+
+function timesMatch(first, second, toleranceSeconds) {
+    if (typeof first !== "number" || typeof second !== "number") {
+        return false;
+    }
+    return Math.abs(first - second) <= toleranceSeconds;
+}
+
+
+// Same milestones and the same tasks, each within the tolerance.
+function demoRunsMatch(first, second, toleranceSeconds) {
+    for (const key of ["walk_started", "storm_alert", "reroute", "sheltered"]) {
+        if (!timesMatch(first[key], second[key], toleranceSeconds)) {
+            return false;
+        }
+    }
+    const firstTasks = Object.keys(first.tasks).sort();
+    const secondTasks = Object.keys(second.tasks).sort();
+    if (JSON.stringify(firstTasks) !== JSON.stringify(secondTasks)) {
+        return false;
+    }
+    for (const taskId of firstTasks) {
+        if (!timesMatch(first.tasks[taskId], second.tasks[taskId], toleranceSeconds)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+// Starts the demo from the gear menu and records, through a store subscription, the exact simulated
+// time of each milestone (walk start, each task done, storm alert, reroute, sheltered) in
+// window.__demoEvents. The speed is raised to 300x once the scenario has set its own speed.
+function startDemoRecorderExpression() {
+    return `(async () => {
+        const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        const store = window.__ariadneStore;
+        const events = { tasks: {} };
+        window.__demoEvents = events;
+        const record = (state) => {
+            const sim = Math.round(state.simElapsedSeconds);
+            if (events.walk_started === undefined && state.walkStartedAtSimSeconds !== null) {
+                events.walk_started = sim;
+            }
+            for (const taskId of state.completedTaskIds) {
+                if (events.tasks[taskId] === undefined) {
+                    events.tasks[taskId] = sim;
+                }
+            }
+            if (events.storm_alert === undefined && state.alerts.some((alert) => alert.alert_type === "solar_particle_event_alert")) {
+                events.storm_alert = sim;
+            }
+            // The detour's own start time: the routed path arrives from the worker a little later (in
+            // real time), but the walk is timed from this start.
+            if (events.reroute === undefined && state.walkDetour !== null) {
+                events.reroute = Math.round(state.walkDetour.started_at_sim_seconds);
+            }
+            if (events.sheltered === undefined && state.walkPhase === "sheltering") {
+                events.sheltered = sim;
+            }
+        };
+        const buttons = () => Array.from(document.querySelectorAll("button"));
+        buttons().find((button) => button.getAttribute("aria-label") === "System menu").click();
+        await sleep(300);
+        buttons().find((button) => button.textContent.trim() === "Run demo scenario").click();
+        for (let attempt = 0; attempt < 100 && !store.getState().isSimPlaying; attempt++) {
+            await sleep(50);
+        }
+        store.subscribe(record);
+        store.getState().setSimSpeedMultiplier(300);
+        return true;
+    })()`;
+}
+
+
+async function saveScreenshot(cdp, fileName) {
+    const shot = await cdp.send("Page.captureScreenshot", { format: "png", fromSurface: true });
+    await writeFile(path.join(OUTPUT_DIR, `${SCREENSHOT_PREFIX}${fileName}`), Buffer.from(shot.data, "base64"));
+}
+
+
+// While the demo walks: the PLAN check step, the LAYERS popover with the Here card, and the 3D view
+// with the astronaut figure (zoomed in around the followed astronaut). Slows the clock meanwhile.
+async function captureWalkScreenshots(cdp, evaluate, waitFor) {
+    await waitFor(`window.__ariadneStore.getState().walkPhase === "walking"`, "the walk to start", 60000);
+    await evaluate(`window.__ariadneStore.getState().setSimSpeedMultiplier(10)`);
+
+    await evaluate(`window.__ariadneStore.getState().setActiveMode("plan")`);
+    await delay(900);
+    await saveScreenshot(cdp, "desktop_plan.png");
+    await evaluate(`window.__ariadneStore.getState().setActiveMode("map")`);
+
+    await evaluate(`window.__ariadneStore.getState().setLayersPopoverOpen(true)`);
+    await delay(900);
+    await saveScreenshot(cdp, "desktop_layers.png");
+    await evaluate(`window.__ariadneStore.getState().setLayersPopoverOpen(false)`);
+
+    await evaluate(`window.__ariadneStore.getState().setViewMode("labyrinth_view")`);
+    await delay(1200);
+    await evaluate(`(() => { const state = window.__ariadneStore.getState(); state.requestZoomStep(1); state.requestZoomStep(1); state.requestZoomStep(1); state.requestZoomStep(1); return true; })()`);
+    await delay(1500);
+    await saveScreenshot(cdp, "desktop_3d_astronaut.png");
+    await evaluate(`window.__ariadneStore.getState().setViewMode("planning_table")`);
+    await evaluate(`window.__ariadneStore.getState().setSimSpeedMultiplier(300)`);
+}
+
+
+// During a walk: the camera follows; a drag pauses it; it resumes about 5 s after the drag ends.
+async function followCheck(cdp, evaluate, waitFor) {
+    await waitFor(`window.__ariadneStore.getState().walkPhase === "walking" && window.__ariadneStore.getState().isFollowingAstronaut`, "the walk to start and the camera to follow", 60000);
+    // Slow the clock during the check so the walk is still going when following resumes.
+    await evaluate(`window.__ariadneStore.getState().setSimSpeedMultiplier(10)`);
+    const followingBeforeDrag = await evaluate(`window.__ariadneStore.getState().isFollowingAstronaut`);
+    await drag(cdp, 760, 330, 620, 250);
+    const pausedAfterDrag = await evaluate(`window.__ariadneStore.getState().followPausedByUser`);
+    await delay(2500);
+    const stillPausedAt2500Ms = await evaluate(`window.__ariadneStore.getState().followPausedByUser`);
+    await delay(4000);
+    const resumedAt6500Ms = await evaluate(`window.__ariadneStore.getState().isFollowingAstronaut`);
+    await evaluate(`window.__ariadneStore.getState().setSimSpeedMultiplier(300)`);
+    return {
+        followingBeforeDrag,
+        pausedAfterDrag,
+        stillPausedAt2500Ms,
+        resumedAt6500Ms,
+        passed: followingBeforeDrag === true && pausedAfterDrag === true && stillPausedAt2500Ms === true && resumedAt6500Ms === true,
+    };
+}
+
+
+
 function layoutExpression() {
     return `(() => {
-        const aside = document.querySelector('aside[aria-label="Controls"]');
+        const tabBar = document.querySelector('nav[aria-label="Modes"]');
+        const statusBar = document.querySelector('footer[aria-label="Status"]');
         const main = document.querySelector("main");
         const heading = document.querySelector(".ariadne-display");
         const bodyStyle = getComputedStyle(document.body);
@@ -230,7 +411,8 @@ function layoutExpression() {
             scrollWidth: document.documentElement.scrollWidth,
             innerWidth: window.innerWidth,
             innerHeight: window.innerHeight,
-            aside: aside === null ? null : aside.getBoundingClientRect().toJSON(),
+            tabBar: tabBar === null ? null : tabBar.getBoundingClientRect().toJSON(),
+            statusBar: statusBar === null ? null : statusBar.getBoundingClientRect().toJSON(),
             main: main === null ? null : main.getBoundingClientRect().toJSON(),
             displayFont: heading === null ? null : getComputedStyle(heading).fontFamily,
             bodyFont: bodyStyle.fontFamily,
@@ -317,7 +499,7 @@ async function main() {
             await waitForLoadedScene(evaluate, waitFor);
             const layout = await evaluate(layoutExpression());
             const screenshot = await cdp.send("Page.captureScreenshot", { format: "png", fromSurface: true });
-            await writeFile(path.join(OUTPUT_DIR, `${viewport.name}.png`), Buffer.from(screenshot.data, "base64"));
+            await writeFile(path.join(OUTPUT_DIR, `${SCREENSHOT_PREFIX}${viewport.name}.png`), Buffer.from(screenshot.data, "base64"));
             results.viewports.push({ ...viewport, layout });
         }
 
@@ -354,14 +536,7 @@ async function main() {
         await drag(cdp, 820, 480, 580, 220);
         const afterLeftUp = await evaluate(markerRectExpression());
 
-        await evaluate(`(() => {
-            const button = Array.from(document.querySelectorAll("button")).find((candidate) => candidate.textContent.trim().toLowerCase() === "reset view");
-            if (button === undefined) {
-                return false;
-            }
-            button.click();
-            return true;
-        })()`);
+        await evaluate(clickButtonExpression("Reset view"));
         await delay(600);
         const afterReset = await evaluate(markerRectExpression());
 
@@ -390,7 +565,56 @@ async function main() {
         };
 
         const panScreenshot = await cdp.send("Page.captureScreenshot", { format: "png", fromSurface: true });
-        await writeFile(path.join(OUTPUT_DIR, "desktop_after_panning_check.png"), Buffer.from(panScreenshot.data, "base64"));
+        await writeFile(path.join(OUTPUT_DIR, `${SCREENSHOT_PREFIX}desktop_after_panning_check.png`), Buffer.from(panScreenshot.data, "base64"));
+
+        // Control legend (D-031): zoom buttons change the spacing between two Knot labels, and
+        // "Center on me" brings the rover (the astronaut before a walk) to the middle of the map.
+        const spacingBefore = await evaluate(knotSpacingExpression());
+        await evaluate(clickButtonExpression("Zoom in"));
+        await delay(600);
+        const spacingAfterZoomIn = await evaluate(knotSpacingExpression());
+        await evaluate(clickButtonExpression("Zoom out"));
+        await delay(600);
+        const spacingAfterZoomOut = await evaluate(knotSpacingExpression());
+
+        await drag(cdp, 700, 400, 900, 250);
+        await evaluate(clickButtonExpression("Center on me"));
+        await delay(800);
+        const roverRect = await evaluate(labelRectExpression(ROVER_LABEL));
+        const mapRect = await evaluate(`document.querySelector("main").getBoundingClientRect().toJSON()`);
+        let roverOffsetFromCentre = null;
+        if (roverRect !== null) {
+            // The label sits just right of the marker glyph; its left edge is close to the marker.
+            roverOffsetFromCentre = {
+                dx: roverRect.x - (mapRect.x + mapRect.width / 2),
+                dy: roverRect.y + roverRect.height / 2 - (mapRect.y + mapRect.height / 2),
+            };
+        }
+
+        let controlsPassed = false;
+        if (spacingBefore !== null && spacingAfterZoomIn !== null && spacingAfterZoomOut !== null && roverOffsetFromCentre !== null) {
+            const zoomInGrew = spacingAfterZoomIn > spacingBefore * 1.3;
+            const zoomOutShrank = spacingAfterZoomOut < spacingAfterZoomIn / 1.3;
+            const roverCentred = Math.abs(roverOffsetFromCentre.dx) < 60 && Math.abs(roverOffsetFromCentre.dy) < 60;
+            controlsPassed = zoomInGrew && zoomOutShrank && roverCentred;
+        }
+        results.controls = { spacingBefore, spacingAfterZoomIn, spacingAfterZoomOut, roverOffsetFromCentre, passed: controlsPassed };
+
+        // Demo scenario twice (headless Chrome keeps animation frames running, unlike a hidden pane),
+        // with the follow camera checked during the first run.
+        results.demoRuns = [];
+        for (let run = 1; run <= 2; run++) {
+            await cdp.send("Page.navigate", { url: APP_URL });
+            await waitForLoadedScene(evaluate, waitFor);
+            await evaluate(startDemoRecorderExpression());
+            if (run === 1) {
+                results.follow = await followCheck(cdp, evaluate, waitFor);
+            } else {
+                await captureWalkScreenshots(cdp, evaluate, waitFor);
+            }
+            await waitFor(`window.__demoEvents.sheltered !== undefined`, "the demo to reach the shelter", 180000);
+            results.demoRuns.push(await evaluate(`window.__demoEvents`));
+        }
     } finally {
         if (cdp !== null) {
             cdp.close();
@@ -398,13 +622,28 @@ async function main() {
         chrome.kill();
     }
 
-    process.stdout.write(`${JSON.stringify(results, null, 2)}\n`);
-
     const noHorizontalScroll = results.viewports.every(
         (entry) => entry.layout.scrollWidth <= entry.layout.innerWidth,
     );
     const panningPassed = results.panning !== null && results.panning.passed;
-    if (noHorizontalScroll === false || panningPassed === false || results.consoleErrors.length > 0) {
+    const controlsPassed = results.controls !== undefined && results.controls.passed;
+    const followPassed = results.follow !== undefined && results.follow.passed;
+    // Both demo runs must reach the same milestones at the same simulated time. Each milestone is seen
+    // on the first frame after it happens; at 300x one frame is about 5 simulated seconds, hence the tolerance.
+    let demoRepeatable = false;
+    if (results.demoRuns !== undefined && results.demoRuns.length === 2) {
+        demoRepeatable = demoRunsMatch(results.demoRuns[0], results.demoRuns[1], DEMO_MATCH_TOLERANCE_SIM_SECONDS);
+    }
+    results.demoRepeatable = demoRepeatable;
+    process.stdout.write(`${JSON.stringify(results, null, 2)}\n`);
+    if (
+        noHorizontalScroll === false ||
+        panningPassed === false ||
+        controlsPassed === false ||
+        followPassed === false ||
+        demoRepeatable === false ||
+        results.consoleErrors.length > 0
+    ) {
         process.exitCode = 1;
     }
 }

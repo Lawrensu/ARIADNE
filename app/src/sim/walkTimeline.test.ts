@@ -15,7 +15,15 @@ import { nearestNeighbourOrder } from "../science/ui/planDisplay";
 import type { SciencePlan } from "../state/scienceSlice";
 import type { WalkDetour } from "../state/walkSlice";
 import { SOLAR_STORM_SCENARIO } from "./scenarioEngine";
-import { bearingBetween, buildWalkTimeline, pointAlongPath, tasksFinishedBetween, walkStateAt } from "./walkTimeline";
+import {
+    bearingBetween,
+    buildWalkTimeline,
+    earlyDepartureShiftSeconds,
+    knotStayEndSeconds,
+    pointAlongPath,
+    tasksFinishedBetween,
+    walkStateAt,
+} from "./walkTimeline";
 
 
 
@@ -184,6 +192,27 @@ describe("walk timeline (synthetic plan)", () => {
         expect(arrived.phase).toBe("sheltering");
         expect(arrived.position).toEqual({ x_m: 100, z_m: 40 });
         expect(tasksFinishedBetween(timeline, detour, 1000, 1300)).toEqual([]);
+    });
+
+    it("knows when the stay at a Knot ends", () => {
+        expect(knotStayEndSeconds(timeline, "knot_a", 1110)).toBe(1150);
+        expect(knotStayEndSeconds(timeline, "knot_a", 1050)).toBeNull();
+        expect(knotStayEndSeconds(timeline, "knot_b", 1110)).toBeNull();
+    });
+
+    it("leaves a Knot early once every task there is ticked off, never otherwise", () => {
+        const plan = makePlan();
+        // At 1110 s the astronaut is at knot_a with 40 s of task left.
+        expect(earlyDepartureShiftSeconds(timeline, null, plan, [], ROVER, 1110)).toBe(0);
+        expect(earlyDepartureShiftSeconds(timeline, null, plan, ["task_a"], ROVER, 1110)).toBe(40);
+        // Shifting the walk start 40 s earlier puts the astronaut on the walk back at 1110 s.
+        const shifted = buildWalkTimeline(plan, [KNOT_A], ROVER, 1000 - 40);
+        const afterShift = walkStateAt(shifted, null, ROVER, 1110);
+        expect(afterShift.phase).toBe("walking");
+        expect(afterShift.knot_id).toBeNull();
+        expect(afterShift.position).toEqual({ x_m: 100, z_m: 0 });
+        // Ticking off while still walking to the Knot does not skip the walk.
+        expect(earlyDepartureShiftSeconds(timeline, null, plan, ["task_a"], ROVER, 1050)).toBe(0);
     });
 });
 

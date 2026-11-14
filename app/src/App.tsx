@@ -16,6 +16,7 @@ import { planRoute } from "./planning/routingService";
 import { AstronautMarker } from "./scene/AstronautMarker";
 import type { SceneMarker } from "./scene/markers";
 import { MarswalkCanvas } from "./scene/MarswalkCanvas";
+import { recomputeSciencePlan } from "./science/sciencePlanService";
 import { SciencePlanLines } from "./science/ui/SciencePlanLines";
 import { useSimClockDriver } from "./sim/clock";
 import { useWalkAndScenarioDriver } from "./sim/walkDriver";
@@ -52,8 +53,32 @@ function ErrorScreen({ error }: { error: string }) {
 
 
 
-// Clicking a marker on the map: the first pick is the start, the next pick is the destination.
+// While the PLAN sheet is open, tapping a Knot on the map adds it to the science plan (step 1 PICK),
+// with all its tasks chosen, then recomputes the plan. Returns true when the tap was used.
+function addKnotToPlanFromMap(marker: SceneMarker): boolean {
+    const state = useAriadneStore.getState();
+    if (state.isSuitHudOpen || state.activeMode !== "plan") {
+        return false;
+    }
+    if (marker.marker_kind !== "knot" || state.processedData === null) {
+        return false;
+    }
+    const knot = state.processedData.knots.find((candidate) => candidate.knot_id === marker.marker_id);
+    if (knot === undefined) {
+        return false;
+    }
+    state.addSciencePlanStop(knot.knot_id, knot.science_tasks.map((task) => task.task_id));
+    void recomputeSciencePlan();
+    return true;
+}
+
+
+// Clicking a marker on the map: in PLAN a Knot joins the plan; otherwise the first pick is the start
+// of a route between two places and the next pick is the destination.
 function selectMarkerAsRouteEndpoint(marker: SceneMarker): void {
+    if (addKnotToPlanFromMap(marker)) {
+        return;
+    }
     const state = useAriadneStore.getState();
     if (state.processedData === null) {
         return;

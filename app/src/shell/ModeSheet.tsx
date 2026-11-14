@@ -15,6 +15,7 @@ import { RoutePlannerPanel } from "../planning/RoutePlannerPanel";
 import { GaleContextInset } from "../scene/GaleContextInset";
 import { SciencePlanPanel } from "../science/ui/SciencePlanPanel";
 import { useAriadneStore } from "../state/store";
+import { InfoToggle } from "../theme/InfoToggle";
 import { selectMode, useShownMode } from "./modes";
 
 
@@ -24,32 +25,16 @@ const CLOSE_DRAG_THRESHOLD_PX = 96;
 
 
 
-function HelpToggle({ text }: { text: string }) {
-    const [isOpen, setOpen] = useState(false);
-    return (
-        <>
-            <button
-                type="button"
-                className="flex h-12 w-12 shrink-0 items-center justify-center text-ariadne-dim hover:text-ariadne-accent"
-                aria-expanded={isOpen}
-                aria-label={isOpen ? "Hide help" : "Show help"}
-                onClick={() => setOpen(!isOpen)}
-            >
-                <span className="flex h-6 w-6 items-center justify-center border border-current text-xs">?</span>
-            </button>
-            {isOpen && <p className="basis-full pb-2 text-xs text-ariadne-muted">{text}</p>}
-        </>
-    );
-}
-
-
-
 function SheetSection({ title, help, children }: { title: string; help?: string; children: ReactNode }) {
     return (
         <section className="flex flex-col border-b border-ariadne-border px-3 pb-3 last:border-b-0">
             <div className="flex min-h-12 flex-wrap items-center justify-between">
                 <h2 className="text-xs uppercase tracking-widest text-ariadne-accent">{title}</h2>
-                {help !== undefined && <HelpToggle text={help} />}
+                {help !== undefined && (
+                    <InfoToggle label={title} buttonVariant="boxed_glyph">
+                        {help}
+                    </InfoToggle>
+                )}
             </div>
             {children}
         </section>

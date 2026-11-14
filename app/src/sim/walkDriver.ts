@@ -25,7 +25,7 @@ import type { WalkPhase } from "../state/walkSlice";
 import { dueEvents, SOLAR_STORM_SCENARIO } from "./scenarioEngine";
 import type { ScenarioEvent } from "./scenarioEngine";
 import type { WalkTimeline } from "./walkTimeline";
-import { buildWalkTimeline, tasksFinishedBetween, walkStateAt } from "./walkTimeline";
+import { buildWalkTimeline, earlyDepartureShiftSeconds, tasksFinishedBetween, walkStateAt } from "./walkTimeline";
 
 
 
@@ -258,11 +258,27 @@ function shelteredMessage(targetId: string, targetLabel: string): string {
 
 
 function runWalkStep(previousSimSeconds: number, simSeconds: number): void {
-    const state = useAriadneStore.getState();
+    let state = useAriadneStore.getState();
     const processedData = state.processedData;
     if (processedData === null) {
         return;
     }
+
+    // Every task at the current Knot already ticked off (by hand, before its planned end): skip the
+    // rest of the stay so the astronaut walks on now instead of standing still until the planned end.
+    const shiftSeconds = earlyDepartureShiftSeconds(
+        currentTimeline(state),
+        state.walkDetour,
+        state.walkPlanSnapshot,
+        state.completedTaskIds,
+        processedData.meta.staging_point,
+        simSeconds,
+    );
+    if (shiftSeconds > 0) {
+        state.shiftWalkStart(-shiftSeconds);
+        state = useAriadneStore.getState();
+    }
+
     const timeline = currentTimeline(state);
     const walk = walkStateAt(timeline, state.walkDetour, processedData.meta.staging_point, simSeconds);
 

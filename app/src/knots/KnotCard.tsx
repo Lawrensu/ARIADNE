@@ -4,12 +4,13 @@
 // Contract values are shown exactly; nothing is recomputed here. Square corners, 1 px phosphor frame,
 // dark backdrop, fits a 375 px phone.
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import type { Knot, KnotMeasurement, ScienceTask } from "../data/contracts";
 import { planRoute } from "../planning/routingService";
 import type { RouteEndpoint } from "../state/routeSlice";
 import { useAriadneStore } from "../state/store";
+import { InfoToggle } from "../theme/InfoToggle";
 import { ProvenanceButton } from "../theme/ProvenancePopover";
 import { localPhotoPath } from "./knotPhotos";
 
@@ -94,30 +95,6 @@ function ScienceTaskRow({ task }: { task: ScienceTask }) {
                 className="shrink-0 text-xs text-ariadne-muted"
             />
         </li>
-    );
-}
-
-
-// A "?" toggle for the one explanation the tasks need.
-function TaskHelp() {
-    const [isOpen, setIsOpen] = useState(false);
-    return (
-        <>
-            <button
-                type="button"
-                className="ariadne-tap min-w-12 border border-ariadne-border text-sm text-ariadne-muted hover:border-ariadne-accent"
-                aria-label="Tasks: more info"
-                aria-expanded={isOpen}
-                onClick={() => setIsOpen(!isOpen)}
-            >
-                ?
-            </button>
-            {isOpen && (
-                <p className="basis-full border-l border-ariadne-border pl-2 text-xs text-ariadne-dim">
-                    Done adds the sample mass to the carried load and slows the walk back (contracts.md 4.6, D-027).
-                </p>
-            )}
-        </>
     );
 }
 
@@ -235,7 +212,11 @@ export function KnotCardContent({ knot }: KnotCardContentProps) {
                     <section>
                         <div className="flex flex-wrap items-center justify-between gap-2">
                             <h3 className={LABEL_CLASS}>Tasks</h3>
-                            {knot.science_tasks.length > 0 && <TaskHelp />}
+                            {knot.science_tasks.length > 0 && (
+                                <InfoToggle label="Tasks">
+                                    Done adds the sample mass to the carried load and slows the walk back (contracts.md 4.6, D-027).
+                                </InfoToggle>
+                            )}
                         </div>
                         {knot.science_tasks.length === 0 && <p className="text-sm text-ariadne-muted">No tasks.</p>}
                         {knot.science_tasks.length > 0 && (

@@ -109,6 +109,34 @@ export function formatMinutesEstimate(totalSeconds: number): string {
 }
 
 
+// Seconds of the reroute walk still ahead (D-030: the detour is walked at constant speed in its
+// routed walking time from started_at_sim_seconds). Never negative; 0 once the target is reached.
+export function remainingDetourWalkSeconds(
+    detour: { started_at_sim_seconds: number; walking_time_s: number },
+    simElapsedSeconds: number,
+): number {
+    const walkedSeconds = simElapsedSeconds - detour.started_at_sim_seconds;
+    const remainingSeconds = detour.walking_time_s - walkedSeconds;
+    if (!Number.isFinite(remainingSeconds)) {
+        return 0;
+    }
+    if (remainingSeconds < 0) {
+        return 0;
+    }
+    return remainingSeconds;
+}
+
+
+// Countdown in whole minutes, rounded up so it never shows "0 min" while still walking:
+// "12 min", "1 min", then "0 min" on arrival.
+export function formatCountdownMinutes(remainingSeconds: number): string {
+    if (!Number.isFinite(remainingSeconds) || remainingSeconds <= 0) {
+        return "0 min";
+    }
+    return `${Math.ceil(remainingSeconds / 60)} min`;
+}
+
+
 // Signed whole minutes for the Thread margin: "+14 min", "-3 min", "0 min".
 // Truncation towards zero keeps the HUD from inventing a minute of margin or of deficit.
 export function formatSignedMinutes(totalSeconds: number): string {

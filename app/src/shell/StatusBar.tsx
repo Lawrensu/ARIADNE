@@ -21,7 +21,8 @@ import { HAZARD_STATE_LABELS, hazardStateColour, StateShape } from "../theme/Sta
 
 
 const SIM_MINUTE_SECONDS = 60;
-const CELL_CLASS = "flex min-w-0 items-center border-r border-ariadne-border px-2 last:border-r-0 lg:px-3";
+// Tighter padding on a phone so play, time, speed, O2 and Thread with their state words fit 375 px.
+const CELL_CLASS = "flex min-w-0 items-center border-r border-ariadne-border px-1.5 last:border-r-0 sm:px-2 lg:px-3";
 
 
 
@@ -61,20 +62,27 @@ interface ReadingProps {
     state: HudState;
     isEstimate: boolean;
     ariaLabel: string;
+    // "fill": takes the remaining width (the Thread, whose "+38 min CAUTION" is the longest text).
+    // "fit": only as wide as its content (O2), so the Thread keeps its state word on a 375 px phone.
+    widthRule: "fill" | "fit";
 }
 
 
 // Label on top and value below on narrow screens; one line from 1024 px.
-function Reading({ label, value, state, isEstimate, ariaLabel }: ReadingProps) {
+function Reading({ label, value, state, isEstimate, ariaLabel, widthRule }: ReadingProps) {
     const colour = hazardStateColour(state);
+    let widthClass = "flex-1 lg:flex-none";
+    if (widthRule === "fit") {
+        widthClass = "flex-none";
+    }
     return (
-        <div className={`${CELL_CLASS} flex-1 lg:flex-none`} role="group" aria-label={ariaLabel}>
+        <div className={`${CELL_CLASS} ${widthClass}`} role="group" aria-label={ariaLabel}>
             <div className="flex min-w-0 flex-col leading-tight lg:flex-row lg:items-center lg:gap-2">
                 <span className="truncate text-xs uppercase tracking-wider text-ariadne-dim">
                     {label}
                     {isEstimate && <span className="ml-1 normal-case tracking-normal">est.</span>}
                 </span>
-                <span className="flex min-w-0 items-center gap-1 whitespace-nowrap" style={{ color: colour }}>
+                <span className="flex min-w-0 items-center gap-0.5 whitespace-nowrap sm:gap-1" style={{ color: colour }}>
                     <span className="text-sm font-bold tabular-nums lg:text-base">{value}</span>
                     <StateShape state={state} sizePx={14} />
                     <span className="text-xs font-bold uppercase">{HAZARD_STATE_LABELS[state]}</span>
@@ -153,7 +161,7 @@ function ClockCell() {
             >
                 <PlayPauseIcon isPlaying={isSimPlaying} />
             </button>
-            <div className="flex flex-col justify-center px-2 leading-tight lg:flex-row lg:items-center lg:gap-2 lg:px-3">
+            <div className="flex flex-col justify-center px-1.5 leading-tight sm:px-2 lg:flex-row lg:items-center lg:gap-2 lg:px-3">
                 <span className="text-xs uppercase tracking-wider text-ariadne-dim">Sim</span>
                 <span className="whitespace-nowrap text-sm tabular-nums text-ariadne-text lg:text-base">
                     T+{formatDurationHm(simElapsedSeconds)}
@@ -161,7 +169,8 @@ function ClockCell() {
             </div>
             <button
                 type="button"
-                className="hidden h-full min-w-14 items-center justify-center border-l border-ariadne-border px-2 text-sm tabular-nums text-ariadne-text hover:bg-ariadne-panel-raised md:flex"
+                // Shown at every width: it is the only speed control in the redesign (the 300x demo needs it on a phone too).
+                className="flex h-full min-w-12 items-center justify-center border-l border-ariadne-border px-1 text-sm tabular-nums text-ariadne-text hover:bg-ariadne-panel-raised md:min-w-14 md:px-2"
                 aria-label={`Simulation speed ${simSpeedMultiplier} times. Tap for the next speed.`}
                 onClick={() => setSimSpeedMultiplier(nextSimSpeed(simSpeedMultiplier))}
             >
@@ -220,6 +229,7 @@ function SuitReadings() {
                 state={o2State}
                 isEstimate
                 ariaLabel={`O2 left, est.: ${o2Text} hours and minutes, ${HAZARD_STATE_LABELS[o2State]}`}
+                widthRule="fit"
             />
             <Reading
                 label="Thread"
@@ -227,6 +237,7 @@ function SuitReadings() {
                 state={threadState}
                 isEstimate
                 ariaLabel={`Thread margin, est.: ${threadText}, ${HAZARD_STATE_LABELS[threadState]}`}
+                widthRule="fill"
             />
         </>
     );
