@@ -197,6 +197,7 @@ BUILD, inside app/ only, adding your own Zustand slices in separate files (never
 2. Provenance: tap any number to see dataset, product ID, resolution, timestamp, uncertainty and an "est." badge.
 3. Alerts: what happened, action, distance and time, one-tap [ROUTE] to the nearest shelter using Malissa's router. An alert without an action is a bug.
 4. Knot cards: copy the photos from knots.json URLs into app/public/knots/ once, with credits; show science text and measurements.
+4b. Science plan (D-027, contracts.md 4.6): show the science budget on the Suit HUD (one tap away), let the crew check off science_tasks at each Knot, add each task's sample_mass_kg to the carried load so the Thread and walking times update, and warn with an action ("drop task X to keep the walk back safe") when the margin gets tight.
 5. Simulation: extend app/src/sim/ to replay environment_timeline.json ("replaying REMS sol 4760") and run app/src/sim/scenario.json (contracts.md 3.15). Build the solar storm from the real curve in data/reference/spe_profile_sol4190.json and say in the UI that weather and storm come from different dates. The scenario must run identically twice.
 6. Mars local time and sun position with the Mars24 algorithm in TypeScript, with tests.
 7. CRT look: scanlines, ochre/rust monochrome, pixel font (e.g. VT323), slight curvature, all reducible; ARIADNE's own identity, never a Pip-Boy copy. Propose the exact palette to Letta and record it in docs/decisions.md as proposed.
