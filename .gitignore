@@ -21,6 +21,8 @@ dist/
 Thumbs.db
 .idea/
 .vscode/
+# Local agent tool settings (for example Claude Code's .claude/launch.json preview config)
+.claude/
 
 
 # QGIS temporary files

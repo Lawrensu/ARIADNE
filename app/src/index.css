@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+/* Placeholder theme tokens. Letta (Stage 3) proposes the final ochre/rust palette and CRT look. */
+@theme {
+    --color-ariadne-background: #120c08;
+    --color-ariadne-panel: #1f150e;
+    --color-ariadne-border: #5a3a22;
+    --color-ariadne-text: #f2d3a8;
+    --color-ariadne-muted: #b08a62;
+    --color-ariadne-accent: #e0892f;
+    --color-ariadne-no-go: #c0392b;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+    margin: 0;
+    background: var(--color-ariadne-background);
+    color: var(--color-ariadne-text);
+    font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+}
