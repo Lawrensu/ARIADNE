@@ -1,6 +1,6 @@
 # ARIADNE hand-off board
 
-Current stage: Stage 2 (with the science plan, contract v1.1.0) built on `dev-malissa` (gate evidence below); waiting for Lawrence to merge into `dev`, run the integration check and sign off, then Stage 3 (Letta) starts
+Current stage: Stage 3 (Letta), started 2026-11-14. Stages 0, 1 and 2 signed off by Lawrence.
 
 Last updated: 2026-11-14
 
@@ -16,17 +16,17 @@ This is the live status board. The main agent of the stage owner updates it when
    - Signed off by: Lawrence, 2026-11-14
 2. Stage 1: data and algorithms pipeline
    - Owner: Lawrence (Part A)
-   - Status: Finished
+   - Status: Done, in `dev`
    - Gate passed: Yes
-   - Signed off by: Lawrence
+   - Signed off by: Lawrence, 2026-11-14
 3. Stage 2: app shell, Labyrinth view, Planning Table, routing, Thread, science plan
    - Owner: Malissa (Part B)
-   - Status: Built and verified on `dev-malissa` (including the science plan, D-027); waiting for merge into `dev` and sign-off
-   - Gate passed: No
-   - Signed off by: none yet
+   - Status: Done, in `dev` (merge `3102b72`, Theta* and D-028 on top in `84e438f`)
+   - Gate passed: Yes
+   - Signed off by: Lawrence, 2026-11-14
 4. Stage 3: Suit HUD, alerts, Knot cards, simulation, CRT polish, demo
    - Owner: Letta (Part C)
-   - Status: Not started
+   - Status: In progress
    - Gate passed: No
    - Signed off by: none yet
 
@@ -61,7 +61,7 @@ This is the live status board. The main agent of the stage owner updates it when
 - [x] `data/processed/` committed on `dev-lawrence` (D-022), and Person B can pull it.
 - [x] Log entry written in `docs/log/person_a.md`.
 - [x] `dev-lawrence` merged into `dev`; integration check passed on `dev` (validator 46 of 46, 63 tests, binaries stored as binary).
-- [ ] Human sign-off.
+- [x] Human sign-off: Lawrence, 2026-11-14.
 
 
 ## Stage 2 gate (Person B to Person C)
@@ -78,8 +78,8 @@ Evidence re-verified on 2026-11-14 after merging contract v1.1.0 and adding the 
 - [x] The Thread draws and shrinks with simulation time and scales with the carried load (contracts.md 4.6: return_field x load_factor against planned time minus elapsed minus reserve). Test: with 30 min left the area is 2.08, 1.91, 1.84 and 1.66 km² for 0, 10, 14 and 25 kg (`app/src/thread/threadLoad.test.ts`). On screen at 5 h elapsed: est. 1.9 km² with 10 kg, 1.8 km² with 14 kg; at v1.0.0 it shrank from 3.0 km² to nothing as time ran out.
 - [x] Data payload is within the budget: production build is 19.19 MB gzip (31.50 MB raw); the budget counts gzip (D-028).
 - [x] Log entry written in `docs/log/person_b.md`.
-- [ ] Person B's branch pushed, merged into `dev` by Lawrence; integration check passed.
-- [ ] Human sign-off.
+- [x] Person B's branch pushed, merged into `dev` by Lawrence; integration check passed (validator 47 of 47, pipeline 68, app 133 tests, typecheck, build, 19.19 MB gzip, browser check, no console errors).
+- [x] Human sign-off: Lawrence, 2026-11-14.
 
 
 ## Stage 3 gate (Person C to demo)
@@ -87,6 +87,9 @@ Evidence re-verified on 2026-11-14 after merging contract v1.1.0 and adding the 
 - [ ] The Suit HUD shows at most 3 numbers at once, and the science budget is reachable in one tap.
 - [ ] Tasks can be checked off at a Knot; samples taken add to the carried load and the Thread updates.
 - [ ] Every number has provenance.
+- [ ] Responsive (D-029): usable with no horizontal scroll at 375 px (phone), 768 px (tablet) and 1280 px or wider (desktop); screenshots of all three.
+- [ ] Easy to navigate (D-029): clear sections, one main action per panel, a reset-view button; the Planning Table pans up, down, left and right when zoomed in.
+- [ ] Fonts self-hosted (D-029): bundled with the app (no font CDN at run time), at most 2 families, readable at arm's length.
 - [ ] Alerts come with actions.
 - [ ] The scenario runs end-to-end, identically twice.
 - [ ] Demo recorded.
@@ -177,7 +180,7 @@ Stage 2 notes for Lawrence and his agents (merge, integration, pipeline):
    - contracts.md 4.6 rule 4: read literally ("margin below the next task plus its walk back"), the walk back is counted twice, because the margin already subtracts the walk back from the current position. The app implements: drop the next task when time left is less than the walk to the next Knot with the current load plus the task plus the walk back from there with its sample (`checkNextTaskDuringWalk`). Consider a decisions.md entry that clarifies the wording.
    - The Thread now follows contracts.md 4.6 (planned 6 h minus elapsed minus 30 min reserve) instead of the 8 h suit used before v1.1.0. system_design.md (Design rationale 1, Algorithms 4) says "remaining consumable time"; it could name the planned time explicitly so nobody reads it as the 8 h suit.
    - system_design.md lists Theta* for any-angle smoothing; it is not built (routes follow 8-connected cell centres). Either keep it as stretch or remove it from the design.
-   - The Stage 1 gate box "Human sign-off" is still unticked although the Stages list says Stage 1 was signed off.
+   - Resolved 2026-11-14: Stage 1 and Stage 2 signed off by Lawrence.
 3. What the app expects from the pipeline (changes here break the app or its tests)
    - The app reads grids by `layer_id` in `meta.json` layers[]: `heightmap`, `slope_degrees`, `traversal_penalty`, `return_field`, `sky_view_factor`, `thermal_inertia`, `mineralogy_class`, `viewshed_rover`. Byte sizes are checked against `grid.width` x `grid.height`. Renaming any of these breaks loading.
    - The loader accepts `contract_version` 1.x only; a 2.0.0 is rejected with a clear error until the app is updated.
@@ -201,9 +204,8 @@ Lawrence's integration changes on top of Stage 2 (2026-11-14, D-028):
 
 ## Next steps
 
-1. Malissa: notify Lawrence that `dev-malissa` is pushed (done when this note is read).
-2. Lawrence: merge `dev-malissa` into `dev`, run the integration check (validator, pipeline tests, then the app checks in "Stage 2 notes for Lawrence and his agents"), decide the payload measure and the open points listed there, tick the last Stage 2 boxes and sign off.
-3. Letta: after Stage 2 is in `dev`, update `dev-letta` from `dev`, then paste the Stage 3 prompt below.
+1. Letta: write the design inspiration into the Stage 3 prompt below, update `dev-letta` from `dev`, then paste the prompt into her agent (opencode).
+2. Lawrence: when Letta pushes, merge `dev-letta` into `dev`, run the integration check from her commit message and hand-off notes, then merge `dev` into `main` for the demo.
 
 
 ## Kickoff prompts
@@ -245,29 +247,47 @@ DONE WHEN every box in the Stage 2 gate in docs/handoff.md is ticked with eviden
 
 ### Stage 3 prompt (Letta)
 
-Use after Stage 2 is merged into `dev`.
+Use after Stage 2 is in `dev` (done, 2026-11-14). Fill in the "DESIGN INSPIRATION" block first, then paste the whole prompt into opencode (any model, for example DeepSeek). Attach inspiration images in the chat, or save them in `docs/images/inspo/` and list the file names.
 
 ```
-You are Letta's main coding agent on ARIADNE (NASA Space Apps 2026, "Interplanetary Survival Guide: Martian Map"). Letta is Person C and owns Stage 3. You are the orchestrator: plan, delegate parallel parts to smaller sub-agents with full briefs, integrate and verify.
+You are Letta's main coding agent on ARIADNE (NASA Space Apps 2026, challenge "Interplanetary Survival Guide: Martian Map"). Letta is Person C and owns Stage 3: everything the astronaut sees, and the demo. You are the orchestrator: make a plan, do shared work yourself, hand independent parts to sub-agents (opencode subagents, for example the general agent through the task tool) with a full brief each, then review and test their work. Work in small steps and run the checks after each step.
 
-READ FIRST, in order, and follow strictly: AGENTS.md (all), docs/handoff.md (Stage 2 to Stage 3 hand-off notes, Stage 3 gate), docs/contracts.md (3.12 knots, 3.14 environment timeline, 3.15 scenario), docs/system_design.md (UX design principles: your main spec; App and Simulation sections), docs/development_conventions.md, README.md (problem, Getting started, Space Apps submission), docs/log/person_c.md, and Malissa's code in app/.
+=== DESIGN INSPIRATION (written by Letta) ===
+Mood in three words: <...>
+References (links, or files in docs/images/inspo/), and what I like in each:
+- <reference 1>: <what to take from it>
+- <reference 2>: <what to take from it>
+- <reference 3>: <what to take from it>
+Colours I want: <...>
+Fonts I like or want to try: <...>
+HUD elements I want to see: <...>
+What to avoid: <...>
+=== END OF DESIGN INSPIRATION ===
 
-BEFORE CODING: confirm you are on dev-letta, fetch, merge origin/dev into it, and check the app runs and its tests pass. If Stage 2 is not in dev, stop and tell Letta.
+Treat the design inspiration as the visual direction. Take mood, colour, typography and layout ideas from it, but ARIADNE keeps its own identity: never copy another product's or game's logo, name, icons or exact layout (for example Fallout's Pip-Boy or Iron Lung). Before building the UI, write a one-page design proposal from the inspiration (palette with hex values and contrast ratios, two fonts, a layout sketch for phone, tablet and desktop, the HUD elements) and show it to Letta. Build only after she approves.
 
-BUILD, inside app/ only, adding your own Zustand slices in separate files (never change Malissa's store shape):
-1. Suit HUD: compass bar, next Knot, at most 3 numbers (distance to next Knot, Thread margin, O2), go / caution / no-go with shape and text, glove-sized targets; everything else on tap.
-2. Provenance: tap any number to see dataset, product ID, resolution, timestamp, uncertainty and an "est." badge.
-3. Alerts: what happened, action, distance and time, one-tap [ROUTE] to the nearest shelter using Malissa's router. An alert without an action is a bug.
-4. Knot cards: copy the photos from knots.json URLs into app/public/knots/ once, with credits; show science text and measurements.
-4b. Science plan (D-027, contracts.md 4.6): show the science budget on the Suit HUD (one tap away), let the crew check off science_tasks at each Knot, add each task's sample_mass_kg to the carried load so the Thread and walking times update, and warn with an action ("drop task X to keep the walk back safe") when the margin gets tight.
-5. Simulation: extend app/src/sim/ to replay environment_timeline.json ("replaying REMS sol 4760") and run app/src/sim/scenario.json (contracts.md 3.15). Build the solar storm from the real curve in data/reference/spe_profile_sol4190.json and say in the UI that weather and storm come from different dates. The scenario must run identically twice.
-6. Mars local time and sun position with the Mars24 algorithm in TypeScript, with tests.
-7. CRT look: scanlines, ochre/rust monochrome, pixel font (e.g. VT323), slight curvature, all reducible; ARIADNE's own identity, never a Pip-Boy copy. Propose the exact palette to Letta and record it in docs/decisions.md as proposed.
-8. Demo: a scripted walk from the rover to a Knot with the storm alert and reroute; help Letta record it and use README's problem section for the pitch.
+STEP 0, read and set up.
+1. Read in this order and follow strictly: AGENTS.md (all), docs/handoff.md (Stage 3 gate, "Stage 2 to Stage 3" notes, "Stage 2 notes for Lawrence", Lawrence's integration changes), docs/decisions.md D-027, D-028 and D-029, docs/contracts.md (3.12 knots, 3.14 environment timeline, 3.15 scenario, 4.6 load factor and science plan), docs/system_design.md (UX design principles is your main spec; App, Algorithms, Simulation), docs/development_conventions.md, README.md (problem, Getting started, Space Apps submission), docs/log/person_c.md.
+2. Git: confirm you are on dev-letta, then git fetch and merge origin/dev into dev-letta. If dev does not contain Stage 2 (app/ exists with the science plan), stop and tell Letta.
+3. From app/: npm ci, npm test (expect 133 passing), npm run typecheck, npm run build. If anything fails before you change code, stop and tell Letta.
 
-Delegate in parallel where folders do not overlap (for example HUD, Knot cards, Mars24, scenario engine), review and test every result.
+STEP 1, the shared work you do yourself.
+1. Fix navigation: in app/src/scene/CameraRig.tsx add screenSpacePanning to the MapControls of the Planning Table so dragging works up, down, left and right when zoomed in; add a "Reset view" button for both views.
+2. Fonts: self-host them with the build (for example npm packages from @fontsource, imported in main.tsx), at most two families: one display font with a console or terminal feel (headings, HUD numbers), one very readable monospace (text, data). No Google Fonts or any font CDN at run time. Keep a monospace fallback.
+3. Theme tokens: one file of CSS variables for the approved palette, font sizes and spacing, used everywhere. Colours must keep WCAG AA contrast (4.5:1) on the dark background, and go / caution / no-go must also differ by shape and text.
+4. Responsive layout: phone 375 px, tablet 768 px, desktop 1280 px and wider, no horizontal scroll. On narrow screens the side panel becomes a drawer or bottom sheet and the map stays full size. Group the controls into clear sections or tabs (Plan, Route, Layers, Time) with one main action each. Keep Malissa's store shape; add your own slices as new files in app/src/state/.
 
-COMMIT MESSAGE: when the gate passes, draft the commit message and show it to Letta before committing. Format: a subject line "feat(app): Stage 3 <short summary>", then sections "What changed", "How it was verified" (exact commands and results), "Stage 3 gate" (each box and its evidence), "Known issues and limits", "Demo and pitch status", "Notes for Lawrence (merge and integration check)". No Co-Authored-By or agent attribution lines.
+STEP 2, delegate in parallel (each sub-agent owns only its folder; never two on the same file):
+A. Suit HUD (app/src/hud/): compass bar, next Knot, at most 3 numbers (distance to next Knot, Thread margin, O2), go / caution / no-go with shape and text, glove-sized targets (64 px), science budget one tap away; uses computeThreadInfo and the sciencePlan in the store (see the Stage 2 to Stage 3 notes).
+B. Knot cards and provenance (app/src/knots/): copy the photos from knots.json URLs into app/public/knots/ once with a small script and show credits; science text, measurements, science_tasks with check-off (setTaskCompleted adds the sample mass to the carried load, and the Thread updates by itself); tap any number to see dataset, product ID, resolution, timestamp, uncertainty and an "est." badge.
+C. Simulation and scenario (app/src/sim/): replay environment_timeline.json on the existing clock (show "replaying REMS sol 4760"); app/src/sim/scenario.json exactly as contracts.md 3.15; the solar storm from the real curve in data/reference/spe_profile_sol4190.json, with the UI saying the weather sol and the storm come from different dates; the scenario must run identically twice.
+D. Alerts and Mars time (app/src/alerts/ and a Mars24 module with tests): every alert has what happened, the action, distance and time, and a one-tap [ROUTE] to the nearest shelter through planRoute in app/src/planning/routingService.ts; the "drop task X to keep the walk back safe" warning from checkNextTaskDuringWalk; Mars local time and sun position with the Mars24 algorithm in TypeScript.
 
-DONE WHEN every box in the Stage 3 gate in docs/handoff.md is ticked with evidence, you appended an entry to docs/log/person_c.md, Letta approved the drafted commit message, you committed on dev-letta and pushed, and told Letta to notify Lawrence. Never merge into dev or main yourself; Lawrence merges. Ask Letta before anything irreversible.
+STEP 3, finish yourself: the CRT look (scanlines, slight curvature, grain, all reducible with one toggle and off by default if they hurt legibility), wire everything into App, then a scripted demo: rover to a Knot, tasks checked off, the solar storm alert, the reroute to shelter, the Thread shrinking.
+
+STEP 4, verify the whole Stage 3 gate in docs/handoff.md with evidence: npm test all green, npm run typecheck clean, npm run build works, npm run payload within budget (gzip), the browser check at 375, 768 and 1280 px (screenshots in docs/images/stage3/), panning works in every direction, no console errors, the scenario runs the same twice. Tick each box with its evidence. Append an entry to docs/log/person_c.md. Write Stage 3 hand-off notes for Lawrence in docs/handoff.md (how to run the demo, expected numbers).
+
+STEP 5, commit for review. Draft the commit message and show it to Letta: subject "feat(app): Stage 3 <short summary>", then sections "What changed", "How it was verified" (exact commands and results), "Stage 3 gate" (each box and its evidence), "Design" (the approved palette and fonts, and how the inspiration was used), "Known issues and limits", "Demo and pitch status", "Notes for Lawrence (merge and integration check)". No Co-Authored-By or agent attribution lines. After Letta approves: commit, push dev-letta, and tell Letta to notify Lawrence. Never merge into dev or main; Lawrence merges and checks. Ask Letta before anything irreversible.
+
+RULES: follow AGENTS.md: readable code, descriptive string constants, provenance and "est." on every number, local grid only, stay in app/ (plus the docs files named above), never change docs/contracts.md or docs/decisions.md without proposing first and asking Letta. Do not change pipeline outputs in data/processed/. Keep every existing test passing; do not change the numbers of routing, the Thread or the science plan.
 ```

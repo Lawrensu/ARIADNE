@@ -267,7 +267,9 @@ A retro CRT terminal HUD, inspired by the genre: scanlines, monochrome ochre/rus
 
 ARIADNE has its own identity. Do not copy the look, name or iconography of Fallout's Pip-Boy.
 
-Person C proposes the exact palette values; the whole team approves. Font and effect strengths are TBD (Person C). Effects must not reduce legibility; keep a way to reduce or disable scanlines and curvature.
+Person C proposes the exact palette values; the whole team approves. Letta sets the visual direction from her own design inspiration (D-029). Effects must not reduce legibility; keep a way to reduce or disable scanlines and curvature.
+
+Fonts (D-029): self-hosted with the build (for example `@fontsource` packages), at most two families: one display font with a console or terminal feel for headings and HUD numbers, one highly readable monospace for text and data. No font CDN at run time.
 
 
 ### Provenance pattern
@@ -295,6 +297,8 @@ Example: "Solar storm: shelter at Knot B, 340 m, 6 min. [ROUTE]". An alert witho
 - Text and key icons keep strong contrast against the dark CRT background; aim for WCAG AA (4.5:1) or better (minimum TBD, Person C).
 - CRT effects (scanlines, curvature, flicker) must not obscure text; make them reducible.
 - Plain, short wording; state units and uncertainty explicitly.
+- Responsive (D-029): phone 375 px, tablet 768 px, desktop 1280 px and wider, no horizontal scroll; on narrow screens the side panel becomes a drawer or bottom sheet.
+- Navigation (D-029): grouped sections, one main action per panel, a reset-view button; the Planning Table pans in every direction.
 
 
 ## Simulation and "real-time"
