@@ -48,7 +48,8 @@ Pitch opener: every Mars map today is made for scientists studying a planet. Nob
 - **Suit HUD:** the minimal in-suit display: compass bar, next Knot, Thread margin, O2, alerts. At most about 3 numbers at once.
 - **Labyrinth view:** the 3D terrain view of the Marswalk site.
 - **The Thread:** the safe-return ring. The boundary of everywhere the astronaut can reach and still walk back to the staging point with the remaining consumables minus a reserve. It shrinks as they walk.
-- **Knots:** science waypoints along the route, with real Curiosity photos and science notes.
+- **Knots:** science waypoints along the route, with real Curiosity photos, science notes and the tasks to do there (imaging, samples, measurements).
+- **Science plan:** choose the Knots and tasks, see the walking time with the load carried, and a science budget that says what fits before the crew must turn back.
 - **Route planning with rerouting:** fast and safe route options, and fast replanning when a hazard changes.
 - **Conditions panel:** local time, sun position and time to sunset, weather, radiation dose budget.
 - **Actionable alerts:** every alert comes with an action, for example "Solar storm: shelter at Knot B, 340 m, 6 min. [ROUTE]".
@@ -200,13 +201,13 @@ Tagline:
 
 > ARIADNE: the Marswalk map with a thread that always leads the astronaut home.
 
-Project summary (171 words; the form suggests 50 to 200):
+Project summary (197 words; the form suggests 50 to 200):
 
-> Imagine the first astronaut walking on Mars. Oxygen is limited, the ground is steep and broken, and a solar storm can strike without warning. Yet every Mars map today was made for scientists studying a whole planet, not for one explorer asking: where can I safely go, and can I still get home?
+> Imagine the first astronauts walking on Mars. They are there for science, collecting samples and carrying tools in stiff spacesuits, with limited oxygen, steep broken ground and solar storms that strike without warning. Yet every Mars map today was made for planetary scientists, not for an explorer asking: where can I safely go, how much science can I do, and can I still get home?
 >
-> So we built ARIADNE, named after the myth of the thread that led Theseus out of the labyrinth. Our pipeline fuses real NASA data (HiRISE terrain and imagery, Curiosity weather, radiation and photos, CRISM minerals, THEMIS thermal inertia) into one map of a 2 km Marswalk in Gale Crater. On it we are building a habitat planning table, a 3D view and a simple suit display. ARIADNE marks no-go ground, plans routes with a walking model tied to Apollo suit speeds, and draws The Thread: the line beyond which the crew could no longer walk back to their rover. It shrinks as they walk.
+> We built ARIADNE, named after the thread that led Theseus out of the labyrinth. Our pipeline fuses real NASA data (HiRISE terrain, Curiosity weather, radiation and photos, CRISM minerals, THEMIS thermal inertia) into one map of a 2 km Marswalk in Gale Crater. On it we are building a planning table, a 3D view and a suit display. ARIADNE routes the crew through science stops, like Curiosity's sulfur stones and boxwork ridges, each with its sampling task, while avoiding steep ground and large rocks. Walking times account for the suit and the load carried. The Thread marks how far the crew can go and still walk back to their rover, so they always know their remaining science time.
 >
-> Exploration succeeds only if explorers come back. ARIADNE shows that answer at every step.
+> Exploration succeeds only when explorers return with discoveries. ARIADNE balances both at every step.
 
 Update "we are building" to "we built" once Stages 2 and 3 are merged.
 

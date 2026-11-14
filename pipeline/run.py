@@ -43,7 +43,7 @@ ORTHO_SOURCE = "HiRISE orthoimage"
 
 
 def main():
-    failures = walking.check_test_vectors()
+    failures = walking.check_test_vectors() + walking.check_load_factor_vectors()
     if failures:
         raise SystemExit("Walking test vectors fail: " + "; ".join(failures))
     settings.PROCESSED_DIR.mkdir(parents=True, exist_ok=True)

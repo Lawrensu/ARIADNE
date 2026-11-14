@@ -130,6 +130,8 @@ def build_meta(export_grid, staging_x_m, staging_z_m, texture_size, sun, layers,
             "suit_capability_hours": settings.SUIT_CAPABILITY_HOURS,
             "planned_marswalk_hours": settings.PLANNED_MARSWALK_HOURS,
             "reserve_minutes": settings.RESERVE_MINUTES,
+            "base_carried_load_kg": settings.BASE_CARRIED_LOAD_KG,
+            "load_time_factor_per_kg": settings.LOAD_TIME_FACTOR_PER_KG,
         },
     }
     if regional_context is not None:

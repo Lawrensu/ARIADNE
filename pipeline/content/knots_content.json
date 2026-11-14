@@ -55,6 +55,35 @@
         "unit": "note",
         "source_url": "https://www.jpl.nasa.gov/news/nasas-curiosity-rover-discovers-a-surprise-in-a-martian-rock/"
       }
+    ],
+    "science_tasks": [
+      {
+        "task_id": "task_sulfur_imaging",
+        "label": "Image the sulfur stone field",
+        "task_type": "imaging",
+        "duration_minutes": 12,
+        "sample_mass_kg": 0,
+        "equipment": [
+          "camera",
+          "scale bar"
+        ],
+        "basis_url": "https://ntrs.nasa.gov/api/citations/20200001774/downloads/20200001774.pdf",
+        "basis_note": "Estimate: panorama plus close-ups with a hand camera, kept short because Apollo 17 EVA 2 time was dominated by sampling and traverse, not photography."
+      },
+      {
+        "task_id": "task_sulfur_collect_fragments",
+        "label": "Collect loose sulfur stone fragments",
+        "task_type": "surface_sample",
+        "duration_minutes": 20,
+        "sample_mass_kg": 0.4,
+        "equipment": [
+          "tongs",
+          "scoop",
+          "sample bag"
+        ],
+        "basis_url": "https://an.rsl.wustl.edu/apollo/data/A16/pages/time/time.html",
+        "basis_note": "Apollo 16 sampling intervals at single stops ran about 6 to 7 minutes per documented sample; 20 minutes allows a few photographed and bagged fragments."
+      }
     ]
   },
   {
@@ -106,6 +135,35 @@
         "value": 43,
         "unit": "m",
         "source_url": "https://science.nasa.gov/blog/sols-4384-4385-leaving-the-bishop-quad/"
+      }
+    ],
+    "science_tasks": [
+      {
+        "task_id": "task_channel_vein_chip",
+        "label": "Chip a light coloured vein",
+        "task_type": "rock_chip_sample",
+        "duration_minutes": 25,
+        "sample_mass_kg": 1.0,
+        "equipment": [
+          "geology hammer",
+          "tongs",
+          "sample bag"
+        ],
+        "basis_url": "https://an.rsl.wustl.edu/apollo/data/A16/pages/time/time.html",
+        "basis_note": "Estimate from Apollo 16 stations that took 23 to 85 minutes in total, with a hammer chip fitting inside the shorter ones."
+      },
+      {
+        "task_id": "task_channel_imaging",
+        "label": "Image the fractured bedrock",
+        "task_type": "imaging",
+        "duration_minutes": 12,
+        "sample_mass_kg": 0,
+        "equipment": [
+          "camera",
+          "scale bar"
+        ],
+        "basis_url": "https://ntrs.nasa.gov/api/citations/20200001774/downloads/20200001774.pdf",
+        "basis_note": "Estimate: documentation photos before and after sampling, a small share of a station like the Apollo 17 EVA 2 science stops."
       }
     ]
   },
@@ -171,6 +229,34 @@
         "unit": "m",
         "source_url": "https://science.nasa.gov/blog/sols-4527-4528-boxwork-ahoy/"
       }
+    ],
+    "science_tasks": [
+      {
+        "task_id": "task_firstview_panorama",
+        "label": "Panorama of the boxwork",
+        "task_type": "imaging",
+        "duration_minutes": 20,
+        "sample_mass_kg": 0,
+        "equipment": [
+          "camera",
+          "tripod"
+        ],
+        "basis_url": "https://science.nasa.gov/blog/sols-4527-4528-boxwork-ahoy/",
+        "basis_note": "The Curiosity team took a 76 frame stereo Mastcam mosaic of the boxwork here; a suited crew would need a comparable, shorter pass (estimate)."
+      },
+      {
+        "task_id": "task_firstview_brushed_bedrock",
+        "label": "Brush bedrock and measure its chemistry",
+        "task_type": "in_situ_measurement",
+        "duration_minutes": 15,
+        "sample_mass_kg": 0,
+        "equipment": [
+          "brush",
+          "handheld XRF"
+        ],
+        "basis_url": "https://science.nasa.gov/blog/sols-4527-4528-boxwork-ahoy/",
+        "basis_note": "Curiosity brushed and analysed the bedrock target Tamarack Valley at this stop; handheld XRF reads in about 60 s (see XRF paper), so 15 minutes covers brushing plus a few points (estimate)."
+      }
     ]
   },
   {
@@ -235,6 +321,34 @@
         "unit": "target",
         "source_url": "https://science.nasa.gov/blog/curiosity-blog-sols-4604-4606-taking-a-deep-breath-of-martian-air/"
       }
+    ],
+    "science_tasks": [
+      {
+        "task_id": "task_ridge_rock_chip",
+        "label": "Chip clay-bearing ridge rock",
+        "task_type": "rock_chip_sample",
+        "duration_minutes": 25,
+        "sample_mass_kg": 1.2,
+        "equipment": [
+          "geology hammer",
+          "tongs",
+          "sample bag"
+        ],
+        "basis_url": "https://an.rsl.wustl.edu/apollo/data/A16/pages/time/time.html",
+        "basis_note": "Estimate from Apollo 16 stations that took 23 to 85 minutes in total, with a hammer chip fitting inside the shorter ones."
+      },
+      {
+        "task_id": "task_ridge_xrf_scan",
+        "label": "Handheld XRF on ridge and veins",
+        "task_type": "in_situ_measurement",
+        "duration_minutes": 10,
+        "sample_mass_kg": 0,
+        "equipment": [
+          "handheld XRF"
+        ],
+        "basis_url": "https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/20120001846.pdf",
+        "basis_note": "A NASA paper puts handheld XRF at about 60 seconds per reading; 10 minutes allows several readings plus positioning."
+      }
     ]
   },
   {
@@ -278,6 +392,34 @@
         "value": "pea-sized",
         "unit": "note",
         "source_url": "https://www.nasa.gov/missions/mars-science-laboratory/curiosity-rover/NASAs-curiosity-rover-sees-martian-spiderwebs-up-close/"
+      }
+    ],
+    "science_tasks": [
+      {
+        "task_id": "task_hollow_soil_nodules",
+        "label": "Scoop soil and pea-sized nodules",
+        "task_type": "soil_sample",
+        "duration_minutes": 20,
+        "sample_mass_kg": 0.8,
+        "equipment": [
+          "scoop",
+          "sample bag"
+        ],
+        "basis_url": "https://an.rsl.wustl.edu/apollo/data/A16/pages/time/time.html",
+        "basis_note": "Apollo 16 sampling intervals at single stops ran about 6 to 7 minutes per sample; 20 minutes allows documentation plus a scoop and nodule pick (estimate)."
+      },
+      {
+        "task_id": "task_hollow_short_core",
+        "label": "Optional short core of hollow soil",
+        "task_type": "core_sample",
+        "duration_minutes": 15,
+        "sample_mass_kg": 0.6,
+        "equipment": [
+          "drive tube",
+          "hammer"
+        ],
+        "basis_url": "https://lsc.apolloinrealtime.org/general/drive_tubes/drive_tubes/",
+        "basis_note": "Apollo drive tubes needed 9 to 70 hammer blows and held about 0.4 to 1 kg each; 15 minutes is an estimate for one short tube."
       }
     ]
   }
