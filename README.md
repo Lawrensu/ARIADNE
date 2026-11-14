@@ -156,7 +156,55 @@ Add `-q` for short output. pytest is configured in `pipeline/pyproject.toml`. No
 
 ### App setup
 
-App setup: added by Malissa in Stage 2.
+Install Node.js 20 or newer (24 LTS recommended) from https://nodejs.org/ then go to the app folder:
+
+```bash
+cd app
+```
+
+Install the exact pinned dependencies (creates `app/node_modules`):
+
+```bash
+npm ci
+```
+
+Run every later command from `app/`. Each of `dev`, `build` and `test` first copies the files the app reads from `data/processed/` into `app/public/data/` (git-ignored), so pull `dev` first to get the data.
+
+Start the app with hot reload at http://localhost:5173:
+
+```bash
+npm run dev
+```
+
+Run the tests (walking-time vectors, routing, the Knot-to-rover cross-check on the real data, layers, the Thread, the clock):
+
+```bash
+npm test
+```
+
+Type-check without building:
+
+```bash
+npm run typecheck
+```
+
+Build the static site into `app/dist/` and print its size (raw and gzip) against the ~30 MB budget:
+
+```bash
+npm run build
+```
+
+```bash
+npm run payload
+```
+
+Serve the production build locally to check it:
+
+```bash
+npm run preview
+```
+
+`roughness_m.bin` is not copied into the app: it is not displayed and leaving it out keeps the payload inside the budget. To ship another processed file, add it to `app/scripts/copyProcessedData.mjs`.
 
 
 ### Troubleshooting
@@ -166,6 +214,8 @@ App setup: added by Malissa in Stage 2.
 - `run.py` stops early with a missing file error: a raw input is not at the exact path listed in "Raw data". A HiRISE file that is too small means the download dropped; resume it with `curl -C -`.
 - The regional (Gale) step fails or hangs: it needs internet to read the USGS mosaic. Check your connection and run again.
 - The validator prints many `FAIL ... missing file` lines: `data/processed/` is empty or partial. Run the pipeline, or `git pull` to get the committed files.
+- `copy-data: ... meta.json not found` when starting the app: `data/processed/` is missing. Pull `dev` to get it.
+- The app shows "Could not load the Marswalk data": run `npm run copy-data` from `app/` and reload the page.
 
 
 ## Team and workflow

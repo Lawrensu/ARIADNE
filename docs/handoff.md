@@ -1,6 +1,6 @@
 # ARIADNE hand-off board
 
-Current stage: Stage 1 merged into `dev`; waiting for Lawrence's sign-off, then Stage 2 (Malissa) starts
+Current stage: Stage 2 built on `dev-malissa` (gate evidence below); waiting for Lawrence to merge into `dev`, run the integration check and sign off, then Stage 3 (Letta) starts
 
 Last updated: 2026-11-14
 
@@ -21,7 +21,7 @@ This is the live status board. The main agent of the stage owner updates it when
    - Signed off by: Lawrence
 3. Stage 2: app shell, Labyrinth view, Planning Table, routing, Thread
    - Owner: Malissa (Part B)
-   - Status: Not started
+   - Status: Built and verified on `dev-malissa`; waiting for merge into `dev` and sign-off
    - Gate passed: No
    - Signed off by: none yet
 4. Stage 3: Suit HUD, alerts, Knot cards, simulation, CRT polish, demo
@@ -66,15 +66,15 @@ This is the live status board. The main agent of the stage owner updates it when
 
 ## Stage 2 gate (Person B to Person C)
 
-- [ ] The app loads the real data with no console errors.
-- [ ] Terrain matches the texture.
-- [ ] Layer toggles work.
-- [ ] A route computes between Knots.
-- [ ] Walking-time test vectors pass in TypeScript.
-- [ ] Cross-check: the TypeScript route time from each Knot to the rover matches `return_field.bin` at that Knot within 1%.
-- [ ] The Thread draws and shrinks with simulation time.
-- [ ] Data payload is within the budget.
-- [ ] Log entry written in `docs/log/person_b.md`.
+- [x] The app loads the real data with no console errors (production build via `npm run preview`, 2026-11-14: console empty after loading, routing, rerouting, all 7 layer toggles and both views).
+- [x] Terrain matches the texture (Planning Table screenshot matches `docs/images/stage1_overlay_check.png`: no-go stripes sit on the scarps of the photo, rover upper middle, Knots on Curiosity's stops).
+- [x] Layer toggles work (no-go, slope, sky view, thermal inertia, minerals, rover radio view, rocks; each with legend, source, product ID and "est." badge from `meta.json` layers[]).
+- [x] A route computes between Knots (in the browser through the routing Web Worker, for example rover to Boxwork hollow: fast est. 35 min over 1.3 km, safe est. 36 min over 1.4 km; D* Lite reroute around a blocked passage).
+- [x] Walking-time test vectors pass in TypeScript (`npm test`: all 8 rows of contracts.md 4.5 within 1e-3 s).
+- [x] Cross-check: the TypeScript route time from each Knot to the rover matches `return_field.bin` at that Knot within 1% (largest relative difference 5.6e-6, `app/src/routing/realData.test.ts`).
+- [x] The Thread draws and shrinks with simulation time (area inside it est. 3.0 km² at 0 h, 0.8 km² at 7 h 14 min, gone at 8 h; screenshots in the browser).
+- [ ] Data payload is within the budget: production build is 31.5 MB raw and 19.2 MB gzip (`npm run payload`). Within budget as transferred; about 5% over 30 MB raw. Malissa to confirm which measure counts (Stage 0 box "Person B confirms the performance budget").
+- [x] Log entry written in `docs/log/person_b.md`.
 - [ ] Person B's branch pushed, merged into `dev` by Lawrence; integration check passed.
 - [ ] Human sign-off.
 
@@ -99,6 +99,11 @@ This is the live status board. The main agent of the stage owner updates it when
 3. Rocks are shadow-based estimates (4,269 kept at confidence 0.6 or more). Some may be terrain edges; none of Curiosity's 203 stops falls on a rock-blocked cell.
 4. The Gale regional image's patch rectangle is only about 20 × 19 px; draw a marker so it is visible.
 5. Environment estimates: UV level (our thresholds), dust tau 0.5 (unsourced), dose equivalent via Q = 3.05. All flagged `is_estimate` in provenance.
+6. App payload: 31.5 MB raw, 19.2 MB gzip. `roughness_m.bin` is not shipped to the app (not displayed). Needs Malissa's confirmation that gzip transfer size is the budget measure.
+7. The Thread at the start of a walk: 7 h 30 min of suit time minus reserve covers every reachable cell (the farthest is about 1 h away), so the Thread equals the edge of the reachable area until about 6.5 h have passed. It visibly shrinks only late in the walk or at high clock speed (1200x).
+8. The "safe" route uses estimated weights (slope squared, penalty, comms dead zones; `app/src/routing/routingGrid.ts`). On short routes it is often close to "fast" (for example 969 s vs 956 s).
+9. Theta* any-angle smoothing (system_design.md, Algorithms 2) is not built; routes follow 8-connected cell centres.
+10. Dev server only: after many hot reloads Vite can re-optimise dependencies and leave React unresponsive until a full page reload. Not seen in the production build.
 
 
 ## Hand-off notes from the previous stage
@@ -128,12 +133,29 @@ Stage 1 to Stage 2 (Lawrence to Malissa):
 - Contract changes during the stage: none after v1.0.0 sign-off.
 - Where the data lives: `data/processed/` on `dev-lawrence` (committed, D-022). Overlay preview: `docs/images/stage1_overlay_check.png`.
 
+Stage 2 to Stage 3 (Malissa to Letta):
+- From stage: Stage 2, app shell, Planning Table, Labyrinth view, layers, routing, the Thread.
+- Date: 2026-11-14.
+- What is done: the React + Vite + TypeScript + R3F app in `app/` loads the real data, draws the textured terrain in the Planning Table (orthographic, north up) and the Labyrinth view (perspective, orbit), the Gale Crater inset with the patch marker, markers for Knots, rover and shelters, 7 toggleable layers with legends and provenance, fast and safe routes between the rover and any Knot (A* in a Web Worker, D* Lite reroute), the Thread (d3-contour of `return_field` in a Web Worker) and a minimal simulation clock. 77 Vitest tests pass; tsc clean; production build works.
+- What is not done or only partly done: Theta* smoothing; final palette and CRT look (placeholders in `app/src/index.css` and the per-folder colour constants); Suit HUD, alerts, Knot cards, scenario, environment replay, Mars24 (all Stage 3).
+- Things to know:
+  - Run from `app/`: `npm ci`, `npm run dev`, `npm test`, `npm run build`, `npm run payload` (README "App setup"). `dev`, `build` and `test` copy `data/processed/` into `app/public/data/` first.
+  - Store: `app/src/state/store.ts` (D-024). Add your slices as separate files following the EXTENSION POINT comment there; never rename existing fields.
+  - Routing for alerts: `planRoute(start, end)` and `rerouteAroundBlockedCells(currentPosition, cellIndices)` in `app/src/planning/routingService.ts` update the store (`routePlans`, `routeStatus`). `RouteEndpoint` and `RoutePlan` are in `app/src/state/routeSlice.ts`; shelters can be passed with `endpoint_kind: "shelter"`.
+  - Clock: `app/src/sim/clock.ts` (`useSimClockDriver`, `computeConsumablesState`, `SIM_SPEED_PRESETS`) and `app/src/sim/SimClockControls.tsx`. The store fields are in `app/src/state/simSlice.ts`. Extend `sim/` with the scenario engine and the replay; keep `simElapsedSeconds` as the single clock.
+  - The Thread threshold is suit time left minus the 30 minute reserve (D-020, `meta.json` parameters); `computeThreadInfo` in `app/src/thread/threadInfo.ts` gives the threshold, area and provenance line for the HUD's "Thread margin".
+  - Drawing on the terrain: use `useTerrain()` and `<DrapedOverlay>` from `app/src/terrain/TerrainContext.tsx` and `sampleTerrainSceneY` from `app/src/terrain/terrainFrame.ts`. Never use lat/lon in the app.
+  - Marker labels use drei `<Html>` (no network font). The marker label overlay sits above the canvas, so give HUD panels `z-50` or higher.
+  - The clock uses `requestAnimationFrame`, so it pauses in a hidden browser tab (expected).
+- Contract changes during the stage: none.
+- Where the data or build lives: `app/` on `dev-malissa`; the build goes to `app/dist/` (git-ignored).
+
 
 ## Next steps
 
-1. Lawrence: sign off Stage 1 (tick the last Stage 1 gate box).
-2. Malissa: update `dev-malissa` from `dev`, then paste the Stage 2 prompt below into her agent.
-3. Letta: non-code prep for Stage 3 (scenario timeline, palette proposal, which Knot photos to show) until the Stage 2 gate passes; then paste the Stage 3 prompt below.
+1. Malissa: confirm the payload measure (known issue 6), then notify Lawrence that `dev-malissa` is pushed.
+2. Lawrence: merge `dev-malissa` into `dev`, run the integration check (validator, pipeline tests, `npm ci`, `npm test`, `npm run build`, `npm run payload`, browser check), tick the last Stage 2 boxes and sign off.
+3. Letta: after Stage 2 is in `dev`, update `dev-letta` from `dev`, then paste the Stage 3 prompt below.
 
 
 ## Kickoff prompts

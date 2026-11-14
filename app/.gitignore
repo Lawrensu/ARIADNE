@@ -1,0 +1,6 @@
+# Copy of data/processed/ made by scripts/copyProcessedData.mjs before dev, build and test
+public/data/
+
+node_modules/
+dist/
+*.tsbuildinfo
