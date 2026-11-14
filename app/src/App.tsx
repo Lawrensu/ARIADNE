@@ -14,6 +14,8 @@ import { planRoute } from "./planning/routingService";
 import { GaleContextInset } from "./scene/GaleContextInset";
 import type { SceneMarker } from "./scene/markers";
 import { MarswalkCanvas } from "./scene/MarswalkCanvas";
+import { SciencePlanLines } from "./science/ui/SciencePlanLines";
+import { SciencePlanPanel } from "./science/ui/SciencePlanPanel";
 import { useSimClockDriver } from "./sim/clock";
 import { SimClockControls } from "./sim/SimClockControls";
 import type { RouteEndpoint } from "./state/routeSlice";
@@ -105,14 +107,15 @@ function ViewSwitch() {
 function ThreadSummary() {
     const processedData = useAriadneStore((state) => state.processedData);
     const simElapsedSeconds = useAriadneStore((state) => state.simElapsedSeconds);
+    const completedTaskIds = useAriadneStore((state) => state.completedTaskIds);
     const refreshKey = Math.floor(simElapsedSeconds / THREAD_AREA_REFRESH_SECONDS);
 
     const threadInfo = useMemo(() => {
         if (processedData === null) {
             return null;
         }
-        return computeThreadInfo(processedData, refreshKey * THREAD_AREA_REFRESH_SECONDS);
-    }, [processedData, refreshKey]);
+        return computeThreadInfo(processedData, refreshKey * THREAD_AREA_REFRESH_SECONDS, completedTaskIds);
+    }, [processedData, refreshKey, completedTaskIds]);
 
     if (threadInfo === null) {
         return null;
@@ -125,7 +128,8 @@ function ThreadSummary() {
                 <span>The Thread: you can still walk back to the rover from inside it.</span>
             </div>
             <div className="text-ariadne-muted">
-                Area inside the Thread: est. {areaKm2.toFixed(1)} km² (updated each simulated minute).
+                Area inside the Thread: est. {areaKm2.toFixed(1)} km² with est. {threadInfo.carried_load_kg.toFixed(1)} kg carried
+                (walking x{threadInfo.load_factor.toFixed(2)}), updated each simulated minute.
             </div>
             <div className="text-xs text-ariadne-muted">{threadInfo.provenance}</div>
         </div>
@@ -197,7 +201,10 @@ function MainView() {
                 <PanelSection title="View">
                     <ViewSwitch />
                 </PanelSection>
-                <PanelSection title="Route">
+                <PanelSection title="Science plan">
+                    <SciencePlanPanel />
+                </PanelSection>
+                <PanelSection title="Route between two places">
                     <RoutePlannerPanel />
                 </PanelSection>
                 <PanelSection title="Simulation clock and the Thread">
@@ -212,9 +219,11 @@ function MainView() {
                     <RockMarkers />
                     <BlockedCellsOverlay />
                     <ThreadLine />
+                    <SciencePlanLines />
                     <RouteLines />
                 </MarswalkCanvas>
-                <div className="absolute bottom-3 right-3 z-50">
+                {/* The inset is about 260 px wide: on narrow screens it would cover the map, so it is hidden there. */}
+                <div className="absolute bottom-3 right-3 z-50 hidden xl:block">
                     <GaleContextInset />
                 </div>
             </main>

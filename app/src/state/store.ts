@@ -6,6 +6,7 @@
 //   layersSlice.ts  overlay toggles and opacity
 //   routeSlice.ts   route endpoints, fast and safe route plans, blocked cells
 //   simSlice.ts     simulation clock state
+//   scienceSlice.ts science plan stops and result, completed tasks (carried load, D-027)
 //
 // EXTENSION POINT for Stage 3 (Letta):
 //   1. Create src/state/<name>Slice.ts exporting `interface <Name>Slice` and
@@ -22,6 +23,8 @@ import type { LayersSlice } from "./layersSlice";
 import { createLayersSlice } from "./layersSlice";
 import type { RouteSlice } from "./routeSlice";
 import { createRouteSlice } from "./routeSlice";
+import type { ScienceSlice } from "./scienceSlice";
+import { createScienceSlice } from "./scienceSlice";
 import type { SimSlice } from "./simSlice";
 import { createSimSlice } from "./simSlice";
 import type { ViewSlice } from "./viewSlice";
@@ -29,7 +32,7 @@ import { createViewSlice } from "./viewSlice";
 
 
 
-export type AriadneState = DataSlice & ViewSlice & LayersSlice & RouteSlice & SimSlice;
+export type AriadneState = DataSlice & ViewSlice & LayersSlice & RouteSlice & SimSlice & ScienceSlice;
 // Stage 3 slices are added here, for example: & HudSlice & AlertsSlice
 
 
@@ -40,5 +43,6 @@ export const useAriadneStore = create<AriadneState>()((...args) => ({
     ...createLayersSlice(...args),
     ...createRouteSlice(...args),
     ...createSimSlice(...args),
+    ...createScienceSlice(...args),
     // Stage 3 slices are added here, for example: ...createHudSlice(...args),
 }));

@@ -49,8 +49,12 @@ export interface ConsumablesState {
     elapsed_s: number;
     suit_remaining_s: number;
     planned_remaining_s: number;
-    // Seconds of walking home the Thread allows: suit remaining minus the reserve, never below 0.
+    // Time left for the Thread, contracts.md 4.6 rule 4 (D-027): planned Marswalk time minus elapsed time
+    // minus the reserve, never below 0. CHANGED from v1.0.0 (suit remaining minus reserve). The Thread
+    // compares return_field x load_factor against this value. Field name kept (deprecate-only habit).
     thread_threshold_s: number;
+    // Same value as thread_threshold_s under a clearer name: planned walk time left.
+    planned_time_left_s: number;
     // Model-derived (D-020), so always shown as "est.".
     is_estimate: true;
 }
@@ -87,6 +91,9 @@ export function computeConsumablesState(
     const reserveSeconds = used.reserve_minutes * SECONDS_PER_MINUTE;
     const suitRemainingSeconds = Math.max(0, suitCapabilitySeconds - elapsedSeconds);
     const plannedRemainingSeconds = Math.max(0, plannedSeconds - elapsedSeconds);
+    // contracts.md 4.6 rule 4: time left = planned time - elapsed - reserve (floored at 0).
+    // suit_remaining_s (8 h suit) stays for the O2 readout; the clock may still run to suit capability.
+    const plannedTimeLeftSeconds = Math.max(0, plannedSeconds - elapsedSeconds - reserveSeconds);
     return {
         suit_capability_s: suitCapabilitySeconds,
         planned_marswalk_s: plannedSeconds,
@@ -94,7 +101,8 @@ export function computeConsumablesState(
         elapsed_s: elapsedSeconds,
         suit_remaining_s: suitRemainingSeconds,
         planned_remaining_s: plannedRemainingSeconds,
-        thread_threshold_s: Math.max(0, suitRemainingSeconds - reserveSeconds),
+        thread_threshold_s: plannedTimeLeftSeconds,
+        planned_time_left_s: plannedTimeLeftSeconds,
         is_estimate: true,
     };
 }

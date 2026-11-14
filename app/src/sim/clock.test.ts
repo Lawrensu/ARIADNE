@@ -23,24 +23,32 @@ describe("advanceSimElapsedSeconds", () => {
 
 
 describe("computeConsumablesState", () => {
-    it("at 0 s: full suit, threshold is capability minus reserve", () => {
+    it("at 0 s: full suit, threshold is planned time minus reserve (contracts.md 4.6)", () => {
         const state = computeConsumablesState(0, DEFAULT_CONSUMABLE_PARAMETERS);
         expect(state.suit_remaining_s).toBe(8 * 3600);
         expect(state.planned_remaining_s).toBe(6 * 3600);
         expect(state.reserve_s).toBe(1800);
-        expect(state.thread_threshold_s).toBe(8 * 3600 - 1800);
+        expect(state.thread_threshold_s).toBe(19800);
+        expect(state.planned_time_left_s).toBe(19800);
         expect(state.is_estimate).toBe(true);
     });
 
-    it("at 7 h: one hour left, half an hour of Thread, planned time used up", () => {
+    it("at 5 h 30 min: planned time minus reserve is used up, Thread time left is 0", () => {
+        const state = computeConsumablesState(5.5 * 3600, DEFAULT_CONSUMABLE_PARAMETERS);
+        expect(state.suit_remaining_s).toBe(2.5 * 3600);
+        expect(state.thread_threshold_s).toBe(0);
+        expect(state.planned_remaining_s).toBe(1800);
+    });
+
+    it("at 7 h: one hour of O2 left, Thread time left stays 0, planned time used up", () => {
         const state = computeConsumablesState(7 * 3600, DEFAULT_CONSUMABLE_PARAMETERS);
         expect(state.suit_remaining_s).toBe(3600);
-        expect(state.thread_threshold_s).toBe(1800);
+        expect(state.thread_threshold_s).toBe(0);
         expect(state.planned_remaining_s).toBe(0);
     });
 
     it("never goes negative past the reserve, and falls back to D-020 without parameters", () => {
-        const state = computeConsumablesState(7.8 * 3600, undefined);
+        const state = computeConsumablesState(5.8 * 3600, undefined);
         expect(state.thread_threshold_s).toBe(0);
         expect(state.suit_capability_s).toBe(8 * 3600);
     });

@@ -9,12 +9,14 @@ import { Line } from "@react-three/drei";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { LocalPosition } from "../data/contracts";
+import { carriedLoadKg, loadFactor, loadParametersFromMeta } from "../science/loadFactor";
 import { computeConsumablesState } from "../sim/clock";
 import { useAriadneStore } from "../state/store";
 import { sampleTerrainSceneY } from "../terrain/terrainFrame";
 import { useTerrain } from "../terrain/TerrainContext";
 import {
     chooseThresholdQuantumSeconds,
+    effectiveReturnFieldThresholdSeconds,
     largestFiniteReturnSeconds,
     quantiseThresholdSeconds,
     THREAD_THRESHOLD_QUANTUM_SECONDS,
@@ -103,6 +105,8 @@ export function ThreadLine() {
     const isSimPlaying = useAriadneStore((state) => state.isSimPlaying);
     const simSpeedMultiplier = useAriadneStore((state) => state.simSpeedMultiplier);
 
+    const completedTaskIds = useAriadneStore((state) => state.completedTaskIds);
+
     const returnField = processedData.float32Layers.return_field;
     const grid = processedData.meta.grid;
     const { rings, requestContours } = useThreadContourWorker(returnField, grid);
@@ -113,9 +117,18 @@ export function ThreadLine() {
         [returnField],
     );
 
-    const thresholdSeconds = computeConsumablesState(simElapsedSeconds, processedData.meta.parameters).thread_threshold_s;
+    // contracts.md 4.6 rule 4: inside the Thread when return_field x load_factor <= time left. The factor is
+    // uniform, so this is the contour of return_field at time left / load_factor. That effective threshold
+    // is what gets quantised and capped, so the worker is asked only when the drawn ring can change.
+    const timeLeftSeconds = computeConsumablesState(simElapsedSeconds, processedData.meta.parameters).planned_time_left_s;
+    const loadParameters = loadParametersFromMeta(processedData.meta.parameters);
+    const carriedKg = carriedLoadKg(processedData.knots, completedTaskIds, loadParameters);
+    const effectiveThresholdSeconds = effectiveReturnFieldThresholdSeconds(
+        timeLeftSeconds,
+        loadFactor(carriedKg, loadParameters),
+    );
     const quantisedThresholdSeconds = quantiseThresholdSeconds(
-        thresholdSeconds,
+        effectiveThresholdSeconds,
         chooseThresholdQuantumSeconds(isSimPlaying, simSpeedMultiplier),
     );
     const drawnThresholdSeconds = Math.min(quantisedThresholdSeconds, thresholdCapSeconds);

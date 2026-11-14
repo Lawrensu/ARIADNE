@@ -177,7 +177,7 @@ Start the app with hot reload at http://localhost:5173:
 npm run dev
 ```
 
-Run the tests (walking-time vectors, routing, the Knot-to-rover cross-check on the real data, layers, the Thread, the clock):
+Run the tests (walking-time and load factor vectors, routing, the Knot-to-rover cross-check on the real data, the science plan, layers, the Thread, the clock):
 
 ```bash
 npm test

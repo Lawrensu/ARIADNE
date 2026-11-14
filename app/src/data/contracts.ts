@@ -67,6 +67,10 @@ export interface WalkingParameters {
     suit_capability_hours: number;
     planned_marswalk_hours: number;
     reserve_minutes: number;
+    // Added in v1.1.0 (contracts.md 3.1 and 4.6, D-027). Optional here so v1.0.0 data still loads;
+    // src/science/loadFactor.ts falls back to the contract values when they are missing.
+    base_carried_load_kg?: number;
+    load_time_factor_per_kg?: number;
 }
 
 
@@ -150,6 +154,29 @@ export interface KnotPhoto {
 }
 
 
+// 3.12 science_tasks (added in v1.1.0, D-027)
+export type ScienceTaskType =
+    | "imaging"
+    | "surface_sample"
+    | "rock_chip_sample"
+    | "soil_sample"
+    | "core_sample"
+    | "in_situ_measurement";
+
+
+export interface ScienceTask {
+    task_id: string;
+    label: string;
+    task_type: ScienceTaskType;
+    // Time spent at the Knot, not walking (est.).
+    duration_minutes: number;
+    // Mass added to the carried load after the task (est.).
+    sample_mass_kg: number;
+    equipment: string[];
+    provenance: Provenance;
+}
+
+
 export interface Knot {
     knot_id: string;
     name: string;
@@ -160,6 +187,8 @@ export interface Knot {
     science_rationale: string;
     measurements: KnotMeasurement[];
     photos: KnotPhoto[];
+    // Added in v1.1.0, may be empty. The loader sets [] when a v1.0.0 file has no such field.
+    science_tasks: ScienceTask[];
 }
 
 

@@ -2,6 +2,7 @@
 // Descriptive string message types (docs/development_conventions.md), each with a request id.
 
 import type { LocalPosition } from "../data/contracts";
+import type { RoutePlan } from "../state/routeSlice";
 import type { RoutePlans } from "./routePlans";
 import type { RoutingGridInput } from "./routingGrid";
 
@@ -32,7 +33,17 @@ export interface RerouteFromRequest {
 }
 
 
-export type RoutingRequest = InitialiseRoutingGridRequest | ComputeRoutePlansRequest | RerouteFromRequest;
+// One "fast" A* route per consecutive pair of waypoints (the science plan legs, contracts.md 4.6).
+// Uses the runtime-blocked cells already applied in the worker and does not change them; it never
+// runs the D* Lite prepare step, so it does not disturb a pending reroute.
+export interface ComputeFastLegsRequest {
+    message_type: "compute_fast_legs";
+    request_id: number;
+    waypoints: LocalPosition[];
+}
+
+
+export type RoutingRequest = InitialiseRoutingGridRequest | ComputeRoutePlansRequest | RerouteFromRequest | ComputeFastLegsRequest;
 
 
 
@@ -51,6 +62,15 @@ export interface RoutePlansReadyResponse {
 }
 
 
+// fast_legs[i] is the "fast" route from waypoints[i] to waypoints[i + 1], or null when unreachable.
+export interface FastLegsReadyResponse {
+    message_type: "fast_legs_ready";
+    request_id: number;
+    fast_legs: Array<RoutePlan | null>;
+    compute_time_ms: number;
+}
+
+
 export interface RouteFailedResponse {
     message_type: "route_failed";
     request_id: number;
@@ -58,4 +78,4 @@ export interface RouteFailedResponse {
 }
 
 
-export type RoutingResponse = RoutingGridReadyResponse | RoutePlansReadyResponse | RouteFailedResponse;
+export type RoutingResponse = RoutingGridReadyResponse | RoutePlansReadyResponse | FastLegsReadyResponse | RouteFailedResponse;

@@ -19,6 +19,12 @@ let latestRequestNumber = 0;
 
 
 
+// The one routing worker of the app, shared with the science planner (src/science/sciencePlanService.ts).
+export function getSharedRoutingClient(processedData: ProcessedData): RoutingClient {
+    return getRoutingClient(processedData);
+}
+
+
 function getRoutingClient(processedData: ProcessedData): RoutingClient {
     if (routingClient !== null && routingClientData === processedData) {
         return routingClient;

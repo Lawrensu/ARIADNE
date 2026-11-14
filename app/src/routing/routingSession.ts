@@ -2,12 +2,14 @@
 // computeRoutePlans: fresh A* for every route option.
 // rerouteFrom: D* Lite (one planner per route option) towards the last requested end, repaired
 // incrementally when cells are blocked or unblocked and when the astronaut moves.
+// computeFastLegs: one "fast" A* per consecutive pair of waypoints (science plan legs), without
+// touching the blocked cells or the D* Lite planners.
 
 import type { LocalPosition } from "../data/contracts";
-import type { RouteOptionId } from "../state/routeSlice";
+import type { RouteOptionId, RoutePlan } from "../state/routeSlice";
 import { DStarLitePlanner } from "./dStarLite";
 import type { RoutePlans } from "./routePlans";
-import { ROUTE_OPTION_IDS, buildRoutePlan, computeRoutePlansOnGrid } from "./routePlans";
+import { ROUTE_OPTION_IDS, buildRoutePlan, computeRoutePlan, computeRoutePlansOnGrid } from "./routePlans";
 import type { RoutingGrid, RoutingGridInput } from "./routingGrid";
 import { applyBlockedCells, createRoutingGrid, isCellPassable, snapToPassableCell } from "./routingGrid";
 
@@ -54,6 +56,18 @@ export class RoutingSession {
                 planner.replan();
             }
         }
+    }
+
+
+    // "fast" route (contracts.md 4.2 edge cost, unloaded) for each consecutive pair of waypoints:
+    // result[i] goes from waypoints[i] to waypoints[i + 1], null when unreachable. Uses the
+    // runtime-blocked cells already applied and leaves them, the goal and the planners unchanged.
+    computeFastLegs(waypoints: LocalPosition[]): Array<RoutePlan | null> {
+        const legs: Array<RoutePlan | null> = [];
+        for (let index = 1; index < waypoints.length; index++) {
+            legs.push(computeRoutePlan(this.routingGrid, "fast", waypoints[index - 1], waypoints[index]));
+        }
+        return legs;
     }
 
 

@@ -3,7 +3,7 @@
 //
 // Input is return_field.bin: seconds to walk from each cell back to the staging point (+Infinity =
 // unreachable, contracts.md 3.6). The Thread is the contour of that field at the threshold
-// (remaining suit time minus reserve): every cell inside the rings has return_field <= threshold.
+// (time left, planned minus elapsed minus reserve, divided by the load factor; contracts.md 4.6): every cell inside the rings has return_field <= threshold.
 //
 // COORDINATE MAPPING (verified in threadContour.test.ts): d3-contour treats value (row, col) as sitting
 // at the point (col + 0.5, row + 0.5) and returns coordinates in those "pixel" units. The centre of
@@ -48,6 +48,20 @@ export function chooseThresholdQuantumSeconds(isSimPlaying: boolean, speedMultip
         return THREAD_THRESHOLD_QUANTUM_SECONDS;
     }
     return Math.max(THREAD_THRESHOLD_QUANTUM_SECONDS, speedMultiplier / MAX_RECOMPUTES_PER_REAL_SECOND);
+}
+
+
+// contracts.md 4.6 rule 4: a cell is inside the Thread when return_field x load_factor <= time left.
+// The load factor is the same for every cell, so this equals return_field <= time left / load_factor.
+// Returns that return_field threshold in seconds (0 when no time is left or the factor is not positive).
+export function effectiveReturnFieldThresholdSeconds(timeLeftSeconds: number, loadFactorValue: number): number {
+    if (timeLeftSeconds <= 0) {
+        return 0;
+    }
+    if (loadFactorValue <= 0) {
+        return 0;
+    }
+    return timeLeftSeconds / loadFactorValue;
 }
 
 

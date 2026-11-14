@@ -66,6 +66,19 @@ function handleRequest(request: RoutingRequest): void {
         });
         return;
     }
+
+    if (request.message_type === "compute_fast_legs") {
+        // No prepareReplanners here: the science plan legs do not need D* Lite (about 1 s).
+        const startedAt = performance.now();
+        const fastLegs = session.computeFastLegs(request.waypoints);
+        postResponse({
+            message_type: "fast_legs_ready",
+            request_id: request.request_id,
+            fast_legs: fastLegs,
+            compute_time_ms: performance.now() - startedAt,
+        });
+        return;
+    }
 }
 
 

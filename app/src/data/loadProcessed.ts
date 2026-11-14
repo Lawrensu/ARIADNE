@@ -159,13 +159,21 @@ export async function loadProcessedData(
         galeContextUrl = resolveUrl(meta.regional_context.file);
     }
 
+    // science_tasks is new in v1.1.0 (contracts.md 3.12); older files simply have no tasks.
+    const knots = decodeJson<Knot[]>(knotsBuffer).map((knot) => {
+        if (Array.isArray(knot.science_tasks)) {
+            return knot;
+        }
+        return { ...knot, science_tasks: [] };
+    });
+
     return {
         meta,
         float32Layers,
         uint8Layers,
         layerEntries,
         rocks: decodeJson<Rock[]>(rocksBuffer),
-        knots: decodeJson<Knot[]>(knotsBuffer),
+        knots,
         shelters: decodeJson<Shelter[]>(sheltersBuffer),
         environmentTimeline: decodeJson<EnvironmentTimeline>(timelineBuffer),
         textureUrl: resolveUrl(meta.texture.file),
