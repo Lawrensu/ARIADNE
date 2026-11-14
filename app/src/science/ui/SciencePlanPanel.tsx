@@ -51,21 +51,21 @@ function FeasibilityShapeIcon({ shape, colour }: { shape: FeasibilityShape; colo
     return (
         <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
             <polygon points="9,2 19,2 26,9 26,19 19,26 9,26 2,19 2,9" fill={colour} />
-            <path d="M9 9 L19 19 M19 9 L9 19" stroke="#120c08" strokeWidth="3" />
+            <path d="M9 9 L19 19 M19 9 L9 19" stroke="var(--ariadne-screen-black)" strokeWidth="3" />
         </svg>
     );
 }
 
 
-// Placeholder state colours until the Stage 3 palette. The shape and the text carry the meaning.
+// Stage 3 palette tokens; the shape and the text carry the meaning as well.
 function feasibilityColour(label: string): string {
     if (label === "GO") {
-        return "#6fbf73";
+        return "var(--ariadne-go)";
     }
     if (label === "CAUTION") {
-        return "#f0c040";
+        return "var(--ariadne-caution)";
     }
-    return "#c0392b";
+    return "var(--ariadne-no-go)";
 }
 
 

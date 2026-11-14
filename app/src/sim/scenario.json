@@ -1,0 +1,45 @@
+{
+  "scenario_id": "solar_particle_event_reroute",
+  "description": "A solar particle event alert mid-walk reroutes the crew from Channel west edge to the nearest terrain overhang and holds them there until the dose rate falls.",
+  "events": [
+    {
+      "at_sim_seconds": 300,
+      "event_type": "walk_started",
+      "payload": { "knot_id": "knot_channel_west_edge" },
+      "display_message": "Walk to Channel west edge.",
+      "recommended_action": "Follow the planned route east."
+    },
+    {
+      "at_sim_seconds": 1200,
+      "event_type": "arrive_at_knot",
+      "payload": { "knot_id": "knot_channel_west_edge", "task_ids": ["task_channel_imaging"] },
+      "display_message": "At Channel west edge: image the fractured bedrock.",
+      "recommended_action": "Mark the bedrock imaging task done."
+    },
+    {
+      "at_sim_seconds": 2100,
+      "event_type": "solar_particle_event_alert",
+      "payload": {
+        "shelter_id": "shelter_overhang_05",
+        "dose_rate_usv_per_hour_upper_bound": 1069.0,
+        "storm_sol": 4190
+      },
+      "display_message": "Solar storm: radiation rising. Shelter at the nearest overhang.",
+      "recommended_action": "Route to the nearest shelter now."
+    },
+    {
+      "at_sim_seconds": 2400,
+      "event_type": "reroute_to_shelter",
+      "payload": { "shelter_id": "shelter_overhang_05" },
+      "display_message": "Rerouting to shelter.",
+      "recommended_action": "Follow the route and enter the shelter."
+    },
+    {
+      "at_sim_seconds": 3300,
+      "event_type": "sheltered",
+      "payload": { "shelter_id": "shelter_overhang_05" },
+      "display_message": "Sheltered. Hold until the dose rate falls.",
+      "recommended_action": "Stay inside; watch the Thread."
+    }
+  ]
+}

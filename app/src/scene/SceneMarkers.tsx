@@ -17,10 +17,10 @@ export type MarkerSelectHandler = (marker: SceneMarker) => void;
 const MARKER_SIZE_PX = 24;
 const MARKER_FILL_COLOUR_BY_KIND: Record<MarkerKind, string> = {
     knot: "var(--color-ariadne-accent)",
-    staging_point: "var(--color-ariadne-text)",
-    shelter: "#7fb3c8",
+    staging_point: "var(--color-ariadne-data)",
+    shelter: "#e9d8a6",
 };
-const MARKER_OUTLINE_COLOUR = "#120c08";
+const MARKER_OUTLINE_COLOUR = "#050a06";
 
 
 
@@ -90,7 +90,7 @@ function MarkerPin({ marker, onSelect }: { marker: SceneMarker; onSelect?: Marke
                         fontSize: 14,
                         lineHeight: 1.2,
                         color: "var(--color-ariadne-text)",
-                        background: "rgba(18, 12, 8, 0.85)",
+                        background: "rgba(5, 10, 6, 0.85)",
                         border: "1px solid var(--color-ariadne-border)",
                     }}
                 >

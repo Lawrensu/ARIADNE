@@ -11,11 +11,12 @@ import { sampleTerrainSceneY } from "../terrain/terrainFrame";
 
 
 
-// Placeholder colours until the Stage 3 palette (Letta). Fast and safe also differ by dash pattern.
+// Route line colours (Stage 3 palette): amber for fast, parchment dashed for safe, phosphor green
+// for smooth. They are data colours, not UI chrome, so they stay in this folder's constants.
 export const ROUTE_LINE_COLOURS: Record<RouteOptionId, string> = {
-    fast: "#ffb347",
-    safe: "#7fd1ff",
-    smooth: "#9be564",
+    fast: "#ffc857",
+    safe: "#e9d8a6",
+    smooth: "#5ce87f",
 };
 
 const ROUTE_LIFT_ABOVE_TERRAIN_M = 2.0;
