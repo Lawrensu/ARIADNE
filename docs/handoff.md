@@ -1,6 +1,6 @@
 # ARIADNE hand-off board
 
-Current stage: Stage 2 (with the science plan, contract v1.1.0) built on `dev-malissa` (gate evidence below); waiting for Lawrence to merge into `dev`, run the integration check and sign off, then Stage 3 (Letta) starts
+Current stage: Stage 3 (Letta), started 2026-11-14. Stages 0, 1 and 2 signed off by Lawrence.
 
 Last updated: 2026-11-14
 
@@ -16,17 +16,17 @@ This is the live status board. The main agent of the stage owner updates it when
    - Signed off by: Lawrence, 2026-11-14
 2. Stage 1: data and algorithms pipeline
    - Owner: Lawrence (Part A)
-   - Status: Finished
+   - Status: Done, in `dev`
    - Gate passed: Yes
-   - Signed off by: Lawrence
+   - Signed off by: Lawrence, 2026-11-14
 3. Stage 2: app shell, Labyrinth view, Planning Table, routing, Thread, science plan
    - Owner: Malissa (Part B)
-   - Status: Built and verified on `dev-malissa` (including the science plan, D-027); waiting for merge into `dev` and sign-off
-   - Gate passed: No
-   - Signed off by: none yet
+   - Status: Done, in `dev` (merge `3102b72`, Theta* and D-028 on top in `84e438f`)
+   - Gate passed: Yes
+   - Signed off by: Lawrence, 2026-11-14
 4. Stage 3: Suit HUD, alerts, Knot cards, simulation, CRT polish, demo
    - Owner: Letta (Part C)
-   - Status: Not started
+   - Status: In progress
    - Gate passed: No
    - Signed off by: none yet
 
@@ -61,7 +61,7 @@ This is the live status board. The main agent of the stage owner updates it when
 - [x] `data/processed/` committed on `dev-lawrence` (D-022), and Person B can pull it.
 - [x] Log entry written in `docs/log/person_a.md`.
 - [x] `dev-lawrence` merged into `dev`; integration check passed on `dev` (validator 46 of 46, 63 tests, binaries stored as binary).
-- [ ] Human sign-off.
+- [x] Human sign-off: Lawrence, 2026-11-14.
 
 
 ## Stage 2 gate (Person B to Person C)
@@ -78,8 +78,8 @@ Evidence re-verified on 2026-11-14 after merging contract v1.1.0 and adding the 
 - [x] The Thread draws and shrinks with simulation time and scales with the carried load (contracts.md 4.6: return_field x load_factor against planned time minus elapsed minus reserve). Test: with 30 min left the area is 2.08, 1.91, 1.84 and 1.66 km² for 0, 10, 14 and 25 kg (`app/src/thread/threadLoad.test.ts`). On screen at 5 h elapsed: est. 1.9 km² with 10 kg, 1.8 km² with 14 kg; at v1.0.0 it shrank from 3.0 km² to nothing as time ran out.
 - [x] Data payload is within the budget: production build is 19.19 MB gzip (31.50 MB raw); the budget counts gzip (D-028).
 - [x] Log entry written in `docs/log/person_b.md`.
-- [ ] Person B's branch pushed, merged into `dev` by Lawrence; integration check passed.
-- [ ] Human sign-off.
+- [x] Person B's branch pushed, merged into `dev` by Lawrence; integration check passed (validator 47 of 47, pipeline 68, app 133 tests, typecheck, build, 19.19 MB gzip, browser check, no console errors).
+- [x] Human sign-off: Lawrence, 2026-11-14.
 
 
 ## Stage 3 gate (Person C to demo)
@@ -87,6 +87,9 @@ Evidence re-verified on 2026-11-14 after merging contract v1.1.0 and adding the 
 - [ ] The Suit HUD shows at most 3 numbers at once, and the science budget is reachable in one tap.
 - [ ] Tasks can be checked off at a Knot; samples taken add to the carried load and the Thread updates.
 - [ ] Every number has provenance.
+- [ ] Responsive (D-029): usable with no horizontal scroll at 375 px (phone), 768 px (tablet) and 1280 px or wider (desktop); screenshots of all three.
+- [ ] Easy to navigate (D-029): clear sections, one main action per panel, a reset-view button; the Planning Table pans up, down, left and right when zoomed in.
+- [ ] Fonts self-hosted (D-029): bundled with the app (no font CDN at run time), at most 2 families, readable at arm's length.
 - [ ] Alerts come with actions.
 - [ ] The scenario runs end-to-end, identically twice.
 - [ ] Demo recorded.
@@ -177,7 +180,7 @@ Stage 2 notes for Lawrence and his agents (merge, integration, pipeline):
    - contracts.md 4.6 rule 4: read literally ("margin below the next task plus its walk back"), the walk back is counted twice, because the margin already subtracts the walk back from the current position. The app implements: drop the next task when time left is less than the walk to the next Knot with the current load plus the task plus the walk back from there with its sample (`checkNextTaskDuringWalk`). Consider a decisions.md entry that clarifies the wording.
    - The Thread now follows contracts.md 4.6 (planned 6 h minus elapsed minus 30 min reserve) instead of the 8 h suit used before v1.1.0. system_design.md (Design rationale 1, Algorithms 4) says "remaining consumable time"; it could name the planned time explicitly so nobody reads it as the 8 h suit.
    - system_design.md lists Theta* for any-angle smoothing; it is not built (routes follow 8-connected cell centres). Either keep it as stretch or remove it from the design.
-   - The Stage 1 gate box "Human sign-off" is still unticked although the Stages list says Stage 1 was signed off.
+   - Resolved 2026-11-14: Stage 1 and Stage 2 signed off by Lawrence.
 3. What the app expects from the pipeline (changes here break the app or its tests)
    - The app reads grids by `layer_id` in `meta.json` layers[]: `heightmap`, `slope_degrees`, `traversal_penalty`, `return_field`, `sky_view_factor`, `thermal_inertia`, `mineralogy_class`, `viewshed_rover`. Byte sizes are checked against `grid.width` x `grid.height`. Renaming any of these breaks loading.
    - The loader accepts `contract_version` 1.x only; a 2.0.0 is rejected with a clear error until the app is updated.

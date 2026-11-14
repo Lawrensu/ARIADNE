@@ -318,6 +318,20 @@ Rules:
 - Affects docs: docs/contracts.md, docs/system_design.md, docs/handoff.md, README.md
 
 
+### D-029: Stage 3 UX requirements: responsive, easy navigation, self-hosted fonts
+
+- Date: 2026-11-14
+- Status: accepted (Lawrence)
+- Decision:
+  1. The app is responsive: phone (375 px), tablet (768 px) and desktop (1280 px and wider), no horizontal scroll; on narrow screens the side panel becomes a drawer or bottom sheet and the map stays full size.
+  2. Navigation is simple: grouped sections, one main action per panel, a reset-view button, and the Planning Table pans in every direction (MapControls with `screenSpacePanning`).
+  3. Fonts are self-hosted with the build (for example through `@fontsource` packages), at most two families, chosen for a space console or retro terminal feel inspired by real spacecraft displays and games like Fallout or Iron Lung, without copying any game's look, name or icons.
+  4. Letta sets the visual direction with her own design inspiration, given to her agent.
+- Why: The Stage 2 interface works but is hard to read and navigate, zoomed-in maps could not be dragged up or down, and a demo must look good on any screen. Self-hosted fonts work offline and look the same everywhere.
+- Alternatives considered: Desktop only (judges may open it on a phone); fonts from a CDN (breaks offline, D-024 spirit).
+- Affects docs: docs/system_design.md, docs/handoff.md
+
+
 ## Open questions (Stage 0)
 
 Status 2026-11-14: questions 1 to 10 and 12 to 21 are resolved by D-017 to D-025. Question 11 (colour palette) stays with Person C.
