@@ -295,6 +295,16 @@ Rules:
 - Affects docs: all. Older entries that name removed files now mean their new home (design principles: docs/system_design.md; Stage 0 guide: D-017 to D-025 and docs/data_sources.md).
 
 
+### D-027: Science plan: tasks at Knots, carried load, science budget
+
+- Date: 2026-11-14
+- Status: accepted (Lawrence)
+- Decision: Each Knot carries science tasks (type, duration, sample mass, equipment). Carried load slows walking by `1 + 0.01 × kg` with a 10 kg tool kit (estimates). The app plans an ordered route through Knots and tasks, checks it against the 6 hour Marswalk minus the 30 minute reserve, and the Thread scales with the current load. Contract v1.1.0 (additive).
+- Why: The challenge asks for a route that lets suited astronauts carrying equipment reach their science objectives while avoiding obstacles. Safety alone is not the mission: the crew must balance discovery against getting home, and see that balance on the map.
+- Alternatives considered: Safety only (misses the science objective); recomputing return_field per load in the pipeline (unnecessary, the load factor is uniform so scaling is exact); a metabolic load model such as Pandolf (better physics, too complex to validate in 48 hours).
+- Affects docs: docs/contracts.md, docs/system_design.md, docs/handoff.md, README.md
+
+
 ## Open questions (Stage 0)
 
 Status 2026-11-14: questions 1 to 10 and 12 to 21 are resolved by D-017 to D-025. Question 11 (colour palette) stays with Person C.

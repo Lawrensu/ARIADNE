@@ -61,6 +61,34 @@ TEST_VECTORS = [
 TEST_TOLERANCE_SECONDS = 1e-3
 
 
+
+
+# ---------------------------------------------------------------- carried load (contracts.md 4.6, D-027)
+
+
+def load_factor(carried_load_kg):
+    """Multiplier on walking time for the mass the crew carries (tools plus samples). Estimate."""
+    return 1.0 + settings.LOAD_TIME_FACTOR_PER_KG * carried_load_kg
+
+
+LOAD_FACTOR_VECTORS = [
+    (0.0, 1.0),
+    (10.0, 1.1),
+    (17.5, 1.175),
+]
+LOAD_FACTOR_TOLERANCE = 1e-9
+
+
+def check_load_factor_vectors():
+    """Returns a list of failure messages. Empty list means all rows pass."""
+    failures = []
+    for row_number, (carried_load_kg, expected) in enumerate(LOAD_FACTOR_VECTORS, start=1):
+        actual = load_factor(carried_load_kg)
+        if abs(actual - expected) > LOAD_FACTOR_TOLERANCE:
+            failures.append(f"load row {row_number}: expected {expected}, got {actual}")
+    return failures
+
+
 def check_test_vectors():
     """Returns a list of failure messages. Empty list means all rows pass."""
     failures = []

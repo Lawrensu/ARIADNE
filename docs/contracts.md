@@ -1,6 +1,6 @@
 # ARIADNE data contracts
 
-Status: SIGNED v1.0.0 (Stage 0 sign-off by Lawrence, 2026-11-14; decisions D-017 to D-025).
+Status: SIGNED v1.1.0 (v1.0.0 signed at Stage 0 by Lawrence, 2026-11-14, D-017 to D-025; v1.1.0 adds the science plan, D-027).
 
 This file is the source of truth for every file passed between stages. When another document disagrees with it, this file wins.
 
@@ -205,7 +205,7 @@ Each entry of `layers`:
 
 Optional fields (added in v1.0.0):
 
-- `parameters` (object): the values the pipeline used, for transparency in the UI: `{ "suit_speed_factor", "gravity_adjustment", "max_walkable_slope_deg", "suit_capability_hours", "planned_marswalk_hours", "reserve_minutes" }`.
+- `parameters` (object, optional in v1.0.0, required from v1.1.0): the values the pipeline used, for transparency in the UI: `{ "suit_speed_factor", "gravity_adjustment", "max_walkable_slope_deg", "suit_capability_hours", "planned_marswalk_hours", "reserve_minutes", "base_carried_load_kg", "load_time_factor_per_kg" }`. The last two are required from v1.1.0 (see 4.6).
 - `regional_context` (object): `{ "file": string, "width_px": int, "height_px": int, "patch_rect_px": { "x", "y", "width", "height" } }` for the Gale regional image (see 3.17).
 
 Example (values are illustrative; the pipeline writes the real ones):
@@ -377,6 +377,13 @@ Fields:
 - `science_rationale` (string): why a crew would go there.
 - `measurements` (array): `[{ "label", "value", "unit", "provenance" }]`.
 - `photos` (array): `[{ "url", "sol", "camera", "caption", "credit" }]`.
+- `science_tasks` (array, added in v1.1.0, may be empty): what the crew does at the Knot. Each task:
+  - `task_id` (string, unique across all Knots), `label` (string).
+  - `task_type` (string): `"imaging"`, `"surface_sample"`, `"rock_chip_sample"`, `"soil_sample"`, `"core_sample"` or `"in_situ_measurement"`.
+  - `duration_minutes` (number > 0): time spent at the Knot, not walking (est.).
+  - `sample_mass_kg` (number ≥ 0): mass added to the carried load after the task (est.).
+  - `equipment` (array of strings).
+  - `provenance` (object, see 1.5): `is_estimate` is `true`; `product_id` is the source the estimate is based on.
 
 Example:
 
@@ -639,6 +646,35 @@ Notes:
 - The set of rows may grow. Rows are never changed after sign-off without a `decisions.md` entry.
 
 
+### 4.6 Carried load and the science plan (v1.1.0, D-027)
+
+Carrying tools and samples slows walking. It is a uniform multiplier, so it applies to every step and to the precomputed `return_field` alike:
+
+```
+load_factor = 1 + load_time_factor_per_kg * carried_load_kg
+walking time with load = walking_time_seconds(...) * load_factor
+seconds to walk back now = return_field[cell] * load_factor
+```
+
+- `carried_load_kg` = `base_carried_load_kg` (tool kit) plus the `sample_mass_kg` of every task done so far.
+- Values in v1.1.0: `base_carried_load_kg` = 10, `load_time_factor_per_kg` = 0.01 (estimates, shown as "est.").
+
+Science plan rule (the app's "science budget"):
+1. A plan is an ordered list of Knots and the tasks chosen at each.
+2. Plan time = walking legs (with the load at that point) + task durations + the walk back to the rover from the last Knot.
+3. A plan is feasible only if plan time ≤ `planned_marswalk_hours` × 3600 − `reserve_minutes` × 60.
+4. During the walk the Thread uses `return_field × load_factor` against the time left (planned time minus elapsed, minus the reserve). If the margin drops below the time of the next task plus its walk back, the app suggests dropping that task.
+
+Load factor test vectors (Python and TypeScript must both pass, tolerance 1e-9):
+
+```
+#  carried_load_kg  expected_load_factor
+1  0.0              1.0
+2  10.0             1.1
+3  17.5             1.175
+```
+
+
 ## 5. Validator
 
 `pipeline/validate/run.py`, run with `uv run`. It must check:
@@ -653,6 +689,7 @@ Notes:
 8. Every UI record has provenance (rocks, Knot measurements, environment samples, layers).
 9. `contract_version` in `meta.json` matches the version in this document.
 10. The walking-time test vectors in 4.5 pass in Python.
+11. The load factor test vectors in 4.6 pass in Python; `science_tasks`, when present, follow 3.12; `meta.json` parameters include the load fields.
 
 Notes:
 
@@ -660,6 +697,11 @@ Notes:
 
 
 ## 6. Changelog
+
+### v1.1.0, 2026-11-14 (SIGNED)
+
+- Science plan (D-027): optional `science_tasks` on each Knot (3.12), carried-load fields in `meta.json` parameters (3.1), load factor and science plan rule with test vectors (4.6), validator check 11.
+- Additive only: no field renamed or removed.
 
 ### v1.0.0, 2026-11-14 (SIGNED)
 

@@ -70,9 +70,10 @@ This is the live status board. The main agent of the stage owner updates it when
 - [ ] Terrain matches the texture.
 - [ ] Layer toggles work.
 - [ ] A route computes between Knots.
+- [ ] Science plan (D-027): an ordered multi-Knot route with chosen tasks, timed with the load factor, shows total time, science budget and feasibility; load factor test vectors (contracts.md 4.6) pass in TypeScript.
 - [ ] Walking-time test vectors pass in TypeScript.
 - [ ] Cross-check: the TypeScript route time from each Knot to the rover matches `return_field.bin` at that Knot within 1%.
-- [ ] The Thread draws and shrinks with simulation time.
+- [ ] The Thread draws and shrinks with simulation time and scales with the carried load.
 - [ ] Data payload is within the budget.
 - [ ] Log entry written in `docs/log/person_b.md`.
 - [ ] Person B's branch pushed, merged into `dev` by Lawrence; integration check passed.
@@ -81,7 +82,8 @@ This is the live status board. The main agent of the stage owner updates it when
 
 ## Stage 3 gate (Person C to demo)
 
-- [ ] The Suit HUD shows at most 3 numbers at once.
+- [ ] The Suit HUD shows at most 3 numbers at once, and the science budget is reachable in one tap.
+- [ ] Tasks can be checked off at a Knot; samples taken add to the carried load and the Thread updates.
 - [ ] Every number has provenance.
 - [ ] Alerts come with actions.
 - [ ] The scenario runs end-to-end, identically twice.
@@ -127,6 +129,12 @@ Stage 1 to Stage 2 (Lawrence to Malissa):
   - Your TypeScript walking function must pass the 8 test vectors in `docs/contracts.md` 4.5.
 - Contract changes during the stage: none after v1.0.0 sign-off.
 - Where the data lives: `data/processed/` on `dev-lawrence` (committed, D-022). Overlay preview: `docs/images/stage1_overlay_check.png`.
+
+Change after the Stage 1 hand-off (science plan, D-027, contract v1.1.0):
+- `knots.json` now has `science_tasks` per Knot (2 each, 174 minutes and 4.0 kg in total, all "est.").
+- `meta.json` parameters add `base_carried_load_kg` (10) and `load_time_factor_per_kg` (0.01).
+- New contract section 4.6: load factor, science plan rule and load factor test vectors.
+- Stage 2 and Stage 3 gates have new science plan boxes. Malissa's follow-up prompt is in Lawrence's chat; her agent merges `origin/dev` and adds the planner.
 
 
 ## Next steps
