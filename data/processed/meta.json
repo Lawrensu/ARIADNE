@@ -1,0 +1,209 @@
+{
+  "contract_version": "1.0.0",
+  "generated_at_utc": "2026-11-14T02:03:32Z",
+  "pipeline_commit": "206679e",
+  "grid": {
+    "width": 1013,
+    "height": 934,
+    "cell_size_m": 2.0
+  },
+  "origin_northwest": {
+    "latitude_deg": -4.7809,
+    "longitude_deg": 137.3771
+  },
+  "crs": "IAU_2015:49900",
+  "elevation_reference": "mars_areoid",
+  "bounds": {
+    "width_m": 2026.0,
+    "height_m": 1868.0,
+    "south_east": {
+      "latitude_deg": -4.812414,
+      "longitude_deg": 137.4114
+    }
+  },
+  "staging_point": {
+    "x_m": 775.0,
+    "z_m": 467.0
+  },
+  "texture": {
+    "file": "texture_hirise.jpg",
+    "width_px": 4096,
+    "height_px": 3777
+  },
+  "sun": {
+    "sun_azimuth_deg": 303.082442,
+    "sun_incidence_deg": 58.808048
+  },
+  "layers": [
+    {
+      "layer_id": "heightmap",
+      "file": "heightmap.bin",
+      "dtype": "float32",
+      "unit": "metres",
+      "source_dataset": "HiRISE DTM",
+      "product_id": "DTEEC_009149_1750_009294_1750_U01",
+      "native_resolution_m": 1.0117,
+      "is_estimate": false,
+      "description": "Elevation above the Mars areoid, mean of the 1 m DTM per 2 m cell."
+    },
+    {
+      "layer_id": "slope_degrees",
+      "file": "slope_degrees.bin",
+      "dtype": "float32",
+      "unit": "degrees",
+      "source_dataset": "HiRISE DTM",
+      "product_id": "DTEEC_009149_1750_009294_1750_U01",
+      "native_resolution_m": 1.0117,
+      "is_estimate": true,
+      "description": "Slope from central differences on the 2 m heightmap."
+    },
+    {
+      "layer_id": "roughness_m",
+      "file": "roughness_m.bin",
+      "dtype": "float32",
+      "unit": "metres",
+      "source_dataset": "HiRISE DTM",
+      "product_id": "DTEEC_009149_1750_009294_1750_U01",
+      "native_resolution_m": 1.0117,
+      "is_estimate": true,
+      "description": "Local height variation (5 m window, 1 m DTM), maximum per 2 m cell."
+    },
+    {
+      "layer_id": "traversal_penalty",
+      "file": "traversal_penalty.bin",
+      "dtype": "float32",
+      "unit": "dimensionless",
+      "source_dataset": "ARIADNE penalty rules (contracts.md 3.5)",
+      "product_id": "DTEEC_009149_1750_009294_1750_U01 + PSP_009149_1750_RED_A_01_ORTHO",
+      "native_resolution_m": 1.0117,
+      "is_estimate": true,
+      "description": "Walking cost multiplier; +Infinity is impassable."
+    },
+    {
+      "layer_id": "return_field",
+      "file": "return_field.bin",
+      "dtype": "float32",
+      "unit": "seconds",
+      "source_dataset": "ARIADNE walking model (contracts.md 4)",
+      "product_id": "DTEEC_009149_1750_009294_1750_U01",
+      "native_resolution_m": 1.0117,
+      "is_estimate": true,
+      "description": "Seconds to walk back to the staging point; +Infinity is unreachable."
+    },
+    {
+      "layer_id": "sky_view_factor",
+      "file": "sky_view_factor.bin",
+      "dtype": "float32",
+      "unit": "dimensionless",
+      "source_dataset": "HiRISE DTM",
+      "product_id": "DTEEC_009149_1750_009294_1750_U01",
+      "native_resolution_m": 1.0117,
+      "is_estimate": true,
+      "description": "Open-sky fraction; proxy for relative cosmic ray exposure."
+    },
+    {
+      "layer_id": "viewshed_rover",
+      "file": "viewshed_rover.bin",
+      "dtype": "uint8",
+      "unit": "dimensionless",
+      "source_dataset": "HiRISE DTM",
+      "product_id": "DTEEC_009149_1750_009294_1750_U01",
+      "native_resolution_m": 1.0117,
+      "is_estimate": true,
+      "description": "1 = line of sight to the rover antenna, 0 = comms dead zone."
+    },
+    {
+      "layer_id": "thermal_inertia",
+      "file": "thermal_inertia.bin",
+      "dtype": "float32",
+      "unit": "J m-2 K-1 s-1/2",
+      "source_dataset": "THEMIS thermal inertia mosaic",
+      "product_id": "THEMIS_TI_Mosaic_Quant_30S120E_100mpp",
+      "native_resolution_m": 100,
+      "is_estimate": false,
+      "description": "THEMIS thermal inertia (about 20% absolute accuracy). Context only: 100 m native pixels, so about 10 to 30 real pixels across the patch, bilinearly smoothed onto the 2 m grid."
+    },
+    {
+      "layer_id": "mineralogy_class",
+      "file": "mineralogy_class.bin",
+      "dtype": "uint8",
+      "unit": "class",
+      "source_dataset": "CRISM MTRDR summary parameters",
+      "product_id": "FRT0000B6F1 + FRT000058A3 (MTRDR SR)",
+      "native_resolution_m": 18,
+      "is_estimate": true,
+      "description": "Weak candidate mineral signatures: a class is kept only where two CRISM observations agree (scene-relative robust z >= 3, raw value positive). Carbonate dropped (one scene only). Low confidence; do not use for routing."
+    }
+  ],
+  "mineralogy_classes": {
+    "0": "no_data",
+    "1": "clay_bearing",
+    "2": "sulfate_bearing",
+    "3": "hematite_bearing",
+    "4": "carbonate_bearing",
+    "5": "none_detected"
+  },
+  "sources": [
+    {
+      "source_dataset": "HiRISE DTM",
+      "product_id": "DTEEC_009149_1750_009294_1750_U01",
+      "url": "https://hirise-pds.lpl.arizona.edu/PDS/DTM/PSP/ORB_009100_009199/PSP_009149_1750_PSP_009294_1750/",
+      "licence_credit": "NASA/JPL/University of Arizona"
+    },
+    {
+      "source_dataset": "HiRISE orthoimage",
+      "product_id": "PSP_009149_1750_RED_A_01_ORTHO",
+      "url": "https://hirise-pds.lpl.arizona.edu/PDS/DTM/PSP/ORB_009100_009199/PSP_009149_1750_PSP_009294_1750/",
+      "licence_credit": "NASA/JPL/University of Arizona"
+    },
+    {
+      "source_dataset": "THEMIS thermal inertia mosaic",
+      "product_id": "THEMIS_TI_Mosaic_Quant_30S120E_100mpp",
+      "url": "https://astrogeology.usgs.gov/search/map/themis_thermal_inertia_mosaic_quantitative_30s120e_100mpp",
+      "licence_credit": "Fergason, Christensen and Kieffer (2006), doi:10.1029/2006JE002735; Mars Odyssey THEMIS, ASU/USGS Astropedia (public domain)"
+    },
+    {
+      "source_dataset": "CRISM MTRDR summary parameters",
+      "product_id": "FRT0000B6F1 + FRT000058A3 (MTRDR SR)",
+      "url": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/",
+      "licence_credit": "Viviano-Beck et al. (2014), DOI 10.17189/1519470 (CRISM summary parameters); NASA/JPL/JHUAPL MRO CRISM team, NASA PDS"
+    },
+    {
+      "source_dataset": "Viking MDIM 2.1 Colorized Global Mosaic",
+      "product_id": "Mars_Viking_MDIM21_ClrMosaic_global_232m",
+      "url": "https://planetarymaps.usgs.gov/mosaic/Mars_Viking_MDIM21_ClrMosaic_global_232m.tif",
+      "licence_credit": "NASA/JPL/USGS Astrogeology Science Center (public domain)"
+    },
+    {
+      "source_dataset": "MSL-M-REMS-5-MODRDR-V1.0",
+      "product_id": "RME_820012645RMD47600000000_______P1",
+      "url": "https://atmos.nmsu.edu/PDS/data/mslrem_1001/",
+      "licence_credit": "NASA/JPL-Caltech, Centro de Astrobiologia (CSIC-INTA)"
+    },
+    {
+      "source_dataset": "MSL-M-RAD-3-RDR-V1.0",
+      "product_id": "RAD_RDR_2025_360_10_42_4760_V00",
+      "url": "https://pds-ppi.igpp.ucla.edu/data/MSL-M-RAD-3-RDR-V1.0/DATA/SOL_04710_04843/RAD_RDR_2025_360_10_42_4760_V00.TXT",
+      "licence_credit": "NASA/JPL-Caltech/SwRI"
+    }
+  ],
+  "parameters": {
+    "suit_speed_factor": 0.6,
+    "gravity_adjustment": 1.0,
+    "max_walkable_slope_deg": 25.0,
+    "suit_capability_hours": 8.0,
+    "planned_marswalk_hours": 6.0,
+    "reserve_minutes": 30.0
+  },
+  "regional_context": {
+    "file": "gale_context.jpg",
+    "width_px": 2000,
+    "height_px": 2000,
+    "patch_rect_px": {
+      "x": 750,
+      "y": 633,
+      "width": 20,
+      "height": 19
+    }
+  }
+}

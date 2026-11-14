@@ -151,7 +151,7 @@ Commits:
 - No agent attribution lines (for example "Co-Authored-By") in commit messages.
 
 Other rules:
-- Never commit `data/raw`. It is git-ignored. How `data/processed` is shared (Git LFS vs shared drive) is TBD, Stage 0, whole team.
+- Never commit `data/raw`. It is git-ignored. `data/processed` is committed to git (D-022).
 - When a decision is accepted, update every affected doc in the same change.
 
 

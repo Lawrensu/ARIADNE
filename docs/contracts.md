@@ -1,6 +1,6 @@
 # ARIADNE data contracts
 
-Status: DRAFT v0.1.0. Must be signed off at Stage 0 (whole team, human approval).
+Status: SIGNED v1.0.0 (Stage 0 sign-off by Lawrence, 2026-11-14; decisions D-017 to D-025).
 
 This file is the source of truth for every file passed between stages. When another document disagrees with it, this file wins.
 
@@ -20,7 +20,7 @@ All grids share one local grid. It is the only coordinate system the app sees.
 
 - Origin: the north-west corner of the patch.
 - +x = east, +z = south, +y = up (Three.js y-up).
-- 1 cell = 1 m (`cell_size_m` in `meta.json`; 1.0 in v0.1.0).
+- 1 cell = `cell_size_m` metres (from `meta.json`; 2.0 in v1.0.0, D-021). Never hard-code it.
 - Row 0 is the north edge. Storage is row-major: index = `row * width + col`.
 - The centre of cell (row, col) is at `x = (col + 0.5) * cell_size_m`, `z = (row + 0.5) * cell_size_m`.
 - Positions in JSON files are `x_m`, `z_m` in this local grid. Latitude and longitude appear only for display.
@@ -146,15 +146,26 @@ Files:
     - Consumer: Stage 3
     - Format: JSON
     - Description: replayed REMS/RAD samples with Mars local time.
-15. `app/.../scenario.json`
+15. `app/src/sim/scenario.json`
     - Producer: Stage 3
     - Consumer: Stage 3
     - Format: JSON
     - Description: scripted scenario. Lives in `app/`, not in `data/processed/` (see 3.15).
+16. `viewshed_rover.bin`
+    - Producer: Stage 1
+    - Consumer: Stage 2, Stage 3
+    - Format: uint8 grid
+    - Description: 1 = line of sight to the rover's antenna, 0 = no line of sight (comms dead zone). See 3.16.
+17. `gale_context.jpg`
+    - Producer: Stage 1
+    - Consumer: Stage 2
+    - Format: JPEG
+    - Description: Gale Crater regional context image for the Planning Table. See 3.17.
 
 Note:
 
-- Who fills in the human-written content of `knots.json` (science text, photos) is decided at Stage 0 (whole team). The file format is fixed here regardless.
+- `knots.json` content (science text, photos) is written in Stage 1 by Lawrence (D-023). Person C may improve the text later without changing fields.
+- `data/processed/` is committed to git (D-022).
 
 
 ## 3. File specifications
@@ -192,11 +203,16 @@ Each entry of `layers`:
 - `is_estimate` (boolean): `true` for model-derived layers.
 - `description` (string): one sentence.
 
-Example (values are illustrative; real values TBD at Stage 0/1):
+Optional fields (added in v1.0.0):
+
+- `parameters` (object): the values the pipeline used, for transparency in the UI: `{ "suit_speed_factor", "gravity_adjustment", "max_walkable_slope_deg", "suit_capability_hours", "planned_marswalk_hours", "reserve_minutes" }`.
+- `regional_context` (object): `{ "file": string, "width_px": int, "height_px": int, "patch_rect_px": { "x", "y", "width", "height" } }` for the Gale regional image (see 3.17).
+
+Example (values are illustrative; the pipeline writes the real ones):
 
 ```json
 {
-  "contract_version": "0.1.0",
+  "contract_version": "1.0.0",
   "generated_at_utc": "2026-11-14T10:00:00Z",
   "pipeline_commit": "TBD",
   "grid": { "width": 2000, "height": 2000, "cell_size_m": 1.0 },
@@ -231,36 +247,44 @@ Example (values are illustrative; real values TBD at Stage 0/1):
 }
 ```
 
-All coordinates in the example above are placeholders, not decisions. Bounds and staging point are TBD at Stage 0 (whole team).
+All coordinates in the example above are placeholders. The real patch and staging point are in D-017 and D-018.
 
 
 ### 3.2 heightmap.bin
 
 - float32, metres above the Mars areoid (`elevation_reference`).
 - `NaN` allowed only where the DTM (digital terrain model, a height map) has no data. Validator reports the count; Stage 1 should fill small gaps and document it.
-- Source: HiRISE DTM, native 1 m.
+- Source: HiRISE DTM `DTEEC_009149_1750_009294_1750_U01`, native 1.0117 m, averaged onto the 2 m grid.
 
 
 ### 3.3 slope_degrees.bin
 
 - float32, degrees, range 0 to 90 inclusive.
 - No `NaN` except where the heightmap is `NaN`.
-- Derived from `heightmap.bin` with a documented method (method TBD, Person A).
+- Method: central differences on `heightmap.bin` (the exported 2 m grid), so the slope layer matches what the walking function sees.
 
 
 ### 3.4 roughness_m.bin
 
 - float32, metres. Range ≥ 0.
-- Local height variation in a moving window (window size and statistic TBD, Person A).
+- Method: on the 1 m grid, subtract a smoothed surface (Gaussian, sigma 2.5 m) from the heights, take the standard deviation of the residual in a 5 m × 5 m window, then keep the maximum per 2 m cell.
 - No `NaN` except where the heightmap is `NaN`.
 
 
 ### 3.5 traversal_penalty.bin
 
 - float32 multiplier, ≥ 1. `1` = ordinary firm ground, larger = slower or riskier.
-- `+Infinity` = impassable: rocks above the size limit, soft sand, excessive roughness, slope above `max_walkable_slope_deg`.
+- `+Infinity` = impassable.
 - `NaN` is not allowed. Cells without data are `+Infinity`.
 - Used in edge cost, see section 4.
+
+Rules in v1.0.0 (estimates, D-019):
+1. Slope above `max_walkable_slope_deg` (25°): `+Infinity`.
+2. Roughness above 0.5 m: `+Infinity`. Roughness 0.2 to 0.5 m: × 1.5.
+3. A detected rock of diameter 1.5 m or more: `+Infinity` for every cell within the rock's radius plus 0.5 m.
+4. Likely soft sand (cell more than 0.3 m below the smoothed surface and roughness under 0.1 m, typical of boxwork hollow fill): × 1.3.
+5. Otherwise: 1.
+6. Factors multiply.
 
 
 ### 3.6 return_field.bin
@@ -269,6 +293,7 @@ All coordinates in the example above are placeholders, not decisions. Bounds and
 - Staging point cell = 0.
 - `+Infinity` = unreachable. `NaN` is not allowed.
 - Edge direction: the cost is for walking towards the staging point, that is from the cell to its neighbour. The pipeline must run Dijkstra on the reversed graph so uphill/downhill asymmetry is correct.
+- Computed on the exported 2 m grid, the same grid the app routes on.
 
 
 ### 3.7 sky_view_factor.bin
@@ -281,7 +306,7 @@ All coordinates in the example above are placeholders, not decisions. Bounds and
 ### 3.8 thermal_inertia.bin
 
 - float32, THEMIS thermal inertia in J m⁻² K⁻¹ s⁻½ (unit string in `meta.json` is authoritative).
-- Resampled to the 1 m grid. Native resolution ~100 m, so it carries only ~10 to 30 real pixels across the patch. Context, not walk-level detail. The layer entry in `meta.json` states `native_resolution_m: 100`.
+- Resampled to the 2 m grid. Native resolution ~100 m, so it carries only ~10 to 30 real pixels across the patch. Context, not walk-level detail. The layer entry in `meta.json` states the native resolution.
 - `NaN` allowed where there is no data.
 
 
@@ -289,7 +314,7 @@ All coordinates in the example above are placeholders, not decisions. Bounds and
 
 - uint8. `0` = no data. Other values map to names through `mineralogy_classes` in `meta.json`.
 - Source: ready-made CRISM mineral maps (native ~18 m). Raw CRISM is never processed.
-- Class list is TBD at Stage 1 (Person A).
+- The class list lives in `mineralogy_classes` in `meta.json`. Stage 1 sets it from the CRISM product used; `"0"` is always `"no_data"`.
 
 
 ### 3.10 texture_hirise.jpg
@@ -309,7 +334,7 @@ Fields:
 - `x_m`, `z_m` (number): position in the local grid, inside the extent.
 - `diameter_m` (number): estimated diameter.
 - `height_m` (number): estimated height.
-- `detection_method` (string): `"shadow_based"` in v0.1.0.
+- `detection_method` (string): `"shadow_based"` in v1.0.0.
 - `confidence` (number): 0 to 1.
 - `provenance` (object): see 1.5. `is_estimate` is `true`.
 
@@ -341,7 +366,7 @@ Rocks below roughly 1.5 m are not individually detected. They are represented st
 
 ### 3.12 knots.json
 
-Array of 4 to 5 objects (count TBD at Stage 0).
+Array of 5 objects in v1.0.0 (D-023).
 
 Fields:
 
@@ -421,7 +446,7 @@ Example:
 ]
 ```
 
-The rover shelter sits at `staging_point`. Which shelters exist in the patch (and whether a habitat entry is included at all) is TBD at Stage 0, whole team.
+The rover shelter sits at `staging_point`. v1.0.0 includes the rover plus terrain overhangs (cells with sky-view factor under 0.75 that are passable and reachable); no habitat entry, because the habitat is far outside the patch (D-024).
 
 
 ### 3.14 environment_timeline.json
@@ -430,7 +455,7 @@ A replay of real historical data on a simulation clock (decision D-014).
 
 Top level object fields:
 
-- `replay_source` (object): `{ "mission": "msl", "instrument_set": ["rems", "rad"], "sol": int }`. The sol is TBD at Stage 0.
+- `replay_source` (object): `{ "mission": "msl", "instrument_set": ["rems", "rad"], "sol": int }`. The sol is chosen in Stage 1 and recorded in `docs/data_sources.md`.
 - `samples` (array): ordered by `seconds_since_replay_start`, ascending.
 
 Each sample:
@@ -476,7 +501,7 @@ Values above are placeholders. Fields that REMS or RAD do not measure directly (
 
 ### 3.15 scenario.json
 
-Produced and consumed by Stage 3 (Person C). It is app content, not pipeline output, so it lives in `app/` (exact path TBD, Person C) and not in `data/processed/`. The validator does not require it. It is specified here so the format is stable.
+Produced and consumed by Stage 3 (Person C). It is app content, not pipeline output, so it lives at `app/src/sim/scenario.json` and not in `data/processed/`. The validator does not require it. It is specified here so the format is stable.
 
 Top level object fields:
 
@@ -513,6 +538,18 @@ Example:
 The set of `event_type` values grows over time. Existing values are not renamed (D-012).
 
 
+### 3.16 viewshed_rover.bin
+
+- uint8. `1` = a helmet 1.8 m above the ground can see the rover's antenna, 3 m above the ground at `staging_point`. `0` = no line of sight (comms dead zone, est.).
+- Computed on the 2 m `heightmap.bin`.
+
+
+### 3.17 Gale regional context image
+
+- `gale_context.jpg` in `data/processed/`, at most 4096 px on the longer side, north up.
+- `regional_context` in `meta.json` gives its size and the patch rectangle in pixels, so the app can draw where the patch is.
+
+
 ## 4. Shared walking-time function
 
 The same function exists in Python (pipeline, for `return_field.bin`) and in TypeScript (app, runtime routing). Both must give the same result.
@@ -536,8 +573,9 @@ edge_cost_seconds = walking_time_seconds(horizontal_distance_m, elevation_change
                     * max(traversal_penalty[from_cell], traversal_penalty[to_cell])
 ```
 
-- Using the maximum of the two cells' penalties is PROPOSED. Person A confirms at Stage 0.
+- The maximum of the two cells' penalties is used (D-019): a step is as hard as its harder end.
 - If either penalty is `+Infinity`, the edge does not exist.
+- If `walking_time_seconds` returns `+Infinity` (step too steep), the edge does not exist.
 - Neighbours are 8-connected. For a diagonal move the horizontal distance is `cell_size_m * sqrt(2)`; for an orthogonal move it is `cell_size_m`. `elevation_change_m` is the difference between the two cell heights.
 - The cost is direction-dependent: the reverse edge has `-elevation_change_m` and therefore a different cost.
 
@@ -554,21 +592,26 @@ walking_time_seconds_earth = horizontal_distance_m / speed_m_per_s
 Note:
 
 - Tobler's function uses horizontal distance and slope S as written above.
-- Whether the path length along the slope is used instead is not decided here.
-- v0.1.0 uses horizontal distance as in the formula.
+- v1.0.0 uses horizontal distance, not path length along the slope.
 
 
-### 4.4 Mars and suit adaptation
-
-Placeholders, decided by Person A at Stage 0 and recorded in `decisions.md`.
+### 4.4 Mars and suit adaptation (D-019)
 
 Parameters:
 
-- `suit_speed_factor` (TBD): multiplier on walking speed for the pressurised suit.
-- `gravity_adjustment` (TBD): adjustment for Mars gravity (0.38 g).
-- `max_walkable_slope_deg` (TBD, proposal: 25): slopes above this are impassable (`+Infinity` penalty).
+- `suit_speed_factor` = 0.6: peak speed becomes exactly 1.0 m/s, matching Apollo's ~2.2 mph maximum nominal suited walking speed.
+- `gravity_adjustment` = 1.0: no adjustment, because the evidence for Mars gravity is thin. Walking times are shown as "est.".
+- `max_walkable_slope_deg` = 25: steeper steps are impassable.
 
-How `suit_speed_factor` and `gravity_adjustment` enter the formula is also TBD (Person A).
+Full formula (both implementations must follow it exactly):
+
+```
+S = elevation_change_m / horizontal_distance_m
+if degrees(atan(abs(S))) > max_walkable_slope_deg:
+    return +Infinity
+speed_kmh = 6 * exp(-3.5 * abs(S + 0.05)) * suit_speed_factor * gravity_adjustment
+walking_time_seconds = horizontal_distance_m / (speed_kmh / 3.6)
+```
 
 
 ### 4.5 Test vectors
@@ -577,20 +620,21 @@ Python (pipeline) and TypeScript (app) implementations MUST both pass these 8 ro
 
 ```
 #  horizontal_distance_m  elevation_change_m  expected_seconds
-1  1.0                    0.0                 TBD
-2  1.0                    0.1                 TBD
-3  1.0                    -0.1                TBD
-4  1.0                    0.5                 TBD
-5  1.0                    -0.5                TBD
-6  1.4142135623730951     0.0                 TBD
-7  10.0                   2.0                 TBD
-8  10.0                   -2.0                TBD
+1  1.0                    0.0                 1.1912
+2  1.0                    0.1                 1.6905
+3  1.0                    -0.1                1.1912
+4  1.0                    0.5                 +Infinity
+5  1.0                    -0.5                +Infinity
+6  1.4142135623730951     0.0                 1.6847
+7  10.0                   2.0                 23.9888
+8  10.0                   -2.0                16.9046
 ```
 
 Notes:
 
-- Every `expected_seconds` value is TBD: Person A computes it at Stage 0 once parameters are fixed.
-- Row 1 is flat ground over 1 m, the anchor example.
+- Row 1 is flat ground over 1 m, the anchor example (0.84 m/s).
+- Row 3 equals row 1: Tobler's speed peaks on a gentle downhill, so this is correct, not a bug.
+- Rows 4 and 5 are 26.6° steps, steeper than 25°, so impassable.
 - Row 6 is a diagonal move on flat ground.
 - The set of rows may grow. Rows are never changed after sign-off without a `decisions.md` entry.
 
@@ -602,20 +646,30 @@ Notes:
 1. Every file listed in section 2 under `data/processed/` exists.
 2. Binary file sizes equal `width × height × bytes per value` (4 for float32, 1 for uint8).
 3. `NaN` and `+Infinity` appear only where this contract allows them.
-4. Value ranges: slope 0 to 90, sky view factor 0 to 1, penalty ≥ 1, roughness ≥ 0.
+4. Value ranges: slope 0 to 90, sky view factor 0 to 1, penalty ≥ 1, roughness ≥ 0, viewshed 0 or 1.
 5. Every x and z in JSON files lies inside the grid extent.
 6. `return_field` at the staging point is 0.
 7. Every Knot is reachable (finite `return_field` at its cell).
 8. Every UI record has provenance (rocks, Knot measurements, environment samples, layers).
 9. `contract_version` in `meta.json` matches the version in this document.
+10. The walking-time test vectors in 4.5 pass in Python.
 
 Notes:
 
 - Passing the validator is part of the Stage 1 hand-off gate (see `docs/handoff.md`).
-- The validator itself is written in Stage 1 and is not yet present.
 
 
 ## 6. Changelog
+
+### v1.0.0, 2026-11-14 (SIGNED)
+
+- Signed off at Stage 0 by Lawrence (D-017 to D-025).
+- Grid cell size 2.0 m for exported layers; pipeline computes at 1 m first (D-021).
+- Walking parameters, full formula, edge slope rule and test vector values filled (D-019).
+- Methods for slope, roughness and the penalty rules defined.
+- Added `viewshed_rover.bin` (3.16), Gale regional context image (3.17), optional `parameters` and `regional_context` in `meta.json`.
+- `scenario.json` path fixed to `app/src/sim/scenario.json`; 5 Knots; shelters are rover plus terrain overhangs.
+
 
 ### v0.1.0, 2026-11-13 (DRAFT)
 

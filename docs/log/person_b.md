@@ -1,4 +1,4 @@
-# Person B log
+# Person B log (Malissa)
 
 Stage owned and role: Stage 2, app shell, Labyrinth view (3D), Planning Table, layer switching, runtime routing, Thread rendering.
 

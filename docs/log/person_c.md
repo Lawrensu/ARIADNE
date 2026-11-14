@@ -1,4 +1,4 @@
-# Person C log
+# Person C log (Letta)
 
 Stage owned and role: Stage 3, Suit HUD, alerts, Knot cards, simulation clock and scenario engine, CRT look polish, demo and pitch.
 

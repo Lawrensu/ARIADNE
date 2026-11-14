@@ -1,0 +1,439 @@
+{
+  "event": "2024-05-20 solar energetic particle event",
+  "donki_cme_id": "2024-05-20T05:36:00-CME-001",
+  "sol": 4190,
+  "baseline_ugy_per_hour": 5.53,
+  "samples": [
+    {
+      "minutes_since_onset": -30,
+      "dose_rate_ugy_per_hour": 5.62,
+      "dose_rate_usv_per_hour_upper_bound": 17.1
+    },
+    {
+      "minutes_since_onset": -20,
+      "dose_rate_ugy_per_hour": 5.64,
+      "dose_rate_usv_per_hour_upper_bound": 17.2
+    },
+    {
+      "minutes_since_onset": -10,
+      "dose_rate_ugy_per_hour": 5.72,
+      "dose_rate_usv_per_hour_upper_bound": 17.4
+    },
+    {
+      "minutes_since_onset": 0,
+      "dose_rate_ugy_per_hour": 7.98,
+      "dose_rate_usv_per_hour_upper_bound": 24.3
+    },
+    {
+      "minutes_since_onset": 10,
+      "dose_rate_ugy_per_hour": 21.44,
+      "dose_rate_usv_per_hour_upper_bound": 65.4
+    },
+    {
+      "minutes_since_onset": 20,
+      "dose_rate_ugy_per_hour": 79.0,
+      "dose_rate_usv_per_hour_upper_bound": 241.0
+    },
+    {
+      "minutes_since_onset": 30,
+      "dose_rate_ugy_per_hour": 211.09,
+      "dose_rate_usv_per_hour_upper_bound": 643.8
+    },
+    {
+      "minutes_since_onset": 40,
+      "dose_rate_ugy_per_hour": 318.46,
+      "dose_rate_usv_per_hour_upper_bound": 971.3
+    },
+    {
+      "minutes_since_onset": 50,
+      "dose_rate_ugy_per_hour": 344.72,
+      "dose_rate_usv_per_hour_upper_bound": 1051.4
+    },
+    {
+      "minutes_since_onset": 60,
+      "dose_rate_ugy_per_hour": 350.49,
+      "dose_rate_usv_per_hour_upper_bound": 1069.0
+    },
+    {
+      "minutes_since_onset": 70,
+      "dose_rate_ugy_per_hour": 341.13,
+      "dose_rate_usv_per_hour_upper_bound": 1040.4
+    },
+    {
+      "minutes_since_onset": 80,
+      "dose_rate_ugy_per_hour": 319.53,
+      "dose_rate_usv_per_hour_upper_bound": 974.6
+    },
+    {
+      "minutes_since_onset": 90,
+      "dose_rate_ugy_per_hour": 296.93,
+      "dose_rate_usv_per_hour_upper_bound": 905.6
+    },
+    {
+      "minutes_since_onset": 100,
+      "dose_rate_ugy_per_hour": 283.29,
+      "dose_rate_usv_per_hour_upper_bound": 864.0
+    },
+    {
+      "minutes_since_onset": 110,
+      "dose_rate_ugy_per_hour": 272.99,
+      "dose_rate_usv_per_hour_upper_bound": 832.6
+    },
+    {
+      "minutes_since_onset": 120,
+      "dose_rate_ugy_per_hour": 257.32,
+      "dose_rate_usv_per_hour_upper_bound": 784.8
+    },
+    {
+      "minutes_since_onset": 130,
+      "dose_rate_ugy_per_hour": 254.08,
+      "dose_rate_usv_per_hour_upper_bound": 774.9
+    },
+    {
+      "minutes_since_onset": 140,
+      "dose_rate_ugy_per_hour": 242.02,
+      "dose_rate_usv_per_hour_upper_bound": 738.2
+    },
+    {
+      "minutes_since_onset": 150,
+      "dose_rate_ugy_per_hour": 214.38,
+      "dose_rate_usv_per_hour_upper_bound": 653.8
+    },
+    {
+      "minutes_since_onset": 160,
+      "dose_rate_ugy_per_hour": 190.24,
+      "dose_rate_usv_per_hour_upper_bound": 580.2
+    },
+    {
+      "minutes_since_onset": 170,
+      "dose_rate_ugy_per_hour": 184.87,
+      "dose_rate_usv_per_hour_upper_bound": 563.9
+    },
+    {
+      "minutes_since_onset": 180,
+      "dose_rate_ugy_per_hour": 176.12,
+      "dose_rate_usv_per_hour_upper_bound": 537.2
+    },
+    {
+      "minutes_since_onset": 190,
+      "dose_rate_ugy_per_hour": 164.65,
+      "dose_rate_usv_per_hour_upper_bound": 502.2
+    },
+    {
+      "minutes_since_onset": 200,
+      "dose_rate_ugy_per_hour": 152.48,
+      "dose_rate_usv_per_hour_upper_bound": 465.1
+    },
+    {
+      "minutes_since_onset": 210,
+      "dose_rate_ugy_per_hour": 138.34,
+      "dose_rate_usv_per_hour_upper_bound": 421.9
+    },
+    {
+      "minutes_since_onset": 220,
+      "dose_rate_ugy_per_hour": 125.08,
+      "dose_rate_usv_per_hour_upper_bound": 381.5
+    },
+    {
+      "minutes_since_onset": 230,
+      "dose_rate_ugy_per_hour": 120.37,
+      "dose_rate_usv_per_hour_upper_bound": 367.1
+    },
+    {
+      "minutes_since_onset": 240,
+      "dose_rate_ugy_per_hour": 116.82,
+      "dose_rate_usv_per_hour_upper_bound": 356.3
+    },
+    {
+      "minutes_since_onset": 250,
+      "dose_rate_ugy_per_hour": 101.88,
+      "dose_rate_usv_per_hour_upper_bound": 310.7
+    },
+    {
+      "minutes_since_onset": 260,
+      "dose_rate_ugy_per_hour": 97.47,
+      "dose_rate_usv_per_hour_upper_bound": 297.3
+    },
+    {
+      "minutes_since_onset": 270,
+      "dose_rate_ugy_per_hour": 97.17,
+      "dose_rate_usv_per_hour_upper_bound": 296.4
+    },
+    {
+      "minutes_since_onset": 280,
+      "dose_rate_ugy_per_hour": 91.71,
+      "dose_rate_usv_per_hour_upper_bound": 279.7
+    },
+    {
+      "minutes_since_onset": 290,
+      "dose_rate_ugy_per_hour": 88.72,
+      "dose_rate_usv_per_hour_upper_bound": 270.6
+    },
+    {
+      "minutes_since_onset": 300,
+      "dose_rate_ugy_per_hour": 89.51,
+      "dose_rate_usv_per_hour_upper_bound": 273.0
+    },
+    {
+      "minutes_since_onset": 310,
+      "dose_rate_ugy_per_hour": 94.57,
+      "dose_rate_usv_per_hour_upper_bound": 288.4
+    },
+    {
+      "minutes_since_onset": 320,
+      "dose_rate_ugy_per_hour": 106.09,
+      "dose_rate_usv_per_hour_upper_bound": 323.6
+    },
+    {
+      "minutes_since_onset": 330,
+      "dose_rate_ugy_per_hour": 110.46,
+      "dose_rate_usv_per_hour_upper_bound": 336.9
+    },
+    {
+      "minutes_since_onset": 340,
+      "dose_rate_ugy_per_hour": 106.84,
+      "dose_rate_usv_per_hour_upper_bound": 325.9
+    },
+    {
+      "minutes_since_onset": 350,
+      "dose_rate_ugy_per_hour": 102.56,
+      "dose_rate_usv_per_hour_upper_bound": 312.8
+    },
+    {
+      "minutes_since_onset": 360,
+      "dose_rate_ugy_per_hour": 101.31,
+      "dose_rate_usv_per_hour_upper_bound": 309.0
+    },
+    {
+      "minutes_since_onset": 370,
+      "dose_rate_ugy_per_hour": 98.2,
+      "dose_rate_usv_per_hour_upper_bound": 299.5
+    },
+    {
+      "minutes_since_onset": 380,
+      "dose_rate_ugy_per_hour": 97.32,
+      "dose_rate_usv_per_hour_upper_bound": 296.8
+    },
+    {
+      "minutes_since_onset": 390,
+      "dose_rate_ugy_per_hour": 98.88,
+      "dose_rate_usv_per_hour_upper_bound": 301.6
+    },
+    {
+      "minutes_since_onset": 400,
+      "dose_rate_ugy_per_hour": 96.09,
+      "dose_rate_usv_per_hour_upper_bound": 293.1
+    },
+    {
+      "minutes_since_onset": 410,
+      "dose_rate_ugy_per_hour": 92.81,
+      "dose_rate_usv_per_hour_upper_bound": 283.1
+    },
+    {
+      "minutes_since_onset": 420,
+      "dose_rate_ugy_per_hour": 89.45,
+      "dose_rate_usv_per_hour_upper_bound": 272.8
+    },
+    {
+      "minutes_since_onset": 430,
+      "dose_rate_ugy_per_hour": 88.33,
+      "dose_rate_usv_per_hour_upper_bound": 269.4
+    },
+    {
+      "minutes_since_onset": 440,
+      "dose_rate_ugy_per_hour": 85.76,
+      "dose_rate_usv_per_hour_upper_bound": 261.6
+    },
+    {
+      "minutes_since_onset": 450,
+      "dose_rate_ugy_per_hour": 82.08,
+      "dose_rate_usv_per_hour_upper_bound": 250.4
+    },
+    {
+      "minutes_since_onset": 460,
+      "dose_rate_ugy_per_hour": 79.13,
+      "dose_rate_usv_per_hour_upper_bound": 241.3
+    },
+    {
+      "minutes_since_onset": 470,
+      "dose_rate_ugy_per_hour": 76.52,
+      "dose_rate_usv_per_hour_upper_bound": 233.4
+    },
+    {
+      "minutes_since_onset": 480,
+      "dose_rate_ugy_per_hour": 73.69,
+      "dose_rate_usv_per_hour_upper_bound": 224.7
+    },
+    {
+      "minutes_since_onset": 490,
+      "dose_rate_ugy_per_hour": 71.1,
+      "dose_rate_usv_per_hour_upper_bound": 216.9
+    },
+    {
+      "minutes_since_onset": 500,
+      "dose_rate_ugy_per_hour": 68.1,
+      "dose_rate_usv_per_hour_upper_bound": 207.7
+    },
+    {
+      "minutes_since_onset": 510,
+      "dose_rate_ugy_per_hour": 64.73,
+      "dose_rate_usv_per_hour_upper_bound": 197.4
+    },
+    {
+      "minutes_since_onset": 520,
+      "dose_rate_ugy_per_hour": 63.1,
+      "dose_rate_usv_per_hour_upper_bound": 192.4
+    },
+    {
+      "minutes_since_onset": 530,
+      "dose_rate_ugy_per_hour": 61.45,
+      "dose_rate_usv_per_hour_upper_bound": 187.4
+    },
+    {
+      "minutes_since_onset": 540,
+      "dose_rate_ugy_per_hour": 60.76,
+      "dose_rate_usv_per_hour_upper_bound": 185.3
+    },
+    {
+      "minutes_since_onset": 550,
+      "dose_rate_ugy_per_hour": 58.86,
+      "dose_rate_usv_per_hour_upper_bound": 179.5
+    },
+    {
+      "minutes_since_onset": 560,
+      "dose_rate_ugy_per_hour": 57.69,
+      "dose_rate_usv_per_hour_upper_bound": 175.9
+    },
+    {
+      "minutes_since_onset": 570,
+      "dose_rate_ugy_per_hour": 56.76,
+      "dose_rate_usv_per_hour_upper_bound": 173.1
+    },
+    {
+      "minutes_since_onset": 580,
+      "dose_rate_ugy_per_hour": 55.56,
+      "dose_rate_usv_per_hour_upper_bound": 169.5
+    },
+    {
+      "minutes_since_onset": 590,
+      "dose_rate_ugy_per_hour": 53.77,
+      "dose_rate_usv_per_hour_upper_bound": 164.0
+    },
+    {
+      "minutes_since_onset": 600,
+      "dose_rate_ugy_per_hour": 52.35,
+      "dose_rate_usv_per_hour_upper_bound": 159.7
+    },
+    {
+      "minutes_since_onset": 610,
+      "dose_rate_ugy_per_hour": 49.73,
+      "dose_rate_usv_per_hour_upper_bound": 151.7
+    },
+    {
+      "minutes_since_onset": 620,
+      "dose_rate_ugy_per_hour": 50.53,
+      "dose_rate_usv_per_hour_upper_bound": 154.1
+    },
+    {
+      "minutes_since_onset": 630,
+      "dose_rate_ugy_per_hour": 49.96,
+      "dose_rate_usv_per_hour_upper_bound": 152.4
+    },
+    {
+      "minutes_since_onset": 640,
+      "dose_rate_ugy_per_hour": 49.41,
+      "dose_rate_usv_per_hour_upper_bound": 150.7
+    },
+    {
+      "minutes_since_onset": 650,
+      "dose_rate_ugy_per_hour": 48.96,
+      "dose_rate_usv_per_hour_upper_bound": 149.3
+    },
+    {
+      "minutes_since_onset": 660,
+      "dose_rate_ugy_per_hour": 48.02,
+      "dose_rate_usv_per_hour_upper_bound": 146.5
+    },
+    {
+      "minutes_since_onset": 670,
+      "dose_rate_ugy_per_hour": 47.29,
+      "dose_rate_usv_per_hour_upper_bound": 144.2
+    },
+    {
+      "minutes_since_onset": 680,
+      "dose_rate_ugy_per_hour": 46.44,
+      "dose_rate_usv_per_hour_upper_bound": 141.6
+    },
+    {
+      "minutes_since_onset": 690,
+      "dose_rate_ugy_per_hour": 44.6,
+      "dose_rate_usv_per_hour_upper_bound": 136.0
+    },
+    {
+      "minutes_since_onset": 700,
+      "dose_rate_ugy_per_hour": 43.27,
+      "dose_rate_usv_per_hour_upper_bound": 132.0
+    },
+    {
+      "minutes_since_onset": 710,
+      "dose_rate_ugy_per_hour": 42.18,
+      "dose_rate_usv_per_hour_upper_bound": 128.6
+    },
+    {
+      "minutes_since_onset": 720,
+      "dose_rate_ugy_per_hour": 41.03,
+      "dose_rate_usv_per_hour_upper_bound": 125.1
+    },
+    {
+      "minutes_since_onset": 730,
+      "dose_rate_ugy_per_hour": 39.75,
+      "dose_rate_usv_per_hour_upper_bound": 121.2
+    },
+    {
+      "minutes_since_onset": 740,
+      "dose_rate_ugy_per_hour": 39.56,
+      "dose_rate_usv_per_hour_upper_bound": 120.7
+    },
+    {
+      "minutes_since_onset": 750,
+      "dose_rate_ugy_per_hour": 39.22,
+      "dose_rate_usv_per_hour_upper_bound": 119.6
+    },
+    {
+      "minutes_since_onset": 760,
+      "dose_rate_ugy_per_hour": 38.83,
+      "dose_rate_usv_per_hour_upper_bound": 118.4
+    },
+    {
+      "minutes_since_onset": 770,
+      "dose_rate_ugy_per_hour": 37.56,
+      "dose_rate_usv_per_hour_upper_bound": 114.6
+    },
+    {
+      "minutes_since_onset": 780,
+      "dose_rate_ugy_per_hour": 37.17,
+      "dose_rate_usv_per_hour_upper_bound": 113.4
+    },
+    {
+      "minutes_since_onset": 790,
+      "dose_rate_ugy_per_hour": 36.75,
+      "dose_rate_usv_per_hour_upper_bound": 112.1
+    },
+    {
+      "minutes_since_onset": 800,
+      "dose_rate_ugy_per_hour": 35.85,
+      "dose_rate_usv_per_hour_upper_bound": 109.3
+    },
+    {
+      "minutes_since_onset": 810,
+      "dose_rate_ugy_per_hour": 35.75,
+      "dose_rate_usv_per_hour_upper_bound": 109.0
+    },
+    {
+      "minutes_since_onset": 820,
+      "dose_rate_ugy_per_hour": 35.1,
+      "dose_rate_usv_per_hour_upper_bound": 107.1
+    }
+  ],
+  "notes": "Real RAD plastic (E) detector dose rate from MSL sol 4190 (product RAD_RDR_2024_140_18_30_4190_V00), linearly interpolated between observation centres (observations of 481 to 961 s). Onset (minutes_since_onset 0) is the start of the first observation above 1.5 times the pre-event baseline, 2024-05-20T05:21:50Z; the steep rise follows within about 15 minutes. The DONKI CME id marks the coronal mass ejection from a backsided active region, not the arrival time. uSv/h is an upper bound: absorbed dose times the surface quality factor 3.05 (Hassler et al. 2014), which is probably too high for solar energetic protons. Truncated observations were dropped. NASA reported 8,100 microgray for an astronaut next to Curiosity; this sol's dosimetry totals only about 1.3 to 1.6 mGy, so that figure is not reproduced here (unresolved, cite as NASA reported). Estimates, not measured dose equivalent."
+}

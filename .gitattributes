@@ -1,0 +1,11 @@
+# Binary data must never get line-ending conversion
+*.bin binary
+*.jpg binary
+*.png binary
+*.tif binary
+
+# Text files keep LF in the repo
+*.md text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
