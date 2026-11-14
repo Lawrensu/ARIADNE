@@ -15,17 +15,17 @@ This is the live status board. The main agent of the stage owner updates it when
    - Gate passed: Yes
    - Signed off by: Lawrence, 2026-11-14
 2. Stage 1: data and algorithms pipeline
-   - Owner: Lawrence (Person A)
-   - Status: In progress
-   - Gate passed: No
-   - Signed off by: none yet
+   - Owner: Lawrence (Part A)
+   - Status: Finished
+   - Gate passed: Yes
+   - Signed off by: Lawrence
 3. Stage 2: app shell, Labyrinth view, Planning Table, routing, Thread
-   - Owner: Malissa (Person B)
+   - Owner: Malissa (Part B)
    - Status: Not started
    - Gate passed: No
    - Signed off by: none yet
 4. Stage 3: Suit HUD, alerts, Knot cards, simulation, CRT polish, demo
-   - Owner: Letta (Person C)
+   - Owner: Letta (Part C)
    - Status: Not started
    - Gate passed: No
    - Signed off by: none yet
