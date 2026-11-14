@@ -35,7 +35,7 @@ export function MarswalkCanvas({ children, onMarkerSelect }: MarswalkCanvasProps
             gl={{ antialias: true }}
             style={{ position: "absolute", inset: 0 }}
         >
-            <color attach="background" args={["#120c08"]} />
+            <color attach="background" args={["#050a06"]} />
             <TerrainProvider processedData={processedData}>
                 <TerrainMesh />
                 <SceneMarkers onMarkerSelect={onMarkerSelect} />

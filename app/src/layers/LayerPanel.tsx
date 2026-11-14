@@ -140,8 +140,7 @@ export function LayerPanel() {
     const setOverlayOpacity = useAriadneStore((state) => state.setOverlayOpacity);
 
     return (
-        <section aria-label="Map layers" className="w-80 max-w-full space-y-2 bg-ariadne-background p-2 text-ariadne-text">
-            <h2 className="text-lg font-bold">Layers</h2>
+        <section aria-label="Map layers" className="w-full space-y-2 text-ariadne-text">
             <label className="block min-h-12 rounded border border-ariadne-border bg-ariadne-panel p-2 text-sm">
                 <span className="flex justify-between">
                     <span>Overlay opacity</span>

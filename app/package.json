@@ -14,9 +14,12 @@
     "typecheck": "tsc -p tsconfig.json",
     "pretest": "npm run copy-data",
     "test": "vitest run",
-    "payload": "node scripts/reportPayload.mjs"
+    "payload": "node scripts/reportPayload.mjs",
+    "browser-check": "node scripts/browserCheck.mjs"
   },
   "dependencies": {
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@fontsource/vt323": "5.3.0",
     "@react-three/drei": "10.7.9",
     "@react-three/fiber": "9.8.2",
     "@react-three/postprocessing": "3.2.2",

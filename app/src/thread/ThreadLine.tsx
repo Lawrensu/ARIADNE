@@ -26,8 +26,8 @@ import {
 
 // Lift above the terrain surface in metres, so the line is not hidden by the mesh.
 const THREAD_LIFT_M = 1.5;
-// Placeholder accent; the final palette comes from Stage 3.
-export const THREAD_COLOR = "#ffd23f";
+// Phosphor green: the Thread is the app's signature line (Stage 3 palette).
+export const THREAD_COLOR = "#5ce87f";
 const THREAD_LINE_WIDTH_PX = 3;
 // Rings enclosing less than this area are not drawn: they are the outlines of single rocks and small
 // no-go spots inside the reachable region (or tiny reachable islands), which would bury the Thread in
