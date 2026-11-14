@@ -8,7 +8,7 @@ Rules:
 - Statuses: `proposed` | `accepted` | `superseded` | `rejected`.
 - A human approves every entry before it becomes `accepted`. Agents may only add entries as `proposed`.
 - When a decision is accepted, every affected doc is updated in the same change.
-- Source-of-truth precedence when docs disagree: `contracts.md` > `decisions.md` (latest accepted entry) > `system_design.md` > `development_conventions.md` > `design_principles.md` > `README.md`.
+- Source-of-truth precedence when docs disagree: `contracts.md` > `decisions.md` (latest accepted entry) > `system_design.md` > `development_conventions.md` > `README.md`.
 
 
 ## Entry template
@@ -187,7 +187,117 @@ Rules:
 - Affects docs: AGENTS.md, README.md, docs/development_conventions.md, docs/handoff.md
 
 
+### D-017: Marswalk patch bounds
+
+- Date: 2026-11-14
+- Status: accepted (Stage 0, Lawrence)
+- Decision: The patch is North -4.7809, South -4.8124, West 137.3771, East 137.4114 (planetocentric, east-positive), about 2,024 m east-west × 1,869 m north-south.
+- Why: It is the smallest box that holds both science targets with a 150 m margin: the Gediz Vallis sulfur field (Curiosity sol 4210) and the boxwork (sols 4527 to 4839). The two targets are only ~2.0 km apart, so one patch covers both. HiRISE DTM `DTEEC_009149_1750_009294_1750_U01` covers it with no gaps, and Curiosity's photos exist along the whole route.
+- Alternatives considered: Boxwork only (loses the sulfur story); two separate patches (twice the data, no shared Thread).
+- Affects docs: docs/contracts.md, docs/stage_0_guide.md, docs/data_sources.md
+
+
+### D-018: Rover staging point
+
+- Date: 2026-11-14
+- Status: accepted (Stage 0, Lawrence)
+- Decision: The pressurised rover parks at lat -4.78877, lon 137.39023 (elevation about -3709 m).
+- Why: It is one of the flattest spots in the patch (mean slope 3.4° within 20 m, max 6.0°), it is almost exactly halfway (1,120 m to the sulfur field, 1,118 m to the boxwork, so two walks of ~1.1 km, inside the Artemis III 2 km excursion radius), and it is ~70 m from Curiosity's sol 4464 stop, so the rover approach follows a route a rover has already driven.
+- Alternatives considered: Curiosity stops at sols 4464, 4473, 4417, 4544 (20 m mean slopes of 14.2°, 29.4°, 10.1°, 6.4°: too steep around the rover); flatter spots on high ground ~230 m above the route (far from Curiosity's path).
+- Affects docs: docs/contracts.md, docs/stage_0_guide.md
+
+
+### D-019: Walking model and penalty rules
+
+- Date: 2026-11-14
+- Status: accepted (Stage 0, Lawrence)
+- Decision: Tobler's hiking function with `suit_speed_factor` 0.6, `gravity_adjustment` 1.0, `max_walkable_slope_deg` 25; `walking_time_seconds` returns `+Infinity` for steeper steps; edge cost uses the max of the two cells' penalties; penalty rules as in contracts.md 3.5.
+- Why: 0.6 makes the peak speed exactly 1.0 m/s, matching Apollo's ~2.2 mph maximum nominal suited speed, and flat ground 0.84 m/s (~3 km/h). Evidence for a Mars gravity correction is thin, so it stays 1.0 and times are labelled "est.". The edge slope rule keeps Python and TypeScript identical even where slope layers are smoothed. Max of two penalties is conservative: a step is as hard as its harder end. The DTM shows slope matches Curiosity's measured tilt (median 8.8° vs 8.4°), so slope-based rules are trustworthy.
+- Alternatives considered: A Mars gravity speed-up (not well supported); mean of penalties (lets routes clip hazards); path length along the slope (small difference, more complex).
+- Affects docs: docs/contracts.md, docs/system_design.md
+
+
+### D-020: Consumables model for the Thread
+
+- Date: 2026-11-14
+- Status: accepted (Stage 0, Lawrence)
+- Decision: Suit capability 8 hours, planned Marswalk 6 hours, 30 minute reserve never used for planning. One shared Thread for the pair. The Thread is recalculated as time passes.
+- Why: Artemis planning gives EVAs of up to 8 hours with a 6 ± 2 hour target. With a pressurised rover, walkback is limited by what a fully recharged suit can walk back. Apollo recalculated walkback limits during each EVA from real consumption, which is what the live Thread shows.
+- Alternatives considered: Percentage reserve (harder to explain); separate Threads per crew member (the crew always walks together).
+- Affects docs: docs/contracts.md, docs/design_principles.md
+
+
+### D-021: Compute at 1 m, export at 2 m
+
+- Date: 2026-11-14
+- Status: accepted (Stage 0, Lawrence)
+- Decision: The pipeline computes terrain at ~1 m and exports all app grids at `cell_size_m` 2.0. The orthoimage texture stays at most 4096 px (~0.5 m per pixel).
+- Why: Measured on the real patch, 8 layers at 1 m are 52 to 96 MB compressed, far over the ~30 MB app budget. At 2 m they are 14 to 24 MB. Computing at 1 m first keeps rock and roughness detail in the penalty.
+- Alternatives considered: Lazy loading at 1 m (still too large); uint16 quantisation (contract change, error risk); smaller patch (loses a target).
+- Affects docs: docs/contracts.md, docs/system_design.md, docs/stage_0_guide.md
+
+
+### D-022: Commit processed data to git
+
+- Date: 2026-11-14
+- Status: accepted (Stage 0, Lawrence)
+- Decision: `data/processed/` is committed to git on the normal branches. `data/raw/` stays git-ignored.
+- Why: At 2 m the processed set is about 27 MB raw with every file under 4 MB, so teammates just pull. No extra tools (Git LFS) or manual downloads, which is the least error-prone hand-off.
+- Alternatives considered: Shared drive (manual, easy to get out of sync); Git LFS (every teammate must install it; small free quotas).
+- Affects docs: AGENTS.md, docs/development_conventions.md, docs/contracts.md
+
+
+### D-023: Knots chosen by Lawrence
+
+- Date: 2026-11-14
+- Status: accepted (Stage 0, Lawrence)
+- Decision: Five Knots at Curiosity stops: `knot_sulfur_stones` (sol 4210), `knot_channel_west_edge` (sol 4389), `knot_boxwork_first_view` (sol 4527), `knot_boxwork_ridge` (sol 4602), `knot_boxwork_hollow` (sol 4653). Lawrence's pipeline writes their text and photos; Person C may improve the text later.
+- Why: Each is a place Curiosity actually studied, so real photos and science exist. Together they tell the story: first pure sulfur on Mars, flood deposits, then groundwater boxwork (clay ridges, carbonate hollows). Picking them in Stage 1 keeps Person C free for the UI.
+- Alternatives considered: Person C picks them (delays Stage 1 output).
+- Affects docs: docs/contracts.md
+
+
+### D-024: Small Stage 0 calls (open questions 14 to 21)
+
+- Date: 2026-11-14
+- Status: accepted (Stage 0, Lawrence)
+- Decision:
+  1. Knot text and photos: Lawrence (Stage 1).
+  2. Photos: the app copies them in with credits, so the demo never needs the network.
+  3. Gale regional image: Lawrence exports it (`gale_context.jpg`).
+  4. `app/src/state/`: Person B owns the store shape; Person C adds slices in separate files.
+  5. Shelters: rover plus terrain overhangs; no habitat in the patch.
+  6. Mars24 sun and time: runs in the app.
+  7. `scenario.json`: `app/src/sim/scenario.json`.
+  8. Viewshed: `viewshed_rover.bin`, uint8. A nearest-shelter field is not exported; the app routes to shelters with D* Lite.
+- Why: Each choice is the simplest that works offline and keeps one owner per file.
+- Alternatives considered: Listed in docs/stage_0_guide.md.
+- Affects docs: docs/contracts.md, docs/system_design.md
+
+
+### D-025: Replay sources
+
+- Date: 2026-11-14
+- Status: accepted (Stage 0, Lawrence)
+- Decision: Weather replay is one real REMS sol from Curiosity's boxwork period (sol recorded in docs/data_sources.md once confirmed released on PDS). The scenario's solar particle event is the May 2024 storm that Curiosity's RAD measured at the surface. The UI says openly that they come from different dates.
+- Why: Both are real measurements from this exact region of Mars, and the May 2024 event is the strongest one Curiosity has recorded, which makes the demo honest and dramatic.
+- Alternatives considered: Synthetic weather (not real); a weaker event (less clear demo).
+- Affects docs: docs/contracts.md, docs/data_sources.md
+
+
+### D-026: Fewer docs, merged by topic
+
+- Date: 2026-11-14
+- Status: accepted (Lawrence)
+- Decision: The repo keeps 8 docs plus logs: README.md, AGENTS.md, CLAUDE.md, docs/system_design.md, docs/contracts.md, docs/data_sources.md, docs/decisions.md, docs/handoff.md, docs/development_conventions.md. Merged and removed: problem_statement.md, getting_started.md and high_level_summary.md into README.md; design_principles.md and the design rationale into docs/system_design.md; kickoff_prompts.md into docs/handoff.md; stage_0_guide.md removed (its results are in D-017 to D-025 and docs/data_sources.md).
+- Why: Too many overlapping docs made the repo harder to read for people and agents. One place per topic keeps it concise and avoids contradictions.
+- Alternatives considered: Keeping every doc with cross-links (redundant).
+- Affects docs: all. Older entries that name removed files now mean their new home (design principles: docs/system_design.md; Stage 0 guide: D-017 to D-025 and docs/data_sources.md).
+
+
 ## Open questions (Stage 0)
+
+Status 2026-11-14: questions 1 to 10 and 12 to 21 are resolved by D-017 to D-025. Question 11 (colour palette) stays with Person C.
 
 1. Exact patch bounds and staging point
    - Owner: Stage 0, whole team
@@ -221,7 +331,7 @@ Rules:
     - Notes: Person C uses it in `scenario.json`.
 11. Exact colour palette values (ochre/rust)
     - Owner: Person C proposes, whole team approves
-    - Notes: See design_principles.md.
+    - Notes: See the UX design principles in docs/system_design.md.
 12. Real names for Persons A, B and C
     - Owner: Stage 0, whole team
     - Notes: Placeholders until then.

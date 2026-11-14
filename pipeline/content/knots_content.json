@@ -1,0 +1,284 @@
+[
+  {
+    "knot_id": "knot_sulfur_stones",
+    "name": "Sulfur stones",
+    "sol": 4210,
+    "latitude_deg": -4.78572,
+    "longitude_deg": 137.40886,
+    "science_rationale": "This is a field of bright stones in Gediz Vallis channel where Curiosity found elemental (pure) sulfur, a first for Mars. Sulfur like this forms only under a narrow range of conditions, so crews would image the stones and sample the loose crystals and nearby bedrock to learn how it got here. The stones are small and brittle, so plan for surface sampling rather than coring.",
+    "sources": [
+      "https://www.jpl.nasa.gov/news/nasas-curiosity-rover-discovers-a-surprise-in-a-martian-rock/",
+      "https://science.nasa.gov/blog/sols-4323-4324-surfin-our-way-out-of-the-channel"
+    ],
+    "photos": [
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04210/opgs/edr/ncam/NLB_771231076EDR_F1072496NCAM00260M_.JPG",
+        "sol": 4210,
+        "camera": "Navcam Left B",
+        "image_id": "NLB_771231076EDR_F1072496NCAM00260M_",
+        "caption": "Stone-strewn floor of Gediz Vallis channel with a butte on the horizon, seen from the sulfur stones stop.",
+        "credit": "NASA/JPL-Caltech"
+      },
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04210/opgs/edr/ncam/NLB_771233487EDR_F1072496NCAM00353M_.JPG",
+        "sol": 4210,
+        "camera": "Navcam Left B",
+        "image_id": "NLB_771233487EDR_F1072496NCAM00353M_",
+        "caption": "Navcam view of fractured bedrock slabs in the rover workspace at the sulfur field stop.",
+        "credit": "NASA/JPL-Caltech"
+      },
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04210/opgs/edr/ncam/NRB_771231308EDR_F1072496NCAM00260M_.JPG",
+        "sol": 4210,
+        "camera": "Navcam Right B",
+        "image_id": "NRB_771231308EDR_F1072496NCAM00260M_",
+        "caption": "Navcam view of rippled sand and gravel beside the rover near the sulfur field.",
+        "credit": "NASA/JPL-Caltech"
+      }
+    ],
+    "extra_measurements": [
+      {
+        "label": "Elemental sulfur crystals found in crushed rock",
+        "value": "May 30, 2024 (about sol 4200, est.)",
+        "unit": "date",
+        "source_url": "https://www.jpl.nasa.gov/news/nasas-curiosity-rover-discovers-a-surprise-in-a-martian-rock/"
+      },
+      {
+        "label": "Mammoth Lakes drill hole",
+        "value": "41st hole, drilled June 18, 2024 (about sol 4219, est.)",
+        "unit": "drill hole",
+        "source_url": "https://www.jpl.nasa.gov/news/nasas-curiosity-rover-discovers-a-surprise-in-a-martian-rock/"
+      },
+      {
+        "label": "Sulfur stone texture",
+        "value": "too small and brittle for the drill; Mammoth Lakes drilled instead",
+        "unit": "note",
+        "source_url": "https://www.jpl.nasa.gov/news/nasas-curiosity-rover-discovers-a-surprise-in-a-martian-rock/"
+      }
+    ]
+  },
+  {
+    "knot_id": "knot_channel_west_edge",
+    "name": "Channel west edge",
+    "sol": 4389,
+    "latitude_deg": -4.78339,
+    "longitude_deg": 137.39898,
+    "science_rationale": "This stop is on the western side of the Gediz Vallis channel, climbing toward a saddle between the channel and a neighbouring canyon. Fractures and light coloured veins here show groundwater moved through the rock long ago. A crew would sample veins and bedrock to compare the west side with the east side of the channel.",
+    "sources": [
+      "https://science.nasa.gov/blog/sols-4384-4385-leaving-the-bishop-quad/",
+      "https://science.nasa.gov/blog/sols-4323-4324-surfin-our-way-out-of-the-channel"
+    ],
+    "photos": [
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04387/opgs/edr/ncam/NLB_786949164EDR_F1112548NCAM00354M_.JPG",
+        "sol": 4387,
+        "camera": "Navcam Left B",
+        "image_id": "NLB_786949164EDR_F1112548NCAM00354M_",
+        "caption": "Fractured bedrock slabs with dark cracks, seen near the western edge of the channel.",
+        "credit": "NASA/JPL-Caltech"
+      },
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04391/opgs/edr/ncam/NLB_787313986EDR_F1120000NCAM00267M_.JPG",
+        "sol": 4391,
+        "camera": "Navcam Left B",
+        "image_id": "NLB_787313986EDR_F1120000NCAM00267M_",
+        "caption": "Rocky slope west of the channel, looking uphill, sol 4391.",
+        "credit": "NASA/JPL-Caltech"
+      },
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04386/opgs/edr/ncam/NRB_786870561EDR_F1112386NCAM00200M_.JPG",
+        "sol": 4386,
+        "camera": "Navcam Right B",
+        "image_id": "NRB_786870561EDR_F1112386NCAM00200M_",
+        "caption": "Layered, wind carved rocks in the robotic arm workspace, sol 4386.",
+        "credit": "NASA/JPL-Caltech"
+      }
+    ],
+    "extra_measurements": [
+      {
+        "label": "Vein target Three Brothers (APXS and MAHLI)",
+        "value": "vertical vein, sols 4384 to 4385",
+        "unit": "target",
+        "source_url": "https://science.nasa.gov/blog/sols-4384-4385-leaving-the-bishop-quad/"
+      },
+      {
+        "label": "Planned drive west after sol 4385",
+        "value": 43,
+        "unit": "m",
+        "source_url": "https://science.nasa.gov/blog/sols-4384-4385-leaving-the-bishop-quad/"
+      }
+    ]
+  },
+  {
+    "knot_id": "knot_boxwork_first_view",
+    "name": "Boxwork first view",
+    "sol": 4527,
+    "latitude_deg": -4.79721,
+    "longitude_deg": 137.38751,
+    "science_rationale": "From here the boxwork appears as smoother terrain criss-crossed by ridges just below the hilltops. It is the best place to image the structures before reaching them and to decide where to go. Crews would take a wide mosaic and sample brushable bedrock nearby.",
+    "sources": [
+      "https://science.nasa.gov/blog/sols-4527-4528-boxwork-ahoy/",
+      "https://www.nasa.gov/missions/mars-science-laboratory/curiosity-rover/NASAs-curiosity-rover-sees-martian-spiderwebs-up-close/"
+    ],
+    "photos": [
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04530/opgs/edr/ncam/NLB_799648881EDR_F1152436NCAM00273M_.JPG",
+        "sol": 4530,
+        "camera": "Navcam Left B",
+        "image_id": "NLB_799648881EDR_F1152436NCAM00273M_",
+        "caption": "Polygon patterned bedrock and distant hills, three sols after the first boxwork view.",
+        "credit": "NASA/JPL-Caltech"
+      },
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04527/opgs/edr/ncam/NLB_799387498EDR_F1152232NCAM00354M_.JPG",
+        "sol": 4527,
+        "camera": "Navcam Left B",
+        "image_id": "NLB_799387498EDR_F1152232NCAM00354M_",
+        "caption": "Rock slabs and rippled sand beside the rover wheel at the first boxwork stop.",
+        "credit": "NASA/JPL-Caltech"
+      },
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04526/opgs/edr/ncam/NLB_799290258EDR_F1151980NCAM00267M_.JPG",
+        "sol": 4526,
+        "camera": "Navcam Left B",
+        "image_id": "NLB_799290258EDR_F1151980NCAM00267M_",
+        "caption": "Cracked, ridged bedrock slabs in front of the rover, sol 4526.",
+        "credit": "NASA/JPL-Caltech"
+      }
+    ],
+    "extra_measurements": [
+      {
+        "label": "Mastcam mosaic of the boxwork",
+        "value": 76,
+        "unit": "frames (stereo)",
+        "source_url": "https://science.nasa.gov/blog/sols-4527-4528-boxwork-ahoy/"
+      },
+      {
+        "label": "Brushed bedrock target Tamarack Valley (DRT, APXS, MAHLI)",
+        "value": "sol 4527",
+        "unit": "target",
+        "source_url": "https://science.nasa.gov/blog/sols-4527-4528-boxwork-ahoy/"
+      },
+      {
+        "label": "ChemCam LIBS target Aguanga",
+        "value": "sol 4527",
+        "unit": "target",
+        "source_url": "https://science.nasa.gov/blog/sols-4527-4528-boxwork-ahoy/"
+      },
+      {
+        "label": "Drive toward the boxwork after sol 4527",
+        "value": 30,
+        "unit": "m",
+        "source_url": "https://science.nasa.gov/blog/sols-4527-4528-boxwork-ahoy/"
+      }
+    ]
+  },
+  {
+    "knot_id": "knot_boxwork_ridge",
+    "name": "Boxwork ridge",
+    "sol": 4602,
+    "latitude_deg": -4.80437,
+    "longitude_deg": 137.37962,
+    "science_rationale": "The rover stopped on a resistant ridge at the start of the main boxwork exposure. Crews would study the ridge chemistry and texture and compare it with the neighbouring hollow, which is about 5 m away. Veins and nodular rock here are good sampling targets.",
+    "sources": [
+      "https://science.nasa.gov/blog/curiosity-blog-sols-4604-4606-taking-a-deep-breath-of-martian-air/",
+      "https://www.nasa.gov/missions/mars-science-laboratory/curiosity-rover/NASAs-curiosity-rover-sees-martian-spiderwebs-up-close/"
+    ],
+    "photos": [
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04602/opgs/edr/ncam/NLB_806041247EDR_F1172454NCAM00385M_.JPG",
+        "sol": 4602,
+        "camera": "Navcam Left B",
+        "image_id": "NLB_806041247EDR_F1172454NCAM00385M_",
+        "caption": "Rough, bright bedrock on top of the ridge, sol 4602.",
+        "credit": "NASA/JPL-Caltech"
+      },
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04605/opgs/edr/ncam/NLB_806306182EDR_F1172538NCAM00264M_.JPG",
+        "sol": 4605,
+        "camera": "Navcam Left B",
+        "image_id": "NLB_806306182EDR_F1172538NCAM00264M_",
+        "caption": "Dark gravelly slope with buttes beyond, sol 4605.",
+        "credit": "NASA/JPL-Caltech"
+      },
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04602/opgs/edr/ncam/NLB_806042881EDR_F1172490NCAM00261M_.JPG",
+        "sol": 4602,
+        "camera": "Navcam Left B",
+        "image_id": "NLB_806042881EDR_F1172490NCAM00261M_",
+        "caption": "View over the rover deck toward a valley and layered slopes, sol 4602.",
+        "credit": "NASA/JPL-Caltech"
+      }
+    ],
+    "extra_measurements": [
+      {
+        "label": "Boxwork ridge height (typical)",
+        "value": "1 to 2",
+        "unit": "m",
+        "source_url": "https://www.nasa.gov/missions/mars-science-laboratory/curiosity-rover/NASAs-curiosity-rover-sees-martian-spiderwebs-up-close/"
+      },
+      {
+        "label": "Drive from ridge to adjacent hollow",
+        "value": 5,
+        "unit": "m",
+        "source_url": "https://science.nasa.gov/blog/curiosity-blog-sols-4604-4606-taking-a-deep-breath-of-martian-air/"
+      },
+      {
+        "label": "Vein target Vicuna (ChemCam LIBS)",
+        "value": "sols 4604 to 4606",
+        "unit": "target",
+        "source_url": "https://science.nasa.gov/blog/curiosity-blog-sols-4604-4606-taking-a-deep-breath-of-martian-air/"
+      },
+      {
+        "label": "Nodular bedrock targets Totoral and Sillar (APXS, MAHLI)",
+        "value": "sols 4604 to 4606",
+        "unit": "target",
+        "source_url": "https://science.nasa.gov/blog/curiosity-blog-sols-4604-4606-taking-a-deep-breath-of-martian-air/"
+      }
+    ]
+  },
+  {
+    "knot_id": "knot_boxwork_hollow",
+    "name": "Boxwork hollow",
+    "sol": 4653,
+    "latitude_deg": -4.80708,
+    "longitude_deg": 137.3799,
+    "science_rationale": "Here the rock changes from smooth ridge bedrock to nodular bedrock at the edge of a shallow hollow. Drilled samples from the boxwork found clay minerals in a ridge and carbonate minerals in a hollow, which points to different water conditions. A crew would sample both the ridge rock and the pea-sized nodules in the hollow.",
+    "sources": [
+      "https://science.nasa.gov/blog/curiosity-blog-sols-4649-4654-ridges-hollows-and-nodules-oh-my",
+      "https://www.nasa.gov/missions/mars-science-laboratory/curiosity-rover/NASAs-curiosity-rover-sees-martian-spiderwebs-up-close/"
+    ],
+    "photos": [
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04650/opgs/edr/ncam/NLB_810298182EDR_F1182304NCAM00353M_.JPG",
+        "sol": 4650,
+        "camera": "Navcam Left B",
+        "image_id": "NLB_810298182EDR_F1182304NCAM00353M_",
+        "caption": "Bedrock in the arm workspace with the Curiosity plate visible, sol 4650.",
+        "credit": "NASA/JPL-Caltech"
+      },
+      {
+        "url": "https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/04650/opgs/edr/ncam/NLB_810299816EDR_F1182304NCAM00354M_.JPG",
+        "sol": 4650,
+        "camera": "Navcam Left B",
+        "image_id": "NLB_810299816EDR_F1182304NCAM00354M_",
+        "caption": "Pale, fractured ground beside the rover wheel at the ridge and hollow edge, sol 4650.",
+        "credit": "NASA/JPL-Caltech"
+      }
+    ],
+    "extra_measurements": [
+      {
+        "label": "Minerals found by X-ray analysis of drilled boxwork samples",
+        "value": "clay minerals in a ridge, carbonate minerals in a hollow",
+        "unit": "mineralogy",
+        "source_url": "https://www.nasa.gov/missions/mars-science-laboratory/curiosity-rover/NASAs-curiosity-rover-sees-martian-spiderwebs-up-close/"
+      },
+      {
+        "label": "Nodule size",
+        "value": "pea-sized",
+        "unit": "note",
+        "source_url": "https://www.nasa.gov/missions/mars-science-laboratory/curiosity-rover/NASAs-curiosity-rover-sees-martian-spiderwebs-up-close/"
+      }
+    ]
+  }
+]

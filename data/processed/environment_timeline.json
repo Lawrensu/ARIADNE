@@ -1,0 +1,1644 @@
+{
+  "replay_source": {
+    "mission": "msl",
+    "instrument_set": [
+      "rems",
+      "rad"
+    ],
+    "sol": 4760
+  },
+  "samples": [
+    {
+      "seconds_since_replay_start": 0.0,
+      "local_mean_solar_time": "00:00:00",
+      "air_temperature_c": -60.1,
+      "ground_temperature_c": -65.6,
+      "pressure_pa": 750.8,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.8,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T10:25:58Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: radiation_dose_rate_ugy_per_hour."
+      }
+    },
+    {
+      "seconds_since_replay_start": 924.742,
+      "local_mean_solar_time": "00:15:00",
+      "air_temperature_c": -60.9,
+      "ground_temperature_c": -68.5,
+      "pressure_pa": 751.2,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.14,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T10:41:23Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 1849.484,
+      "local_mean_solar_time": "00:30:00",
+      "air_temperature_c": -61.7,
+      "ground_temperature_c": -71.5,
+      "pressure_pa": 751.6,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.96,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T10:56:48Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 2774.226,
+      "local_mean_solar_time": "00:45:00",
+      "air_temperature_c": -62.4,
+      "ground_temperature_c": -74.4,
+      "pressure_pa": 752.0,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.85,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T11:12:13Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 3698.968,
+      "local_mean_solar_time": "01:00:00",
+      "air_temperature_c": -63.2,
+      "ground_temperature_c": -77.3,
+      "pressure_pa": 752.3,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.57,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T11:27:37Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 4623.711,
+      "local_mean_solar_time": "01:15:00",
+      "air_temperature_c": -64.0,
+      "ground_temperature_c": -77.3,
+      "pressure_pa": 752.4,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.22,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T11:43:02Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 5548.453,
+      "local_mean_solar_time": "01:30:00",
+      "air_temperature_c": -64.7,
+      "ground_temperature_c": -77.2,
+      "pressure_pa": 752.4,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.55,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T11:58:27Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 6473.195,
+      "local_mean_solar_time": "01:45:00",
+      "air_temperature_c": -65.5,
+      "ground_temperature_c": -77.2,
+      "pressure_pa": 752.4,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.36,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T12:13:52Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 7397.937,
+      "local_mean_solar_time": "02:00:00",
+      "air_temperature_c": -66.3,
+      "ground_temperature_c": -77.1,
+      "pressure_pa": 752.4,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.76,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T12:29:16Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 8322.679,
+      "local_mean_solar_time": "02:15:00",
+      "air_temperature_c": -65.1,
+      "ground_temperature_c": -75.6,
+      "pressure_pa": 752.3,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.87,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T12:44:41Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 9247.421,
+      "local_mean_solar_time": "02:30:00",
+      "air_temperature_c": -66.1,
+      "ground_temperature_c": -70.5,
+      "pressure_pa": 752.0,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.82,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T13:00:06Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 10172.163,
+      "local_mean_solar_time": "02:45:00",
+      "air_temperature_c": -67.3,
+      "ground_temperature_c": -71.4,
+      "pressure_pa": 751.5,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.82,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T13:15:31Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: radiation_dose_rate_ugy_per_hour."
+      }
+    },
+    {
+      "seconds_since_replay_start": 11096.905,
+      "local_mean_solar_time": "03:00:00",
+      "air_temperature_c": -68.0,
+      "ground_temperature_c": -71.4,
+      "pressure_pa": 751.0,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.81,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T13:30:55Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 12021.648,
+      "local_mean_solar_time": "03:15:00",
+      "air_temperature_c": -68.6,
+      "ground_temperature_c": -71.4,
+      "pressure_pa": 750.4,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.87,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T13:46:20Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 12946.39,
+      "local_mean_solar_time": "03:30:00",
+      "air_temperature_c": -68.7,
+      "ground_temperature_c": -71.9,
+      "pressure_pa": 750.2,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.99,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T14:01:45Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 13871.132,
+      "local_mean_solar_time": "03:45:00",
+      "air_temperature_c": -69.3,
+      "ground_temperature_c": -72.2,
+      "pressure_pa": 750.4,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.71,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T14:17:10Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 14795.874,
+      "local_mean_solar_time": "04:00:00",
+      "air_temperature_c": -68.8,
+      "ground_temperature_c": -71.4,
+      "pressure_pa": 750.4,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.71,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T14:32:34Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 15720.616,
+      "local_mean_solar_time": "04:15:00",
+      "air_temperature_c": -69.6,
+      "ground_temperature_c": -72.8,
+      "pressure_pa": 750.8,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.01,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T14:47:59Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 16645.358,
+      "local_mean_solar_time": "04:30:00",
+      "air_temperature_c": -70.0,
+      "ground_temperature_c": -73.2,
+      "pressure_pa": 751.2,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.82,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T15:03:24Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 17570.1,
+      "local_mean_solar_time": "04:45:00",
+      "air_temperature_c": -70.7,
+      "ground_temperature_c": -75.1,
+      "pressure_pa": 751.2,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.92,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T15:18:49Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 18494.842,
+      "local_mean_solar_time": "05:00:00",
+      "air_temperature_c": -71.1,
+      "ground_temperature_c": -75.2,
+      "pressure_pa": 751.6,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.09,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T15:34:13Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 19419.585,
+      "local_mean_solar_time": "05:15:00",
+      "air_temperature_c": -70.8,
+      "ground_temperature_c": -74.0,
+      "pressure_pa": 752.9,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.91,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T15:49:38Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: radiation_dose_rate_ugy_per_hour."
+      }
+    },
+    {
+      "seconds_since_replay_start": 20344.327,
+      "local_mean_solar_time": "05:30:00",
+      "air_temperature_c": -69.1,
+      "ground_temperature_c": -73.6,
+      "pressure_pa": 755.0,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.74,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T16:05:03Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 21269.069,
+      "local_mean_solar_time": "05:45:00",
+      "air_temperature_c": -69.0,
+      "ground_temperature_c": -71.7,
+      "pressure_pa": 757.7,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.6,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T16:20:28Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 22193.811,
+      "local_mean_solar_time": "06:00:00",
+      "air_temperature_c": -68.6,
+      "ground_temperature_c": -69.4,
+      "pressure_pa": 760.5,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.87,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T16:35:52Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 23118.553,
+      "local_mean_solar_time": "06:15:00",
+      "air_temperature_c": -65.3,
+      "ground_temperature_c": -67.7,
+      "pressure_pa": 762.7,
+      "uv_index_level": "moderate",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.8,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T16:51:17Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2, radiation_dose_rate_ugy_per_hour."
+      }
+    },
+    {
+      "seconds_since_replay_start": 24043.295,
+      "local_mean_solar_time": "06:30:00",
+      "air_temperature_c": -62.0,
+      "ground_temperature_c": -66.0,
+      "pressure_pa": 764.8,
+      "uv_index_level": "moderate",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.73,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T17:06:42Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 24968.037,
+      "local_mean_solar_time": "06:45:00",
+      "air_temperature_c": -58.7,
+      "ground_temperature_c": -64.3,
+      "pressure_pa": 767.0,
+      "uv_index_level": "moderate",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.66,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T17:22:06Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 25892.78,
+      "local_mean_solar_time": "07:00:00",
+      "air_temperature_c": -55.5,
+      "ground_temperature_c": -62.6,
+      "pressure_pa": 769.2,
+      "uv_index_level": "moderate",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.68,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T17:37:31Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 26817.522,
+      "local_mean_solar_time": "07:15:00",
+      "air_temperature_c": -52.1,
+      "ground_temperature_c": -54.8,
+      "pressure_pa": 766.0,
+      "uv_index_level": "high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.97,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T17:52:56Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 27742.264,
+      "local_mean_solar_time": "07:30:00",
+      "air_temperature_c": -48.7,
+      "ground_temperature_c": -47.0,
+      "pressure_pa": 762.8,
+      "uv_index_level": "high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.76,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T18:08:21Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 28667.006,
+      "local_mean_solar_time": "07:45:00",
+      "air_temperature_c": -45.4,
+      "ground_temperature_c": -39.1,
+      "pressure_pa": 759.6,
+      "uv_index_level": "high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.64,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T18:23:45Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2, radiation_dose_rate_ugy_per_hour."
+      }
+    },
+    {
+      "seconds_since_replay_start": 29591.748,
+      "local_mean_solar_time": "08:00:00",
+      "air_temperature_c": -42.0,
+      "ground_temperature_c": -31.3,
+      "pressure_pa": 756.4,
+      "uv_index_level": "very_high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.53,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T18:39:10Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 30516.49,
+      "local_mean_solar_time": "08:15:00",
+      "air_temperature_c": -43.0,
+      "ground_temperature_c": -28.8,
+      "pressure_pa": 753.8,
+      "uv_index_level": "very_high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.47,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T18:54:35Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 31441.232,
+      "local_mean_solar_time": "08:30:00",
+      "air_temperature_c": -40.4,
+      "ground_temperature_c": -25.3,
+      "pressure_pa": 750.5,
+      "uv_index_level": "very_high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.82,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T19:10:00Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 32365.974,
+      "local_mean_solar_time": "08:45:00",
+      "air_temperature_c": -37.8,
+      "ground_temperature_c": -20.9,
+      "pressure_pa": 747.9,
+      "uv_index_level": "very_high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.67,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T19:25:24Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 33290.717,
+      "local_mean_solar_time": "09:00:00",
+      "air_temperature_c": -32.8,
+      "ground_temperature_c": -17.2,
+      "pressure_pa": 745.6,
+      "uv_index_level": "extreme",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.61,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T19:40:49Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 34215.459,
+      "local_mean_solar_time": "09:15:00",
+      "air_temperature_c": -31.3,
+      "ground_temperature_c": -13.6,
+      "pressure_pa": 744.0,
+      "uv_index_level": "extreme",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.22,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T19:56:14Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 35140.201,
+      "local_mean_solar_time": "09:30:00",
+      "air_temperature_c": -29.8,
+      "ground_temperature_c": -10.0,
+      "pressure_pa": 742.4,
+      "uv_index_level": "extreme",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.24,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T20:11:39Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 36064.943,
+      "local_mean_solar_time": "09:45:00",
+      "air_temperature_c": -28.4,
+      "ground_temperature_c": -6.4,
+      "pressure_pa": 740.7,
+      "uv_index_level": "extreme",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.79,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T20:27:03Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 36989.685,
+      "local_mean_solar_time": "10:00:00",
+      "air_temperature_c": -26.9,
+      "ground_temperature_c": -2.8,
+      "pressure_pa": 739.1,
+      "uv_index_level": "extreme",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.42,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T20:42:28Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 37914.427,
+      "local_mean_solar_time": "10:15:00",
+      "air_temperature_c": -20.9,
+      "ground_temperature_c": -1.7,
+      "pressure_pa": 737.7,
+      "uv_index_level": "extreme",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.3,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T20:57:53Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: radiation_dose_rate_ugy_per_hour."
+      }
+    },
+    {
+      "seconds_since_replay_start": 38839.169,
+      "local_mean_solar_time": "10:30:00",
+      "air_temperature_c": -20.2,
+      "ground_temperature_c": 0.1,
+      "pressure_pa": 735.3,
+      "uv_index_level": "extreme",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.18,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T21:13:18Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 39763.911,
+      "local_mean_solar_time": "10:45:00",
+      "air_temperature_c": -18.4,
+      "ground_temperature_c": 1.8,
+      "pressure_pa": 732.9,
+      "uv_index_level": "extreme",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.77,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T21:28:42Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 40688.654,
+      "local_mean_solar_time": "11:00:00",
+      "air_temperature_c": -18.8,
+      "ground_temperature_c": 2.9,
+      "pressure_pa": 730.5,
+      "uv_index_level": "extreme",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.25,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T21:44:07Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 41613.396,
+      "local_mean_solar_time": "11:15:00",
+      "air_temperature_c": -20.1,
+      "ground_temperature_c": 4.6,
+      "pressure_pa": 728.1,
+      "uv_index_level": "high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.97,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T21:59:32Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 42538.138,
+      "local_mean_solar_time": "11:30:00",
+      "air_temperature_c": -18.9,
+      "ground_temperature_c": 5.4,
+      "pressure_pa": 725.7,
+      "uv_index_level": "very_high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.04,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T22:14:57Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 43462.88,
+      "local_mean_solar_time": "11:45:00",
+      "air_temperature_c": -15.0,
+      "ground_temperature_c": 5.8,
+      "pressure_pa": 723.5,
+      "uv_index_level": "very_high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.71,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T22:30:21Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 44387.622,
+      "local_mean_solar_time": "12:00:00",
+      "air_temperature_c": -11.9,
+      "ground_temperature_c": 6.6,
+      "pressure_pa": 721.3,
+      "uv_index_level": "very_high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.03,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T22:45:46Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 45312.364,
+      "local_mean_solar_time": "12:15:00",
+      "air_temperature_c": -10.3,
+      "ground_temperature_c": 6.8,
+      "pressure_pa": 719.3,
+      "uv_index_level": "very_high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.68,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T23:01:11Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 46237.106,
+      "local_mean_solar_time": "12:30:00",
+      "air_temperature_c": -8.7,
+      "ground_temperature_c": 7.0,
+      "pressure_pa": 717.3,
+      "uv_index_level": "very_high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.46,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T23:16:36Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 47161.848,
+      "local_mean_solar_time": "12:45:00",
+      "air_temperature_c": -7.1,
+      "ground_temperature_c": 7.1,
+      "pressure_pa": 715.2,
+      "uv_index_level": "very_high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.22,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T23:32:00Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2, radiation_dose_rate_ugy_per_hour."
+      }
+    },
+    {
+      "seconds_since_replay_start": 48086.59,
+      "local_mean_solar_time": "13:00:00",
+      "air_temperature_c": -5.4,
+      "ground_temperature_c": 7.3,
+      "pressure_pa": 713.2,
+      "uv_index_level": "very_high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.99,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-26T23:47:25Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 49011.333,
+      "local_mean_solar_time": "13:15:00",
+      "air_temperature_c": -4.9,
+      "ground_temperature_c": 5.9,
+      "pressure_pa": 711.4,
+      "uv_index_level": "very_high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.66,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T00:02:50Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 49936.075,
+      "local_mean_solar_time": "13:30:00",
+      "air_temperature_c": -4.4,
+      "ground_temperature_c": 4.4,
+      "pressure_pa": 709.6,
+      "uv_index_level": "very_high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 20.02,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T00:18:15Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 50860.817,
+      "local_mean_solar_time": "13:45:00",
+      "air_temperature_c": -3.9,
+      "ground_temperature_c": 2.9,
+      "pressure_pa": 707.9,
+      "uv_index_level": "high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.61,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T00:33:39Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 51785.559,
+      "local_mean_solar_time": "14:00:00",
+      "air_temperature_c": -3.4,
+      "ground_temperature_c": 1.5,
+      "pressure_pa": 706.1,
+      "uv_index_level": "high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.68,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T00:49:04Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 52710.301,
+      "local_mean_solar_time": "14:15:00",
+      "air_temperature_c": -4.0,
+      "ground_temperature_c": -0.6,
+      "pressure_pa": 704.9,
+      "uv_index_level": "high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.82,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T01:04:29Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 53635.043,
+      "local_mean_solar_time": "14:30:00",
+      "air_temperature_c": -4.7,
+      "ground_temperature_c": -2.7,
+      "pressure_pa": 703.8,
+      "uv_index_level": "high",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.28,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T01:19:53Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 54559.785,
+      "local_mean_solar_time": "14:45:00",
+      "air_temperature_c": -5.4,
+      "ground_temperature_c": -4.8,
+      "pressure_pa": 702.6,
+      "uv_index_level": "moderate",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.17,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T01:35:18Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 55484.527,
+      "local_mean_solar_time": "15:00:00",
+      "air_temperature_c": -6.1,
+      "ground_temperature_c": -6.9,
+      "pressure_pa": 701.4,
+      "uv_index_level": "moderate",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.55,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T01:50:43Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 56409.27,
+      "local_mean_solar_time": "15:15:00",
+      "air_temperature_c": -8.6,
+      "ground_temperature_c": -9.6,
+      "pressure_pa": 700.8,
+      "uv_index_level": "moderate",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.63,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T02:06:08Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2, radiation_dose_rate_ugy_per_hour."
+      }
+    },
+    {
+      "seconds_since_replay_start": 57334.012,
+      "local_mean_solar_time": "15:30:00",
+      "air_temperature_c": -11.1,
+      "ground_temperature_c": -12.3,
+      "pressure_pa": 700.1,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.71,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T02:21:32Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 58258.754,
+      "local_mean_solar_time": "15:45:00",
+      "air_temperature_c": -13.6,
+      "ground_temperature_c": -15.0,
+      "pressure_pa": 699.4,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.42,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T02:36:57Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 59183.496,
+      "local_mean_solar_time": "16:00:00",
+      "air_temperature_c": -16.2,
+      "ground_temperature_c": -17.6,
+      "pressure_pa": 698.7,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.84,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T02:52:22Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 60108.238,
+      "local_mean_solar_time": "16:15:00",
+      "air_temperature_c": -16.7,
+      "ground_temperature_c": -20.9,
+      "pressure_pa": 698.9,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 20.02,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T03:07:47Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 61032.98,
+      "local_mean_solar_time": "16:30:00",
+      "air_temperature_c": -20.1,
+      "ground_temperature_c": -26.2,
+      "pressure_pa": 699.1,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.5,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T03:23:11Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 61957.722,
+      "local_mean_solar_time": "16:45:00",
+      "air_temperature_c": -25.6,
+      "ground_temperature_c": -29.6,
+      "pressure_pa": 699.9,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 20.01,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T03:38:36Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 62882.464,
+      "local_mean_solar_time": "17:00:00",
+      "air_temperature_c": -32.3,
+      "ground_temperature_c": -32.9,
+      "pressure_pa": 701.1,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.52,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T03:54:01Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 63807.207,
+      "local_mean_solar_time": "17:15:00",
+      "air_temperature_c": -33.4,
+      "ground_temperature_c": -36.1,
+      "pressure_pa": 704.5,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.35,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T04:09:26Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 64731.949,
+      "local_mean_solar_time": "17:30:00",
+      "air_temperature_c": -34.6,
+      "ground_temperature_c": -39.3,
+      "pressure_pa": 708.0,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.06,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T04:24:50Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 65656.691,
+      "local_mean_solar_time": "17:45:00",
+      "air_temperature_c": -35.7,
+      "ground_temperature_c": -42.5,
+      "pressure_pa": 711.4,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.56,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T04:40:15Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 66581.433,
+      "local_mean_solar_time": "18:00:00",
+      "air_temperature_c": -36.9,
+      "ground_temperature_c": -45.7,
+      "pressure_pa": 714.9,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.99,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T04:55:40Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: radiation_dose_rate_ugy_per_hour."
+      }
+    },
+    {
+      "seconds_since_replay_start": 67506.175,
+      "local_mean_solar_time": "18:15:00",
+      "air_temperature_c": -38.1,
+      "ground_temperature_c": -46.9,
+      "pressure_pa": 719.5,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.41,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T05:11:05Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 68430.917,
+      "local_mean_solar_time": "18:30:00",
+      "air_temperature_c": -39.4,
+      "ground_temperature_c": -48.0,
+      "pressure_pa": 724.2,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.14,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T05:26:29Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 69355.659,
+      "local_mean_solar_time": "18:45:00",
+      "air_temperature_c": -40.6,
+      "ground_temperature_c": -49.2,
+      "pressure_pa": 728.8,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.08,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T05:41:54Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 70280.401,
+      "local_mean_solar_time": "19:00:00",
+      "air_temperature_c": -41.9,
+      "ground_temperature_c": -50.4,
+      "pressure_pa": 733.5,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.22,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T05:57:19Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 71205.144,
+      "local_mean_solar_time": "19:15:00",
+      "air_temperature_c": -43.6,
+      "ground_temperature_c": -52.0,
+      "pressure_pa": 733.5,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.26,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T06:12:44Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 72129.886,
+      "local_mean_solar_time": "19:30:00",
+      "air_temperature_c": -45.2,
+      "ground_temperature_c": -53.5,
+      "pressure_pa": 733.4,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.33,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T06:28:08Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 73054.628,
+      "local_mean_solar_time": "19:45:00",
+      "air_temperature_c": -46.9,
+      "ground_temperature_c": -55.1,
+      "pressure_pa": 733.4,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.06,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T06:43:33Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 73979.37,
+      "local_mean_solar_time": "20:00:00",
+      "air_temperature_c": -48.6,
+      "ground_temperature_c": -56.7,
+      "pressure_pa": 733.3,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.61,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T06:58:58Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 74904.112,
+      "local_mean_solar_time": "20:15:00",
+      "air_temperature_c": -50.4,
+      "ground_temperature_c": -58.7,
+      "pressure_pa": 735.3,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.1,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T07:14:23Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 75828.854,
+      "local_mean_solar_time": "20:30:00",
+      "air_temperature_c": -52.3,
+      "ground_temperature_c": -60.6,
+      "pressure_pa": 737.3,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.99,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T07:29:47Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2, radiation_dose_rate_ugy_per_hour."
+      }
+    },
+    {
+      "seconds_since_replay_start": 76753.596,
+      "local_mean_solar_time": "20:45:00",
+      "air_temperature_c": -54.2,
+      "ground_temperature_c": -62.5,
+      "pressure_pa": 739.2,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.88,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T07:45:12Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 77678.338,
+      "local_mean_solar_time": "21:00:00",
+      "air_temperature_c": -56.1,
+      "ground_temperature_c": -64.5,
+      "pressure_pa": 741.2,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.06,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T08:00:37Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 78603.081,
+      "local_mean_solar_time": "21:15:00",
+      "air_temperature_c": -56.3,
+      "ground_temperature_c": -64.5,
+      "pressure_pa": 742.1,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.24,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T08:16:02Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 79527.823,
+      "local_mean_solar_time": "21:30:00",
+      "air_temperature_c": -56.5,
+      "ground_temperature_c": -64.5,
+      "pressure_pa": 742.9,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.2,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T08:31:26Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2, radiation_dose_rate_ugy_per_hour."
+      }
+    },
+    {
+      "seconds_since_replay_start": 80452.565,
+      "local_mean_solar_time": "21:45:00",
+      "air_temperature_c": -56.8,
+      "ground_temperature_c": -64.5,
+      "pressure_pa": 743.8,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.15,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T08:46:51Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 81377.307,
+      "local_mean_solar_time": "22:00:00",
+      "air_temperature_c": -57.0,
+      "ground_temperature_c": -64.5,
+      "pressure_pa": 744.6,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.18,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T09:02:16Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 82302.049,
+      "local_mean_solar_time": "22:15:00",
+      "air_temperature_c": -57.2,
+      "ground_temperature_c": -64.6,
+      "pressure_pa": 745.5,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.06,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T09:17:40Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 83226.791,
+      "local_mean_solar_time": "22:30:00",
+      "air_temperature_c": -57.5,
+      "ground_temperature_c": -64.6,
+      "pressure_pa": 746.3,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.53,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T09:33:05Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 84151.533,
+      "local_mean_solar_time": "22:45:00",
+      "air_temperature_c": -57.7,
+      "ground_temperature_c": -64.6,
+      "pressure_pa": 747.2,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.97,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T09:48:30Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 85076.276,
+      "local_mean_solar_time": "23:00:00",
+      "air_temperature_c": -57.9,
+      "ground_temperature_c": -64.6,
+      "pressure_pa": 748.1,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.06,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T10:03:55Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 86001.018,
+      "local_mean_solar_time": "23:15:00",
+      "air_temperature_c": -58.2,
+      "ground_temperature_c": -64.6,
+      "pressure_pa": 748.9,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.16,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T10:19:19Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). Interpolated in this bin: air_temperature_c, ground_temperature_c, pressure_pa, uv_abc_w_m2."
+      }
+    },
+    {
+      "seconds_since_replay_start": 86925.76,
+      "local_mean_solar_time": "23:30:00",
+      "air_temperature_c": -58.4,
+      "ground_temperature_c": -64.6,
+      "pressure_pa": 749.8,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 19.16,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T10:34:44Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    },
+    {
+      "seconds_since_replay_start": 87850.502,
+      "local_mean_solar_time": "23:45:00",
+      "air_temperature_c": -58.5,
+      "ground_temperature_c": -65.7,
+      "pressure_pa": 750.7,
+      "uv_index_level": "low",
+      "dust_opacity_tau": 0.5,
+      "radiation_dose_rate_usv_per_hour": 18.46,
+      "provenance": {
+        "source_dataset": "Curiosity REMS and RAD",
+        "product_id": "RME_820012645RMD47600000000_______P1 + RAD_RDR_2025_360_10_42_4760_V00",
+        "timestamp": "2025-12-27T10:50:09Z",
+        "is_estimate": true,
+        "uncertainty": "Estimated fields: uv_index_level (own thresholds on smoothed REMS UV_ABC), dust_opacity_tau (assumed 0.5, unsourced, range 0.3 to 0.8), radiation_dose_rate_usv_per_hour (RAD plastic detector uGy/h times quality factor 3.05, plus or minus 0.26). No field interpolated in this bin."
+      }
+    }
+  ]
+}

@@ -29,23 +29,23 @@ AGENTS.md                    This file: entry point for every agent (read order,
 CLAUDE.md                    Contains only "@AGENTS.md" (Claude Code import)
 .gitignore                   Git ignore rules (raw data, Python/Node artefacts, env files)
 docs/
-  system_design.md           Architecture, local grid, components, data flow, algorithms, folder layout
+  system_design.md           Architecture, design rationale, pipeline, app layout, algorithms, UX design principles
   development_conventions.md Code, doc and git conventions
-  design_principles.md       UX principles and visual identity
   contracts.md               Exact file formats between stages (source of truth for data formats)
   data_sources.md            Every dataset: product ID, URL, resolution, licence, processing, status
   decisions.md               Append-only decision log
-  handoff.md                 Current stage, gate checklists, known issues, next steps
-  stage_0_guide.md           Stage 0 prep, session agenda and proposals (working guide, not a source of truth)
+  handoff.md                 Current stage, gate checklists, known issues, hand-off notes, kickoff prompts
+  images/                    Images referenced by docs (e.g. stage1_overlay_check.png)
   log/
-    person_a.md              End-of-session entries from Person A's agents
-    person_b.md              End-of-session entries from Person B's agents
-    person_c.md              End-of-session entries from Person C's agents
-pipeline/                    Person A: Python (uv) data and algorithms pipeline. Empty placeholder for now (.gitkeep)
+    person_a.md              End-of-session entries from Lawrence's agents (Person A)
+    person_b.md              End-of-session entries from Malissa's agents (Person B)
+    person_c.md              End-of-session entries from Letta's agents (Person C)
+pipeline/                    Person A: Python (uv) data and algorithms pipeline (ariadne_pipeline/, run.py, validate/, tests/, content/)
 app/                         Persons B and C: React + Vite + TypeScript + React Three Fiber app. Empty placeholder for now (.gitkeep)
 data/
   raw/                       Downloaded source data (git-ignored) (.gitkeep)
-  processed/                 Pipeline outputs per contracts.md; sharing method TBD (Stage 0) (.gitkeep)
+  processed/                 Pipeline outputs per contracts.md; committed to git (D-022)
+  reference/                 Reference data for the app that is not a contract file (e.g. spe_profile_sol4190.json, the real May 2024 solar storm dose curve)
 ```
 
 Doc file names are lowercase snake_case, except `README.md`, `AGENTS.md` and `CLAUDE.md`.
@@ -54,7 +54,7 @@ Doc file names are lowercase snake_case, except `README.md`, `AGENTS.md` and `CL
 ## Doc ownership
 
 1. `README.md`
-   - Source of truth for: public project description (problem, idea, site, features, scope, team, status).
+   - Source of truth for: public project description: problem and existing solutions, idea, site, features, getting started (setup, run, test), team, Space Apps submission text.
    - Read when: orienting a human or new reader.
    - Updated by: any person or their main agent.
    - Update when: scope, team, status or features change.
@@ -69,8 +69,8 @@ Doc file names are lowercase snake_case, except `README.md`, `AGENTS.md` and `CL
    - Updated by: nobody (do not add instructions here).
    - Update when: never.
 4. `docs/system_design.md`
-   - Source of truth for: architecture, local grid, components, data flow, algorithms, folder layout.
-   - Read when: before designing or changing any component or algorithm.
+   - Source of truth for: architecture, design rationale, local grid, components, data flow, algorithms, folder layout, UX design principles and visual identity.
+   - Read when: before designing or changing any component, algorithm, UI or visual.
    - Updated by: a person's main agent, once the matching decision is accepted.
    - Update when: a decision changes the architecture or algorithms.
 5. `docs/development_conventions.md`
@@ -78,47 +78,37 @@ Doc file names are lowercase snake_case, except `README.md`, `AGENTS.md` and `CL
    - Read when: before writing any code or doc.
    - Updated by: a person's main agent, with team agreement.
    - Update when: the team agrees a convention change.
-6. `docs/design_principles.md`
-   - Source of truth for: UX principles, feature vocabulary, the two-view concept, colour states and visual identity.
-   - Read when: before any UI or visual work.
-   - Updated by: a person's main agent (usually Person C's), with team agreement.
-   - Update when: a design decision is accepted.
-7. `docs/contracts.md`
+6. `docs/contracts.md`
    - Source of truth for: exact file formats between stages, walking-time formula, test vectors.
    - Read when: before any code that reads or writes pipeline outputs.
    - Updated by: proposed by the main agent, approved by a human.
    - Update when: a format change is approved (deprecate-only for fields in use).
-8. `docs/data_sources.md`
+7. `docs/data_sources.md`
    - Source of truth for: every dataset (product ID, URL, resolution, licence, processing, status).
    - Read when: before using, downloading or citing a dataset.
    - Updated by: the main agent of whoever touches the dataset (usually Person A).
    - Update when: a dataset is added, downloaded, processed or its status changes.
-9. `docs/decisions.md`
+8. `docs/decisions.md`
    - Source of truth for: decision log (append-only), including open and accepted decisions.
    - Read when: before changing anything the team already decided.
    - Updated by: proposed by the main agent, approved by a human.
    - Update when: a decision is proposed or accepted. Never edit past entries, add new ones.
-10. `docs/handoff.md`
-    - Source of truth for: current stage, gate checklists, known issues, next steps.
-    - Read when: start of every session.
-    - Updated by: the main agent of the stage owner.
-    - Update when: stage status, checklist, known issue or next step changes.
-11. `docs/stage_0_guide.md`
-    - Source of truth for: nothing. Working guide for Stage 0; results go to decisions, contracts and handoff.
-    - Read when: preparing for or running Stage 0.
-    - Updated by: any person or their main agent.
-    - Update when: Stage 0 prep changes. Frozen once Stage 0 is signed off.
-12. `docs/log/person_a.md`
+9. `docs/handoff.md`
+   - Source of truth for: current stage, gate checklists, known issues, next steps.
+   - Read when: start of every session.
+   - Updated by: the main agent of the stage owner.
+   - Update when: stage status, checklist, known issue or next step changes.
+10. `docs/log/person_a.md`
     - Source of truth for: Person A's session history.
     - Read when: picking up Person A's work.
     - Updated by: Person A's main agent only.
     - Update when: end of every session.
-13. `docs/log/person_b.md`
+11. `docs/log/person_b.md`
     - Source of truth for: Person B's session history.
     - Read when: picking up Person B's work.
     - Updated by: Person B's main agent only.
     - Update when: end of every session.
-14. `docs/log/person_c.md`
+12. `docs/log/person_c.md`
     - Source of truth for: Person C's session history.
     - Read when: picking up Person C's work.
     - Updated by: Person C's main agent only.
@@ -135,8 +125,7 @@ When docs disagree, the higher one wins:
 2. `docs/decisions.md` (latest accepted entry)
 3. `docs/system_design.md`
 4. `docs/development_conventions.md`
-5. `docs/design_principles.md`
-6. `README.md`
+5. `README.md`
 
 Any disagreement you find is a bug. Stop, report it to your human, and propose a fix in `docs/decisions.md`. Do not silently pick one. When a decision is accepted, every affected doc is updated in the same change.
 
@@ -151,15 +140,15 @@ Stages:
    - Work: confirm patch and staging point; choose 4 to 5 Knots; finalise `contracts.md` (including walking-time formula and test vectors) and sign off; decide how processed data is shared (Git LFS vs shared drive).
    - Folders: `docs/` only.
 2. Stage 1
-   - Owner: Lawrence
+   - Owner: Lawrence (Person A), branch `dev-lawrence`
    - Work: data and algorithms pipeline: ingest, crop, reproject to the local grid, derive slope/roughness/rocks/sky-view/sand, traversal penalty, return field, environment timeline, Knots in grid coordinates, export, contract validator.
    - Folders: `pipeline/`, `data/`.
 3. Stage 2
-   - Owner: {insert name}
+   - Owner: Malissa (Person B), branch `dev-malissa`
    - Work: app shell, Labyrinth view (3D), Planning Table, layer switching, runtime routing (A*, Theta*, D* Lite), Thread rendering.
    - Folders: `app/`.
 4. Stage 3
-   - Owner: {insert name}
+   - Owner: Letta (Person C), branch `dev-letta`
    - Work: Suit HUD, alerts, Knot cards, simulation clock and scenario engine, CRT look polish, demo and pitch.
    - Folders: `app/`.
 
@@ -238,7 +227,7 @@ Report back with:         <files changed, how it was verified, anything ambiguou
 - Use descriptive string constants (for example `"no_go"`, `"slope_degrees"`, `"solar_particle_event_alert"`), not enums.
 - Use `uv` for Python.
 - Stay in your stage's folders (see Workflow).
-- Do not commit large data to git unless Stage 0 chose Git LFS. Raw data is git-ignored.
+- Never commit `data/raw/` (git-ignored). `data/processed/` is committed to git (D-022); keep each file under ~10 MB.
 - Do not write application code before the event starts if the hackathon rules forbid it.
 - Work only on your personal `dev-{firstname}` branch; only Lawrence merges into `dev` and `main` (see "Git workflow").
 - No agent attribution lines ("Co-Authored-By") in commit messages.

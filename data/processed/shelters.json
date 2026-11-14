@@ -1,0 +1,50 @@
+[
+  {
+    "shelter_id": "shelter_rover",
+    "shelter_type": "pressurised_rover",
+    "x_m": 775.0,
+    "z_m": 467.0,
+    "sky_view_factor": 0.859,
+    "is_estimate": false
+  },
+  {
+    "shelter_id": "shelter_overhang_01",
+    "shelter_type": "terrain_overhang",
+    "x_m": 1331.0,
+    "z_m": 1139.0,
+    "sky_view_factor": 0.647,
+    "is_estimate": true
+  },
+  {
+    "shelter_id": "shelter_overhang_02",
+    "shelter_type": "terrain_overhang",
+    "x_m": 393.0,
+    "z_m": 723.0,
+    "sky_view_factor": 0.665,
+    "is_estimate": true
+  },
+  {
+    "shelter_id": "shelter_overhang_03",
+    "shelter_type": "terrain_overhang",
+    "x_m": 943.0,
+    "z_m": 1739.0,
+    "sky_view_factor": 0.686,
+    "is_estimate": true
+  },
+  {
+    "shelter_id": "shelter_overhang_04",
+    "shelter_type": "terrain_overhang",
+    "x_m": 31.0,
+    "z_m": 1625.0,
+    "sky_view_factor": 0.687,
+    "is_estimate": true
+  },
+  {
+    "shelter_id": "shelter_overhang_05",
+    "shelter_type": "terrain_overhang",
+    "x_m": 1995.0,
+    "z_m": 369.0,
+    "sky_view_factor": 0.691,
+    "is_estimate": true
+  }
+]

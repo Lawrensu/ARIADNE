@@ -40,3 +40,12 @@ Instructions:
 - Broken or open: absolute elevation drifts 1 to 18 m against Curiosity's waypoints (not a shift, slopes unaffected); staging point and data resolution need team sign-off.
 - Next step: Stage 0 session; walk Person B through the 2 m export recommendation.
 - Delegated to sub-agents: analysis script (`analyze_patch.py`, kept outside the repo) written and run by a sub-agent; checked by reviewing its synthetic test and re-checking the suspicious slope and alignment numbers with a separate script.
+
+
+### 2026-11-14 10:10 | Claude Code | Stage 0 sign-off and Stage 1 pipeline built
+
+- Changed: contracts signed v1.0.0 (2 m grid, walking numbers, penalty rules, viewshed, regional image); decisions D-017 to D-025; full pipeline in `pipeline/` (settings, grid, walking, terrain, rocks, penalty, return_field, sky_view, surface, knots, environment, regional, export, `run.py`, `validate/run.py`, tests); Knot content in `pipeline/content/knots_content.json`; `data/processed/` generated (33 MB); hand-off notes in `docs/handoff.md`; overlay preview `docs/images/stage1_overlay_check.png`.
+- Verified (how): `uv run python validate/run.py` 46 of 46 pass; `uv run pytest` 63 pass; visual overlay of no-go zones, rocks, Knots, rover and Thread contours on the HiRISE texture; rock detections checked against Curiosity's route (with confidence 0.6 or more, 0 of 203 stops fall on a rock-blocked cell); CRISM classes kept only where both scenes agree (scene agreement on detections was only 1.3%).
+- Broken or open: mineralogy is weak (890 agreed cells); environment UV level, dust tau and dose equivalent are estimates; the regional image cache must be built once with network (`data/raw/regional/`), later runs are offline.
+- Next step: commit and push `dev-lawrence`, merge into `dev`, integration check, sign off Stage 1, brief Malissa.
+- Delegated to sub-agents: research (REMS/RAD/SPE, THEMIS/CRISM, Knot photos), modules (rocks, sky_view, validator, regional, surface, environment), docs (high-level summary, getting started, data sources refresh, problem statement). Each result checked by running its tests, the validator and real-data numbers; two outputs corrected by the main agent (CRISM agreement rule, UV upper envelope) and one weak spot fixed (regional image now cached offline).
