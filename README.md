@@ -270,7 +270,7 @@ Update "we are building" to "we built" once Stages 2 and 3 are merged.
 - [docs/contracts.md](docs/contracts.md): exact file formats between stages, walking-time formula, test vectors.
 - [docs/data_sources.md](docs/data_sources.md): every dataset with product ID, URL, resolution, licence and status.
 - [docs/decisions.md](docs/decisions.md): append-only decision log.
-- [docs/handoff.md](docs/handoff.md): current stage, gate checklists, known issues, next steps, and the Stage 2 and 3 kickoff prompts.
+- [docs/handoff.md](docs/handoff.md): current stage, gate checklists, known issues, hand-off notes and next steps.
 - [docs/development_conventions.md](docs/development_conventions.md): code, doc and git conventions.
 - [docs/log/person_a.md](docs/log/person_a.md): session log for Lawrence (Person A).
 - [docs/log/person_b.md](docs/log/person_b.md): session log for Malissa (Person B).

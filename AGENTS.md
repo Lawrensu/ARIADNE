@@ -34,7 +34,7 @@ docs/
   contracts.md               Exact file formats between stages (source of truth for data formats)
   data_sources.md            Every dataset: product ID, URL, resolution, licence, processing, status
   decisions.md               Append-only decision log
-  handoff.md                 Current stage, gate checklists, known issues, hand-off notes, kickoff prompts
+  handoff.md                 Current stage, gate checklists, known issues, hand-off notes, next steps
   images/                    Images referenced by docs (e.g. stage1_overlay_check.png)
   log/
     person_a.md              End-of-session entries from Lawrence's agents (Person A)
