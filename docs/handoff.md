@@ -1,6 +1,6 @@
 # ARIADNE hand-off board
 
-Current stage: Stage 1, gate checks passed; waiting for commit, merge into `dev` and sign-off (Lawrence)
+Current stage: Stage 1 merged into `dev`; waiting for Lawrence's sign-off, then Stage 2 (Malissa) starts
 
 Last updated: 2026-11-14
 
@@ -58,9 +58,9 @@ This is the live status board. The main agent of the stage owner updates it when
 - [x] Overlay check: texture vs heightmap vs rocks aligned (rendered overlay `docs/images/stage1_overlay_check.png`, no-go zones sit on the scarps in the photo).
 - [x] Knots are visually in the right place (on Curiosity's stops, none needed snapping).
 - [x] Walking-time test vectors pass in Python (`uv run pytest`: 63 tests pass).
-- [ ] `data/processed/` committed on `dev-lawrence` (D-022), and Person B can pull it.
+- [x] `data/processed/` committed on `dev-lawrence` (D-022), and Person B can pull it.
 - [x] Log entry written in `docs/log/person_a.md`.
-- [ ] `dev-lawrence` merged into `dev`; integration check passed.
+- [x] `dev-lawrence` merged into `dev`; integration check passed on `dev` (validator 46 of 46, 63 tests, binaries stored as binary).
 - [ ] Human sign-off.
 
 
@@ -131,7 +131,7 @@ Stage 1 to Stage 2 (Lawrence to Malissa):
 
 ## Next steps
 
-1. Lawrence: commit and push `dev-lawrence`, merge into `dev`, run the integration check, sign off Stage 1.
+1. Lawrence: sign off Stage 1 (tick the last Stage 1 gate box).
 2. Malissa: update `dev-malissa` from `dev`, then paste the Stage 2 prompt below into her agent.
 3. Letta: non-code prep for Stage 3 (scenario timeline, palette proposal, which Knot photos to show) until the Stage 2 gate passes; then paste the Stage 3 prompt below.
 
