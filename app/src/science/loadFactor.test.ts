@@ -28,7 +28,10 @@ describe("loadFactor (contracts.md 4.6 test vectors)", () => {
 describe("load parameters and carried load on the real data", () => {
     it("reads the v1.1.0 load parameters from meta.json", async () => {
         const data = await loadProcessedDataFromDisk();
-        expect(data.meta.contract_version).toBe("1.1.0");
+        // Load parameters exist from contract v1.1.0 onwards (any later 1.x, e.g. the 1.1.1 wording fix, D-028).
+        const [major, minor] = data.meta.contract_version.split(".").map(Number);
+        expect(major).toBe(1);
+        expect(minor).toBeGreaterThanOrEqual(1);
         expect(loadParametersFromMeta(data.meta.parameters)).toEqual({ base_carried_load_kg: 10, load_time_factor_per_kg: 0.01 });
     });
 

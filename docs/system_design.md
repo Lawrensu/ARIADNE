@@ -22,7 +22,7 @@ The gap: no tool we found combines real Mars terrain data, a suit-calibrated wal
 
 What makes ARIADNE different, each point tied to the gap it closes:
 
-1. **The Thread.** Gap: Apollo walkback limits were computed by ground teams and recalculated manually during each EVA ([Apollo 11 Lunar Surface Journal](https://www.nasa.gov/wp-content/uploads/static/history/alsj/a11/a11.gaits.html)). The Thread is a live safe-return boundary: remaining consumables minus a 30 minute reserve, recalculated as the crew walks, with alerts that always include an action.
+1. **The Thread.** Gap: Apollo walkback limits were computed by ground teams and recalculated manually during each EVA ([Apollo 11 Lunar Surface Journal](https://www.nasa.gov/wp-content/uploads/static/history/alsj/a11/a11.gaits.html)). The Thread is a live safe-return boundary: the planned Marswalk time left (6 h minus elapsed minus a 30 minute reserve), scaled by the carried load and recalculated as the crew walks, with alerts that always include an action.
 2. **Local walking cost.** Gap: Minerva (xGDS, SEXTANT, Playbook) authors report time estimates too inaccurate to use, a constant walking speed in xGDS, no terrain traversability, and poor fit for replanning during an EVA ([Marquez 2019](https://pmc.ncbi.nlm.nih.gov/articles/PMC6442304), [xGDS](https://software.nasa.gov/software/ARC-17174-1)). ARIADNE uses Tobler walking time from the 1 m HiRISE DTM, rocks and roughness in the penalty, peak speed capped at Apollo's ~1.0 m/s, no-go above 25°.
 3. **One patch, many datasets.** Gap: portals such as [Mars Trek](https://trek.nasa.gov/mars/jpl/config/textAbout.html) and [JMARS](https://jmars.mars.asu.edu/what-jmars) are global and built for scientists, with no walking time or consumables. ARIADNE shows HiRISE terrain, REMS weather, RAD radiation, CRISM minerals, THEMIS thermal inertia and a solar particle event in one view.
 4. **Real ground photos at Knots.** Gap: orbiter maps show no point of view. Curiosity photos at five science waypoints tell the astronaut what to expect.
@@ -164,15 +164,15 @@ Problems and the algorithm used for each:
      - Direction-dependent (uphill differs from downhill), so edge cost = `walking_time_seconds(horizontal_distance_m, elevation_change_m)` times the maximum of the two cells' penalties (D-019).
      - Exact definition and test vectors are in docs/contracts.md section 4.
 2. Routing
-   - Algorithm: A* for a single route; Theta* for any-angle smoothing.
+   - Algorithm: A* on the 8-connected 2 m grid (fast and safe options); Theta* any-angle search (the "smooth" option, D-028).
    - Runs in: app.
-   - Notes: several weightings give fast and safe route options.
+   - Notes: several weightings give fast and safe route options. Theta* walks each straight segment through every cell it crosses with the contract edge cost, so it never crosses a no-go cell or a step steeper than 25°; it is 2 to 10% faster than A* to the Knots. The Thread and science plan legs stay on the 8-connected model, which is the conservative side.
 3. Rerouting
    - Algorithm: D* Lite.
    - Runs in: app.
    - Notes: fast replanning when hazards change; powers the solar storm reroute demo.
 4. The Thread
-   - Algorithm: one Dijkstra from the staging point (precomputed) gives `return_field`; the live ring is the contour of `return_field` at (remaining consumable time minus reserve).
+   - Algorithm: one Dijkstra from the staging point (precomputed) gives `return_field`; the live ring is the contour of `return_field × load_factor` at the planned time left (6 h minus elapsed minus the 30 minute reserve, D-028). The 8 h suit capability is shown separately as O2.
    - Runs in: pipeline (field), app (contour).
    - Notes:
      - Marching squares (d3-contour or equivalent), cheap to update every tick.
@@ -225,7 +225,7 @@ Problems and the algorithm used for each:
 
 Use these names consistently in code, UI and docs.
 
-- **The Thread:** the safe-return ring. The boundary of everywhere the astronaut can reach and still walk back to the staging point with the remaining consumables minus a reserve. It shrinks as they walk.
+- **The Thread:** the safe-return ring. The boundary of everywhere the astronaut can reach and still walk back to the staging point within the planned Marswalk time minus a reserve, with the load they carry. It shrinks as they walk.
 - **Knots:** science waypoints along the route, each with science tasks (imaging, samples, measurements).
 - **Science budget:** science time still available after the walk back and the reserve; shrinks with every step and every sample carried.
 - **Labyrinth view:** the 3D terrain view of the Marswalk site.

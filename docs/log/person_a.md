@@ -58,3 +58,12 @@ Instructions:
 - Broken or open: task durations and masses are estimates anchored to Apollo 16 station times; load factor 0.01 per kg is an estimate.
 - Next step: merge into dev; Malissa's agent adds the science planner to her Stage 2 work before committing.
 - Delegated to sub-agents: science task content (checked: valid JSON, totals, sources), validator v1.1.0 (checked: tests pass, full validator run on real data).
+
+
+### 2026-11-14 14:30 | Claude Code | Stage 2 integration: merge, D-028, Theta*
+
+- Changed: merged `dev-malissa` into `dev`; D-028 (gzip payload measure, contract v1.1.1 wording for the Thread and the drop-task rule, Theta* built in integration); Theta* "smooth" route option in `app/src/routing/` and the route planner UI; pipeline rerun for v1.1.1; system_design, README, handoff updated.
+- Verified (how): validator 47 of 47; pipeline tests 68; app tests 133 (13 new for Theta*); typecheck clean; build works; payload 19.19 MB gzip; browser on the production preview: Plan all Knots GO 5 h 03 min, 27 min left; Rover to Boxwork hollow fast 35, safe 36, smooth 31 min; Labyrinth view; no console errors.
+- Broken or open: Stage 1 and Stage 2 sign-off waiting for Lawrence; Theta* search takes 0.5 to 2.2 s per route in the worker.
+- Next step: Lawrence signs off Stages 1 and 2; Letta starts Stage 3.
+- Delegated to sub-agents: Theta* (checked: its tests, all existing tests unchanged, real-data comparison, browser check of the smooth route).

@@ -305,6 +305,19 @@ Rules:
 - Affects docs: docs/contracts.md, docs/system_design.md, docs/handoff.md, README.md
 
 
+### D-028: Stage 2 integration calls: payload measure, drop-task wording, Theta*
+
+- Date: 2026-11-14
+- Status: accepted (Lawrence)
+- Decision:
+  1. The ~30 MB payload budget is measured as transferred (gzip): the Stage 2 build is 19.19 MB gzip (31.50 MB raw), within budget.
+  2. Contract 4.6 is clarified (v1.1.1, wording only): the Thread uses the planned Marswalk time left (6 h minus elapsed minus the 30 minute reserve), while the 8 h suit capability is shown as O2. Drop the next task when the planned time left is less than the walk to the next Knot with the current load, plus the task, plus the walk back from there with its sample. This matches what Malissa built (`checkNextTaskDuringWalk`).
+  3. Theta* any-angle routing is built by Lawrence during the Stage 2 integration, as an extra route option next to fast and safe.
+- Why: Static hosts serve the data compressed, so gzip is what the crew device downloads. The old rule 4 counted the walk back twice. Theta* was in the design and gives smoother, shorter paths on open ground.
+- Alternatives considered: Raw size (would force dropping a layer for a 5% overrun); keeping the ambiguous wording; leaving Theta* as a stretch goal.
+- Affects docs: docs/contracts.md, docs/system_design.md, docs/handoff.md, README.md
+
+
 ## Open questions (Stage 0)
 
 Status 2026-11-14: questions 1 to 10 and 12 to 21 are resolved by D-017 to D-025. Question 11 (colour palette) stays with Person C.

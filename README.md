@@ -47,10 +47,10 @@ Pitch opener: every Mars map today is made for scientists studying a planet. Nob
 - **Planning Table:** the habitat/rover display. A big map with all layers, used to plan the route.
 - **Suit HUD:** the minimal in-suit display: compass bar, next Knot, Thread margin, O2, alerts. At most about 3 numbers at once.
 - **Labyrinth view:** the 3D terrain view of the Marswalk site.
-- **The Thread:** the safe-return ring. The boundary of everywhere the astronaut can reach and still walk back to the staging point with the remaining consumables minus a reserve. It shrinks as they walk.
+- **The Thread:** the safe-return ring. The boundary of everywhere the astronaut can reach and still walk back to the staging point within the planned Marswalk time minus a reserve, with the load they carry. It shrinks as they walk.
 - **Knots:** science waypoints along the route, with real Curiosity photos, science notes and the tasks to do there (imaging, samples, measurements).
 - **Science plan:** choose the Knots and tasks, see the walking time with the load carried, and a science budget that says what fits before the crew must turn back.
-- **Route planning with rerouting:** fast and safe route options, and fast replanning when a hazard changes.
+- **Route planning with rerouting:** fast, safe and smooth (any-angle, Theta*) route options, and fast replanning when a hazard changes.
 - **Conditions panel:** local time, sun position and time to sunset, weather, radiation dose budget.
 - **Actionable alerts:** every alert comes with an action, for example "Solar storm: shelter at Knot B, 340 m, 6 min. [ROUTE]".
 - **Provenance:** every displayed value is traceable (dataset, product ID, resolution, timestamp, uncertainty). Model-derived values are labelled "est.".

@@ -19,11 +19,13 @@ const TEST_HAZARD_RADIUS_M = 12;
 const ROUTE_OPTION_LABELS: Record<RouteOptionId, string> = {
     fast: "Fast",
     safe: "Safe",
+    smooth: "Smooth",
 };
 
 const ROUTE_OPTION_DESCRIPTIONS: Record<RouteOptionId, string> = {
     fast: "shortest walking time",
     safe: "prefers gentle slopes, easy ground and rover line of sight",
+    smooth: "any-angle, Theta*",
 };
 
 
@@ -210,6 +212,7 @@ export function RoutePlannerPanel() {
                 <div className="flex flex-col gap-1">
                     <RouteOptionRow option="fast" plan={routePlans.fast} />
                     <RouteOptionRow option="safe" plan={routePlans.safe} />
+                    <RouteOptionRow option="smooth" plan={routePlans.smooth} />
                     <div className="flex gap-1">
                         <button type="button" className="min-h-12 flex-1 rounded border border-ariadne-border px-2 text-sm hover:border-ariadne-accent" onClick={placeTestHazard}>
                             Block passage mid-route (test reroute)

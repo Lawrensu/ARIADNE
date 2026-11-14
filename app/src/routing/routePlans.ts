@@ -1,6 +1,7 @@
 // Route options and RoutePlan building (app/src/state/routeSlice.ts).
 // "fast": minimum contract edge cost (contracts.md 4.2).
 // "safe": the same search with safeEdgeWeight >= 1 on each edge (routingGrid.ts, estimate).
+// "smooth": Theta* any-angle search (thetaStar.ts), contract cost along each straight segment.
 // For both, walking_time_s is the contract walking time summed along the chosen path, never the
 // weighted search cost, so the number shown to the crew means the same thing for both options.
 
@@ -10,11 +11,17 @@ import type { GridPath } from "./aStar";
 import { findPathAStar } from "./aStar";
 import type { RoutingGrid } from "./routingGrid";
 import { cellCentreFromIndex, contractEdgeCostSeconds, neighbourDirection, snapToPassableCell } from "./routingGrid";
+import { findPathThetaStar, measureSegmentPath } from "./thetaStar";
 
 
 
 
+// The options that have an incremental D* Lite planner (routingSession.ts).
 export const ROUTE_OPTION_IDS: RouteOptionId[] = ["fast", "safe"];
+
+// Every option computeRoutePlansOnGrid returns. "smooth" is Theta* (thetaStar.ts): its path
+// vertices are joined by straight segments, so it has no D* Lite planner and is searched afresh.
+export const ALL_ROUTE_OPTION_IDS: RouteOptionId[] = ["fast", "safe", "smooth"];
 
 
 export type RoutePlans = Partial<Record<RouteOptionId, RoutePlan>>;
@@ -49,7 +56,13 @@ export function measurePath(routingGrid: RoutingGrid, cellIndices: number[]): Pa
 
 
 export function buildRoutePlan(routingGrid: RoutingGrid, routeOption: RouteOptionId, path: GridPath): RoutePlan | null {
-    const measures = measurePath(routingGrid, path.cellIndices);
+    let measures: PathMeasures;
+    if (routeOption === "smooth") {
+        // cell_indices are the vertices of straight segments, not neighbouring cells.
+        measures = measureSegmentPath(routingGrid, path.cellIndices);
+    } else {
+        measures = measurePath(routingGrid, path.cellIndices);
+    }
     if (!Number.isFinite(measures.walkingTimeSeconds)) {
         return null;
     }
@@ -97,7 +110,12 @@ export function computeRoutePlan(
     if (endpoints.endIndex === -1) {
         return null;
     }
-    const path = findPathAStar(routingGrid, endpoints.startIndex, endpoints.endIndex, routeOption);
+    let path: GridPath | null;
+    if (routeOption === "smooth") {
+        path = findPathThetaStar(routingGrid, endpoints.startIndex, endpoints.endIndex);
+    } else {
+        path = findPathAStar(routingGrid, endpoints.startIndex, endpoints.endIndex, routeOption);
+    }
     if (path === null) {
         return null;
     }
@@ -109,7 +127,7 @@ export function computeRoutePlan(
 // matches RouteSlice.routePlans (Partial<Record<RouteOptionId, RoutePlan>>).
 export function computeRoutePlansOnGrid(routingGrid: RoutingGrid, start: LocalPosition, end: LocalPosition): RoutePlans {
     const plans: RoutePlans = {};
-    for (const routeOption of ROUTE_OPTION_IDS) {
+    for (const routeOption of ALL_ROUTE_OPTION_IDS) {
         const plan = computeRoutePlan(routingGrid, routeOption, start, end);
         if (plan !== null) {
             plans[routeOption] = plan;

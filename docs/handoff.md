@@ -43,7 +43,7 @@ This is the live status board. The main agent of the stage owner updates it when
 - [x] Decide the consumables model (O2 duration, reserve).
 - [x] Choose the REMS sol to replay and the DONKI event for the scenario.
 - [x] Decide how processed data is shared (Git LFS vs shared drive).
-- [ ] Person B confirms the performance budget (≤ ~30 MB, texture ≤ 4096 × 4096).
+- [x] Person B confirms the performance budget (≤ ~30 MB, texture ≤ 4096 × 4096): measured as gzip, 19.19 MB (D-028).
 - [ ] Person C proposes the exact colour palette values; the whole team approves.
 - [x] Settle the remaining small TBDs (open questions 14 to 21 in docs/decisions.md): Knot text writer, photo hosting, Gale image, `state/` ownership, shelter list, Mars24 location, `scenario.json` path, nearest-shelter and viewshed formats.
 - [x] Fill in the names of the Stage 2 and Stage 3 owners: Malissa (Person B), Letta (Person C).
@@ -76,7 +76,7 @@ Evidence re-verified on 2026-11-14 after merging contract v1.1.0 and adding the 
 - [x] Walking-time test vectors pass in TypeScript (`npm test`: all 8 rows of contracts.md 4.5 within 1e-3 s).
 - [x] Cross-check: the TypeScript route time from each Knot to the rover matches `return_field.bin` at that Knot within 1% (largest relative difference 5.6e-6, `app/src/routing/realData.test.ts`).
 - [x] The Thread draws and shrinks with simulation time and scales with the carried load (contracts.md 4.6: return_field x load_factor against planned time minus elapsed minus reserve). Test: with 30 min left the area is 2.08, 1.91, 1.84 and 1.66 km² for 0, 10, 14 and 25 kg (`app/src/thread/threadLoad.test.ts`). On screen at 5 h elapsed: est. 1.9 km² with 10 kg, 1.8 km² with 14 kg; at v1.0.0 it shrank from 3.0 km² to nothing as time ran out.
-- [ ] Data payload is within the budget: production build is 31.50 MB raw and 19.19 MB gzip (`npm run payload`, after the science plan). Within budget as transferred; about 5% over 30 MB raw. Malissa to confirm which measure counts (Stage 0 box "Person B confirms the performance budget").
+- [x] Data payload is within the budget: production build is 19.19 MB gzip (31.50 MB raw); the budget counts gzip (D-028).
 - [x] Log entry written in `docs/log/person_b.md`.
 - [ ] Person B's branch pushed, merged into `dev` by Lawrence; integration check passed.
 - [ ] Human sign-off.
@@ -193,6 +193,11 @@ Stage 2 notes for Lawrence and his agents (merge, integration, pipeline):
    - The routing worker and the Thread worker each hold a copy of the grids they need (a few MB each), so the main thread never blocks on routing or contours.
    - `.claude/` is git-ignored (local agent tool settings).
 
+
+Lawrence's integration changes on top of Stage 2 (2026-11-14, D-028):
+- Theta* any-angle routing added as the "smooth" route option: `app/src/routing/thetaStar.ts` (+ tests), small edits in `routePlans.ts`, `routingSession.ts`, `state/routeSlice.ts` (`RouteOptionId` gains `"smooth"`), `RoutePlannerPanel.tsx`, `RouteLines.tsx` (green line). Fast stays the default; fast, safe, D* Lite, science plan and the cross-check numbers are unchanged.
+- Contract v1.1.1 (wording only): Thread uses the planned time left; drop-task rule as Malissa built it. `app/src/science/loadFactor.test.ts` now accepts any contract 1.1 or later.
+- Integration check on `dev` after the merge: validator 47 of 47, pipeline tests 68, app tests 133, typecheck clean, build works, payload 19.19 MB gzip, browser: Plan all Knots GO 5 h 03 min with 27 min left; Rover to Boxwork hollow fast 35 min, safe 36 min, smooth 31 min; Labyrinth view; no console errors.
 
 ## Next steps
 

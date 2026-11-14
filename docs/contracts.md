@@ -1,6 +1,6 @@
 # ARIADNE data contracts
 
-Status: SIGNED v1.1.0 (v1.0.0 signed at Stage 0 by Lawrence, 2026-11-14, D-017 to D-025; v1.1.0 adds the science plan, D-027).
+Status: SIGNED v1.1.1 (v1.0.0 signed at Stage 0 by Lawrence, 2026-11-14, D-017 to D-025; v1.1.0 adds the science plan, D-027; v1.1.1 clarifies wording, D-028).
 
 This file is the source of truth for every file passed between stages. When another document disagrees with it, this file wins.
 
@@ -663,7 +663,8 @@ Science plan rule (the app's "science budget"):
 1. A plan is an ordered list of Knots and the tasks chosen at each.
 2. Plan time = walking legs (with the load at that point) + task durations + the walk back to the rover from the last Knot.
 3. A plan is feasible only if plan time ≤ `planned_marswalk_hours` × 3600 − `reserve_minutes` × 60.
-4. During the walk the Thread uses `return_field × load_factor` against the time left (planned time minus elapsed, minus the reserve). If the margin drops below the time of the next task plus its walk back, the app suggests dropping that task.
+4. During the walk the Thread uses `return_field × load_factor` against the planned time left: `planned_marswalk_hours` × 3600 minus elapsed, minus the reserve. The 8 hour suit capability is shown separately as O2 and is not used for the Thread.
+5. The app suggests dropping the next task when the planned time left is less than: the walk to the next Knot with the current load, plus the task, plus the walk back to the rover from that Knot with the task's sample added.
 
 Load factor test vectors (Python and TypeScript must both pass, tolerance 1e-9):
 
@@ -697,6 +698,11 @@ Notes:
 
 
 ## 6. Changelog
+
+### v1.1.1, 2026-11-14 (SIGNED)
+
+- Wording only (D-028): 4.6 rule 4 now says the Thread uses the planned time left, not the suit capability; the drop-task rule is rule 5 and no longer counts the walk back twice. No field or value changed.
+
 
 ### v1.1.0, 2026-11-14 (SIGNED)
 

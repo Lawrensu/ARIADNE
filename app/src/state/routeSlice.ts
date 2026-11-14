@@ -22,7 +22,8 @@ export interface RouteEndpoint {
 
 // "fast": minimum walking time (edge cost from contracts.md 4.2).
 // "safe": walking time weighted further towards low-penalty, low-slope, sheltered ground (est.).
-export type RouteOptionId = "fast" | "safe";
+// "smooth": minimum walking time with any-angle straight segments (Theta*), contract cost along each segment (est.).
+export type RouteOptionId = "fast" | "safe" | "smooth";
 
 
 export interface RoutePlan {

@@ -1,5 +1,5 @@
 // The routing state that lives inside the Web Worker, as a plain class so it is testable in Node.
-// computeRoutePlans: fresh A* for every route option.
+// computeRoutePlans: fresh A* for "fast" and "safe", fresh Theta* for "smooth".
 // rerouteFrom: D* Lite (one planner per route option) towards the last requested end, repaired
 // incrementally when cells are blocked or unblocked and when the astronaut moves.
 // computeFastLegs: one "fast" A* per consecutive pair of waypoints (science plan legs), without
@@ -121,6 +121,12 @@ export class RoutingSession {
             if (plan !== null) {
                 plans[routeOption] = plan;
             }
+        }
+
+        // "smooth" has no incremental planner: Theta* is searched afresh towards the same goal.
+        const smoothPlan = computeRoutePlan(this.routingGrid, "smooth", current, this.goalPosition);
+        if (smoothPlan !== null) {
+            plans.smooth = smoothPlan;
         }
         return plans;
     }

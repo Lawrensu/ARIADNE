@@ -1,4 +1,4 @@
-// Draws the fast and safe route plans from the store on the terrain (owner: Malissa, Stage 2).
+// Draws the fast, safe and smooth route plans from the store on the terrain (owner: Malissa, Stage 2).
 // The selected option is drawn thick and on top; the other one thin, so both stay comparable.
 
 import { Line } from "@react-three/drei";
@@ -15,10 +15,11 @@ import { sampleTerrainSceneY } from "../terrain/terrainFrame";
 export const ROUTE_LINE_COLOURS: Record<RouteOptionId, string> = {
     fast: "#ffb347",
     safe: "#7fd1ff",
+    smooth: "#9be564",
 };
 
 const ROUTE_LIFT_ABOVE_TERRAIN_M = 2.0;
-const ROUTE_OPTION_DRAW_ORDER: RouteOptionId[] = ["safe", "fast"];
+const ROUTE_OPTION_DRAW_ORDER: RouteOptionId[] = ["safe", "smooth", "fast"];
 
 
 

@@ -12,7 +12,7 @@ import type { RoutingGridInput } from "./routingGrid";
 
 
 export interface RoutingClient {
-    // A* for "fast" and "safe" from start to end. An option without a route is left out.
+    // A* for "fast" and "safe", Theta* for "smooth", from start to end. An option without a route is left out.
     computeRoutePlans(
         start: LocalPosition,
         end: LocalPosition,
