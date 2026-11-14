@@ -44,6 +44,131 @@ Everyone:
 2. Write down one sentence on the problem we solve. We compare them in the pitch session later.
 
 
+## Prep results: Lawrence (Person A)
+
+Done 2026-11-13 from Curiosity's waypoint file and the HiRISE DTM index. Proposals for the team session, not decisions yet. Source details are in `docs/data_sources.md` (3.1, 3.2, 3.14).
+
+
+### Key Curiosity stops (anchors)
+
+1. Sulfur stone field, Gediz Vallis channel: sol 4210, lat -4.78572, lon 137.40886, elevation -3688 m.
+2. Leaving the sulfur field: sol 4332, lat -4.78474, lon 137.40610.
+3. Western edge of the channel: sol 4389, lat -4.78339, lon 137.39898.
+4. First view of the boxwork: sol 4527, lat -4.79721, lon 137.38751.
+5. First boxwork site: sol 4541, lat -4.79782, lon 137.38593.
+6. Main boxwork, top of the 11 m ramp: sol 4602, lat -4.80437, lon 137.37962, elevation -3631 m.
+7. Inside the boxwork: sol 4687, lat -4.80784, lon 137.38104.
+8. Late boxwork: sol 4839, lat -4.80991, lon 137.38186, elevation -3599 m.
+
+Notes:
+- Sulfur sols come from NASA (crystals sol 4208 to 4209, Mammoth Lakes drill about sol 4220). Boxwork sols come from the Curiosity blog (first view sol 4527, main boxwork sol 4602 to 4603).
+- Rover positions are the last stop on or before each sol.
+
+
+### 1. HiRISE terrain model
+
+Result: found, and it covers the whole route.
+1. Primary: `DTEEC_009149_1750_009294_1750_U01` (1.01 m, 391 MB), with orthoimage `PSP_009149_1750_RED_A_01_ORTHO` (0.25 m, 388 MB).
+2. Backup: `DTEEC_019698_1750_019988_1750_U01` (1.01 m, 543 MB). Also covers every stop; useful as a cross-check.
+
+Notes:
+- Both footprints contain all 8 anchors above.
+- Downloaded and checked 2026-11-14 (primary DTM and orthoimage, about 780 MB, in `data/raw/hirise/`).
+
+Download checks:
+1. No gaps: 0% no-data inside the patch, in both the DTM and the orthoimage.
+2. Real pixel sizes: DTM 1.0117 m, orthoimage 0.2529 m. Same projection (equirectangular, Mars sphere R 3,396,190 m).
+3. Slopes are trustworthy: DTM slope at 205 Curiosity stops (median 8.8°) matches the rover's own measured tilt (median 8.4°). Smoothing barely changes them, so they are real terrain, not noise.
+4. Absolute elevation differs from Curiosity's waypoint elevations by +18 m in the north (sulfur area) down to +1 m at the boxwork. It is a smooth drift (a ~0.5° tilt of the height reference), not a horizontal shift. Slopes and relative heights are unaffected; the app only needs relative heights.
+5. The terrain is steep: median slope 11.7°, and 18% of the patch is above 25°. The route planner will have real no-go zones (good for the demo).
+
+
+### 2. Distance between the two targets
+
+Result: about 2 km. Both targets fit in one ~2 × 2 km patch, so no split is needed.
+1. Sulfur field to main boxwork (straight line): 2,046 m.
+2. Western channel edge to main boxwork: 1,686 m.
+3. Sulfur field to late boxwork: 2,140 m.
+4. Curiosity drove about 3.5 km between them (sol 4210 to 4602), because it followed a winding route.
+
+Patch proposal (anchors plus 150 m margin):
+- North -4.7809, South -4.8124, West 137.3771, East 137.4114.
+- Size: 2,024 m east-west × 1,869 m north-south.
+- Elevation on the route: -3734 m to -3598 m (about 136 m of relief).
+
+
+### 3. Rover staging point
+
+Method: search the DTM for the flattest 20 m radius areas within 1.4 km of both targets, then prefer spots next to Curiosity's route (proven drivable). Only about 3% of that area has a 20 m mean slope under 5°.
+
+Proposal:
+1. Staging point: lat -4.78877, lon 137.39023, elevation about -3709 m.
+   - Mean slope 3.4° within 20 m (max 6.0°).
+   - 1,120 m to the sulfur field and 1,118 m to the main boxwork: exactly halfway, so two walks of about 1.1 km each.
+   - About 70 m from Curiosity's sol 4464 stop, so the rover approach follows Curiosity's own route.
+
+Rejected:
+1. Curiosity stops checked on the DTM (mean slope within 20 m): sol 4464 14.2°, sol 4473 29.4°, sol 4417 10.1°, sol 4544 6.4°. Rover tilt only shows the ground under the rover, not the area around it.
+2. Flatter DTM spots (lat -4.80181, lon 137.39748 at 3.1°, and similar) sit on high ground about 230 m above the route, far from Curiosity's path.
+
+Notes:
+- About 1.1 km from the rover is well inside the 2 km Artemis III excursion radius.
+
+
+### 4. Walking numbers
+
+Proposal:
+1. `suit_speed_factor` = 0.6. Peak speed is then exactly 1.0 m/s (Tobler's peak 6 km/h × 0.6), which matches the Apollo maximum nominal suited speed (~2.2 mph). Flat ground is 0.84 m/s (~3 km/h).
+2. `gravity_adjustment` = 1.0 (no adjustment in v0.1.0; evidence is thin; walking times shown as "est.").
+3. `max_walkable_slope_deg` = 25.
+4. New rule to agree: `walking_time_seconds` returns `+Infinity` when the edge slope is steeper than `max_walkable_slope_deg`. This keeps Python and TypeScript identical even where the cell slope layer is smoothed.
+
+Formula (proposed for contracts.md section 4.4):
+
+```
+S = elevation_change_m / horizontal_distance_m
+if atan(|S|) in degrees > max_walkable_slope_deg: return +Infinity
+speed_kmh = 6 * exp(-3.5 * |S + 0.05|) * suit_speed_factor * gravity_adjustment
+walking_time_seconds = horizontal_distance_m / (speed_kmh / 3.6)
+```
+
+Test vectors with these values (for contracts.md section 4.5, tolerance ±1e-3 s):
+
+```
+horizontal_distance_m   elevation_change_m   expected_seconds
+1.0                      0.0                 1.1912   (flat ground anchor)
+1.0                      0.1                 1.6905
+1.0                     -0.1                 1.1912
+1.0                      0.5                 +Infinity (26.6° > 25°)
+1.0                     -0.5                 +Infinity (26.6° > 25°)
+1.4142135623730951       0.0                 1.6847   (diagonal, flat)
+10.0                     2.0                 23.9888
+10.0                    -2.0                 16.9046
+```
+
+Notes:
+- 1 m at -0.1 equals flat ground. That is how Tobler works (it peaks on a gentle downhill), not a bug.
+- Sanity check: sulfur field to main boxwork in a straight line on flat ground takes about 41 minutes. Real routes through the ridges will be longer.
+
+
+### 5. Measured data size (for the session with Person B)
+
+Measured on the real patch (2,010 × 1,845 cells at 1 m):
+1. At 1 m, one float32 layer is 14.8 MB raw. Heightmap compresses to 10.4 MB (gzip) or 7.2 MB (brotli); slope only to 13.3 MB or 11.9 MB.
+2. At 1 m, all 8 layers: about 108 MB raw, 52 to 96 MB compressed. Over the ~30 MB budget even with compression.
+3. At 2 m (1,005 × 922 cells), all 8 layers: about 27 MB raw, 14 to 24 MB compressed. Fits the budget.
+4. Orthoimage: the patch is 8,038 × 7,382 px at full 0.25 m; a 4,096 px texture means about 0.5 m per pixel.
+
+Recommendation: the pipeline computes everything at 1 m (accuracy), and exports the app layers at 2 m (fits the budget). If Person B wants 1 m detail in the Labyrinth view, load only the heightmap at 1 m (7 to 10 MB compressed) and keep the other layers at 2 m.
+
+
+### Still to do before the session
+
+- [x] Download the primary DTM and orthoimage, check gaps and the staging slope.
+- [x] Measure compressed layer sizes for the data size decision.
+- [ ] Walk Person B through the data size recommendation.
+
+
 ## Team session agenda (60 minutes)
 
 1. Patch and staging point (10 min, Person A presents)
@@ -118,7 +243,7 @@ Options:
 3. Smaller patch: ~1.5 × 1.5 km (9 MB per layer).
 4. Smaller data types (for example uint16 with a scale factor). This is a contract change and adds error risk.
 
-Recommendation: decide after Person A downloads the DTM. Measure the compressed size of real 1 m layers first; if over budget, use option 1, then option 2. Avoid option 4.
+Recommendation: measured on the real DTM (see "Prep results: Lawrence", section 5). 1 m is over budget even compressed; 2 m fits. Use option 2 (compute at 1 m, export at 2 m), optionally with a 1 m heightmap only. Avoid option 4.
 
 Sharing:
 - Proposal: a shared drive folder named by `contract_version` (for example `processed_v0.1.0`), because free Git LFS quotas are small (verify).

@@ -95,7 +95,8 @@ This is the live status board. The main agent of the stage owner updates it when
 
 1. Data size conflicts with the payload budget.
    - One 2000 × 2000 float32 grid is 16 MB; the contract lists about 115 MB of layers against a ~30 MB budget.
-   - Options and a recommendation are in `docs/stage_0_guide.md` ("Data size and sharing"). Decide at Stage 0.
+   - Measured on the real DTM: 1 m layers are 52 to 96 MB compressed; 2 m layers are 14 to 24 MB.
+   - Recommendation (compute at 1 m, export at 2 m) is in `docs/stage_0_guide.md`. Decide at Stage 0.
 
 
 ## Hand-off notes from the previous stage

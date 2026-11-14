@@ -64,11 +64,12 @@ Tier is the data-layer priority from README.md: Must, Should, Stretch, Support, 
 - Data type: Optical
 - Used for: Base texture of the Labyrinth view and Planning Table; input to rock detection
 - Source: Mars Trek tiles https://trek.nasa.gov/mars/ or HiRISE ortho product via https://www.uahirise.org/dtm/ (verify)
-- Product ID: TBD (Stage 0)
+- Product ID: candidate `PSP_009149_1750_RED_A_01_ORTHO` (0.25 m, 388 MB JP2), the orthoimage matching the candidate DTM in 3.2. Backup: `ESP_019698_1750_RED_A_01_ORTHO` (0.25 m, 462 MB)
+- Download URL: https://hirise-pds.lpl.arizona.edu/PDS/DTM/PSP/ORB_009100_009199/PSP_009149_1750_PSP_009294_1750/PSP_009149_1750_RED_A_01_ORTHO.JP2
 - Resolution: 25 to 50 cm
 - Licence and credit: TBD (expected: NASA/JPL/University of Arizona; verify)
 - Processing: Download, crop to the patch, reproject to the local grid, resample to at most 4096 × 4096, export `texture_hirise.jpg`; record sun azimuth and incidence in `meta.json`
-- Status: To verify at Stage 0
+- Status: Downloaded 2026-11-14 to `data/raw/hirise/`. Real pixel size 0.2529 m; no no-data in the patch. Team confirms at Stage 0
 
 
 ### 3.2 HiRISE DTM: slope and roughness (Must)
@@ -78,11 +79,13 @@ DTM = digital terrain model, a height map.
 - Data type: Topographic
 - Used for: Heightmap, slope, roughness, traversal penalty, return field, sky-view factor, 3D terrain
 - Source: https://www.uahirise.org/dtm/ (verify)
-- Product ID: TBD (Stage 0: confirm a DTM covers the patch)
+- Product ID: candidate `DTEEC_009149_1750_009294_1750_U01` ("Gale Crater filled channel and fan deposit", 1.01 m, 391 MB). Backup: `DTEEC_019698_1750_019988_1750_U01` ("Lower northwest portion of mound", 1.01 m, 543 MB)
+- Download URL: https://hirise-pds.lpl.arizona.edu/PDS/DTM/PSP/ORB_009100_009199/PSP_009149_1750_PSP_009294_1750/DTEEC_009149_1750_009294_1750_U01.IMG
+- Coverage check: both DTM footprints contain all 9 Curiosity stops from the sulfur field (sol 4210) to the late boxwork (sol 4839), tested against the footprint corners in the HiRISE DTM index (https://hirise-pds.lpl.arizona.edu/PDS/INDEX/DTMCUMINDEX.TAB). Gaps inside the footprint are only visible after download
 - Resolution: 1 m (1 to 2 m ridges are near the limit: they appear smoothed)
 - Licence and credit: TBD (verify)
 - Processing: Download, crop, reproject to the local grid, fill small gaps, compute slope and roughness, export `heightmap.bin`, `slope_degrees.bin`, `roughness_m.bin`
-- Status: To verify at Stage 0
+- Status: Downloaded 2026-11-14 to `data/raw/hirise/`. Real pixel size 1.0117 m; no gaps in the patch; slopes match Curiosity's measured tilt; absolute elevation is 1 to 18 m above Curiosity's waypoint elevations (smooth drift). Team confirms at Stage 0
 
 
 ### 3.3 Radiation: Curiosity RAD (Must)
@@ -215,6 +218,18 @@ DTM = digital terrain model, a height map.
 - Licence and credit: TBD (verify)
 - Processing: Download or export a regional crop, resize, mark the patch location; delivered as a static image (file name and location TBD, Stage 0)
 - Status: To verify at Stage 0
+
+
+### 3.14 Curiosity traverse waypoints (Support)
+
+- Data type: Positions (rover localisation)
+- Used for: Patch bounds, staging point candidates, Knot positions, matching ground photos to places by sol
+- Source: MSL waypoints GeoJSON used by NASA's Curiosity location map: https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/MSL_waypoints.json (verify licence)
+- Product ID: `MSL_waypoints.json` (downloaded 2026-11-13, 1388 stops, last sol 5070)
+- Resolution: Points. Fields include sol, lat, lon (planetocentric, east-positive), `elev_geoid`, rover `tilt`, odometry
+- Licence and credit: NASA/JPL-Caltech (verify)
+- Processing: Pick stops by sol; rover `tilt` at a stop is used as a first check of how flat the ground is
+- Status: In use for Stage 0 prep
 
 
 ## 4. Resolution reality check
