@@ -41,8 +41,20 @@
     --ariadne-space-8: 2rem;
     --ariadne-tap-table: 3rem;
     --ariadne-tap-hud: 4rem;
+    /* Deprecated (D-031): the icon rail and side panel were replaced by the mode tabs. */
     --ariadne-rail-width: 5.5rem;
     --ariadne-panel-width: 21.25rem;
+
+    /* Shell layout (interface redesign, D-031): thin bars around a full-size map. */
+    --ariadne-tab-bar-height: 3.5rem;
+    --ariadne-status-bar-height: 3rem;
+    --ariadne-sheet-width: 23.75rem;
+    --ariadne-sheet-phone-height: 55vh;
+    --ariadne-overlay-card-width: 22rem;
+    --ariadne-line: 1px;
+    --ariadne-bracket-size: 0.625rem;
+    /* Cards over the map: solid panel green, slightly see-through, no gradient, no shadow. */
+    --ariadne-overlay-panel: rgba(10, 20, 12, 0.94);
 }
 
 @theme inline {
@@ -59,6 +71,7 @@
     --color-ariadne-go: var(--ariadne-go);
     --color-ariadne-caution: var(--ariadne-caution);
     --color-ariadne-no-go: var(--ariadne-no-go);
+    --color-ariadne-overlay: var(--ariadne-overlay-panel);
     --font-display: var(--ariadne-font-display);
     --font-mono: var(--ariadne-font-mono);
 }
@@ -94,6 +107,38 @@ body,
 
 .ariadne-tap-hud {
     min-height: var(--ariadne-tap-hud);
+}
+
+/* Bracket corners (D-031 rule 5): the only decoration on cards over the map. Top left and bottom
+   right, 2 px phosphor green, square. In the components layer so utilities such as "absolute"
+   still win over the default "relative" here. */
+@layer components {
+    .ariadne-bracketed {
+        position: relative;
+    }
+
+    .ariadne-bracketed::before,
+    .ariadne-bracketed::after {
+        content: "";
+        position: absolute;
+        width: var(--ariadne-bracket-size);
+        height: var(--ariadne-bracket-size);
+        border-color: var(--ariadne-phosphor-green);
+        border-style: solid;
+        pointer-events: none;
+    }
+
+    .ariadne-bracketed::before {
+        top: -1px;
+        left: -1px;
+        border-width: 2px 0 0 2px;
+    }
+
+    .ariadne-bracketed::after {
+        right: -1px;
+        bottom: -1px;
+        border-width: 0 2px 2px 0;
+    }
 }
 
 /* Thin, dark scrollbars so panels do not grow light bars on a CRT. */

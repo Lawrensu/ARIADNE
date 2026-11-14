@@ -1,6 +1,6 @@
 # ARIADNE Stage 3 visual direction (proposal for Letta)
 
-Date: 2026-11-14. Author: Letta's main agent. Status: awaiting Letta's approval before any UI build.
+Date: 2026-11-14. Author: Letta's main agent. Status: approved as built (Lawrence for the team, 2026-11-14, D-030).
 
 Mood: retro, classic, old school. A rugged field terminal bolted into a suit, not a game skin. ARIADNE keeps its own name, wordmark, icons and layout; no Pip-Boy, Iron Lung or Alien: Isolation logo, icon or exact layout is copied.
 
@@ -91,3 +91,55 @@ CRT look: scanlines, 1.5 percent barrel curvature, grain, vignette, one toggle "
 3. `App.tsx` restructured into rail plus tabbed panel plus status strip, with the existing Planning Table, Labyrinth view and panels kept inside; the store shape is unchanged (new slices only in new files).
 4. Fonts imported in `main.tsx` from the two @fontsource packages.
 5. No contract files, pipeline outputs or routing/Thread/science numbers change.
+
+
+## 6. Interface redesign (D-031, 2026-11-14)
+
+Lawrence's direction: inspired by a retro field-terminal map (one monochrome phosphor map, a mode tab bar across the top, a status bar across the bottom) and a 3D game map menu (bright walkable floors, an objective card with a checklist, a control legend along the bottom). Take the ideas, never the look: no game names, logos, icons, fonts or exact layouts. Goal: intuitive for an astronaut in gloves, nothing that reads as generated filler.
+
+### 6.1 Rules for every screen
+
+1. The map is the screen. It is always full size; everything else is a thin bar or a card floating over it.
+2. One way to get anywhere: the mode tabs. No side rail, no "CONSOLE" panel, no second row of tabs.
+3. Words are short labels, not paragraphs. At most one help line under a control; longer explanations go behind a small "?" (or the provenance popover).
+4. One accent colour for "you can act on this" (phosphor green). Parchment only for data values. Caution and no-go colours only for hazards and alerts, always with shape and word.
+5. Square corners, 1 px phosphor lines, no drop shadows, no gradients, no rounded "cards" look. Thin bracket corners or a top tab notch are the decoration.
+6. Glove targets: 48 px minimum everywhere, 64 px in SUIT mode.
+7. Phone 375, tablet 768, desktop 1280+: no horizontal scroll; the same structure at every width.
+
+### 6.2 Layout
+
+```
++----------------------------------------------------------+
+| [gear]   MAP   PLAN   SUIT   DATA              REPLAY    |  tab bar, 56 px
++----------------------------------------------------------+
+| OBJECTIVE card (top left)              ALERT (top right) |
+|                                                          |
+|                  full-screen map                         |
+|                                                          |
+| mode sheet (PLAN, DATA): left card on desktop,           |
+| bottom sheet on phone and tablet, map stays visible      |
+|                                                          |
+| [-] [+]  [CENTER ON ME]  [RESET]  [2D/3D]  [LEGEND]      |  control legend, over the map
++----------------------------------------------------------+
+| SOL 4760 LMST 13:20 | T+1:52 [>] 60x | O2 6:07 | THREAD +38 min |  status bar, 48 px
++----------------------------------------------------------+
+```
+
+- Tab bar: gear (system menu: Run demo scenario, Start walk, Back to rover, CRT effects on/off, credits), then MAP, PLAN, SUIT, DATA as large uppercase VT323 tabs; the active tab is filled phosphor green with a notch joining it to the frame line below; a REPLAY badge on the right.
+- MAP (default): map, objective card, alert card, control legend, status bar.
+- PLAN: MAP plus the plan sheet: science plan (one main action "Plan all Knots"), then "Route between two places" folded below.
+- SUIT: the Suit HUD fills the area between the tab bar and the status bar (not a separate full-screen overlay). Leaving SUIT returns to the map.
+- DATA: MAP plus the data sheet: Layers (toggles with legend swatches), Knots (list opening Knot cards), Mars time, Gale context image.
+- Objective card: "OBJECTIVE" header, the next Knot (or "Shelter: rover" while rerouted, or "Plan a walk" with a PLAN button when there is no plan), its tasks as a checklist with check boxes, and distance plus est. walk time. Collapses to one line on phone.
+- Control legend: buttons, not just hints: zoom out, zoom in, Center on me, Reset view, 2D/3D switch, Legend (opens the marker and layer legend). On desktop a quiet hint line: "drag pan, right-drag rotate, wheel zoom".
+- Status bar: replayed sol and LMST, sim clock T+h:mm with play/pause and speed, O2 left, Thread margin, each with its state colour and "est." where it is an estimate.
+
+### 6.3 Map look ("phosphor hologram")
+
+- Terrain: the real HiRISE relief rendered in phosphor green shades on near-black (luminance of the orthoimage mapped onto a green ramp), so it stays real data but reads as one display.
+- Walkable ground is lit (brighter green); no-go ground (traversal penalty no-go, slope over 25 degrees) is dark with a fine diagonal hatch, so the safe floor reads at a glance.
+- A faint square grid (100 m) over the terrain gives scale.
+- Lines: the Thread is the brightest line (solid, glowing); the science plan is parchment dashed; routes use phosphor green with distinct dash patterns and labels for fast, safe and smooth.
+- Markers are glyphs: diamond Knot, square rover, triangle shelter, circle-with-arrow you. Labels show only for Knots, the rover, the current objective and a hovered or selected marker; shelters show their label on hover or when an alert targets them.
+- Default view: flat, north-up 2D. 3D is one tap away.

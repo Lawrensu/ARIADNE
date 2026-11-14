@@ -1,12 +1,18 @@
-// Planning Table science plan panel (D-027, contracts.md 4.6). Owner: Malissa, Stage 2.
+// Planning science plan panel (D-027, contracts.md 4.6). Owner: Malissa, Stage 2; restyled for the mode sheets (D-031).
 // Pick and order Knots, tick science tasks, see leg times, plan time, science budget left, and GO / CAUTION / NO-GO.
 // Every change to the stops or tasks recomputes the plan (debounced); the recompute can fail and is never assumed to work.
+// Layout: width-fluid, no outer frame and no title (the sheet supplies both). Words are short;
+// longer explanations sit behind a "?" toggle.
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
 
 import type { Knot, ScienceTask } from "../../data/contracts";
 import type { SciencePlan } from "../../state/scienceSlice";
 import { useAriadneStore } from "../../state/store";
+import { EstimateBadge } from "../../theme/EstimateBadge";
+import { ProvenanceDialog } from "../../theme/ProvenancePopover";
+import { StateBadge, StateShape } from "../../theme/StateBadge";
 import { carriedLoadKg, loadFactor, loadParametersFromMeta } from "../loadFactor";
 import { recomputeSciencePlan } from "../sciencePlanService";
 import {
@@ -18,120 +24,138 @@ import {
     formatLoadRule,
     formatMinutesEstimate,
     formatPlanLimit,
-    formatTaskDuration,
     nearestNeighbourOrder,
     unreachableKnotNames,
 } from "./planDisplay";
-import type { FeasibilityShape } from "./planDisplay";
 
 
 
 const RECOMPUTE_DEBOUNCE_MS = 150;
 
-const BUTTON_CLASS = "min-h-12 rounded border border-ariadne-border px-3 text-sm hover:border-ariadne-accent disabled:opacity-40";
-const EST_BADGE_CLASS = "rounded border border-ariadne-muted px-1 text-xs text-ariadne-muted";
+const LABEL_CLASS = "text-xs uppercase tracking-widest text-ariadne-muted";
+
+const MAIN_ACTION_CLASS =
+    "ariadne-tap w-full border border-ariadne-accent bg-ariadne-accent px-3 text-base font-bold uppercase tracking-wider text-ariadne-background hover:bg-ariadne-text disabled:opacity-40";
+
+const OUTLINE_BUTTON_CLASS =
+    "ariadne-tap border border-ariadne-border px-3 text-sm uppercase tracking-wider text-ariadne-text hover:border-ariadne-accent disabled:opacity-40";
+
+// Icon-like text buttons for reorder and remove: small text, still a 48 px target.
+const SMALL_BUTTON_CLASS =
+    "ariadne-tap min-w-12 border border-ariadne-border px-1 text-xs uppercase tracking-wider text-ariadne-muted hover:border-ariadne-accent hover:text-ariadne-text disabled:opacity-30";
 
 
 
-function FeasibilityShapeIcon({ shape, colour }: { shape: FeasibilityShape; colour: string }) {
-    if (shape === "filled_circle") {
+// A heading row with a small "?" that opens a longer explanation underneath.
+function HelpRow({ title, helpLabel, children }: { title: string; helpLabel: string; children: ReactNode }) {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+        <div>
+            <div className="flex items-center justify-between gap-2">
+                <span className={LABEL_CLASS}>{title}</span>
+                <button
+                    type="button"
+                    className="ariadne-tap min-w-12 border border-ariadne-border text-sm text-ariadne-muted hover:border-ariadne-accent"
+                    aria-label={`${helpLabel}: more info`}
+                    aria-expanded={isOpen}
+                    onClick={() => setIsOpen(!isOpen)}
+                >
+                    ?
+                </button>
+            </div>
+            {isOpen && <div className="border-l border-ariadne-border pl-2 text-xs text-ariadne-muted">{children}</div>}
+        </div>
+    );
+}
+
+
+// Square check box drawn as a shape, so the state never depends on colour alone.
+function CheckBoxMark({ isChecked }: { isChecked: boolean }) {
+    if (isChecked) {
         return (
-            <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
-                <circle cx="14" cy="14" r="11" fill={colour} />
-            </svg>
-        );
-    }
-    if (shape === "triangle") {
-        return (
-            <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
-                <polygon points="14,3 26,25 2,25" fill={colour} />
+            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" fill="var(--ariadne-accent)" />
+                <path d="M6 12 L10 16 L18 7" stroke="var(--ariadne-screen-black)" strokeWidth="2.6" fill="none" />
             </svg>
         );
     }
     return (
-        <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
-            <polygon points="9,2 19,2 26,9 26,19 19,26 9,26 2,19 2,9" fill={colour} />
-            <path d="M9 9 L19 19 M19 9 L9 19" stroke="var(--ariadne-screen-black)" strokeWidth="3" />
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" fill="none" stroke="var(--ariadne-muted-green)" strokeWidth="2" />
         </svg>
     );
 }
 
-
-// Stage 3 palette tokens; the shape and the text carry the meaning as well.
-function feasibilityColour(label: string): string {
-    if (label === "GO") {
-        return "var(--ariadne-go)";
-    }
-    if (label === "CAUTION") {
-        return "var(--ariadne-caution)";
-    }
-    return "var(--ariadne-no-go)";
-}
-
-
-
-function TaskProvenance({ task }: { task: ScienceTask }) {
-    return (
-        <div className="mt-1 text-xs text-ariadne-muted">
-            Source: {task.provenance.source_dataset}, product {task.provenance.product_id}
-            {task.provenance.uncertainty !== undefined && <>, uncertainty {String(task.provenance.uncertainty)}</>}
-            {task.equipment.length > 0 && <>. Equipment: {task.equipment.join(", ")}</>}. <span className={EST_BADGE_CLASS}>est.</span>
-        </div>
-    );
-}
 
 
 function TaskRow({ knotId, task, isChosen }: { knotId: string; task: ScienceTask; isChosen: boolean }) {
     const toggleSciencePlanTask = useAriadneStore((state) => state.toggleSciencePlanTask);
     const setTaskCompleted = useAriadneStore((state) => state.setTaskCompleted);
     const isCompleted = useAriadneStore((state) => state.completedTaskIds.includes(task.task_id));
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isSourceOpen, setIsSourceOpen] = useState(false);
 
-    let includeClassName = "flex min-h-12 flex-1 items-center gap-2 rounded border px-2 text-left text-sm ";
-    if (isChosen) {
-        includeClassName += "border-ariadne-accent";
+    let labelClass = "min-w-0 flex-1 py-1 text-left text-sm";
+    if (!isChosen) {
+        labelClass += " opacity-60";
+    }
+
+    let doneClass = "ariadne-tap min-w-12 border px-1 text-xs uppercase tracking-wider ";
+    if (isCompleted) {
+        doneClass += "border-ariadne-accent bg-ariadne-accent text-ariadne-background";
     } else {
-        includeClassName += "border-ariadne-border opacity-70";
+        doneClass += "border-ariadne-border text-ariadne-muted hover:border-ariadne-accent";
     }
 
     return (
-        <div className="rounded">
-            <div className="flex gap-1">
-                <button
-                    type="button"
-                    className={includeClassName}
-                    aria-pressed={isChosen}
-                    onClick={() => toggleSciencePlanTask(knotId, task.task_id)}
-                >
-                    <span className="w-5 text-lg" aria-hidden="true">{isChosen ? "[x]" : "[ ]"}</span>
-                    <span className="flex-1">
-                        <span className="font-bold">{task.label}</span>{" "}
-                        <span className="text-xs text-ariadne-muted">({task.task_type.replace(/_/g, " ")})</span>
-                        <span className="block text-xs text-ariadne-muted">
-                            {formatTaskDuration(task.duration_minutes)}, sample est. {task.sample_mass_kg.toFixed(1)} kg
-                            {task.equipment.length > 0 && <>, {task.equipment.join(", ")}</>}
-                        </span>
-                    </span>
-                </button>
-                <button
-                    type="button"
-                    className={BUTTON_CLASS}
-                    aria-pressed={isCompleted}
-                    onClick={() => setTaskCompleted(task.task_id, !isCompleted)}
-                >
-                    {isCompleted ? "Done" : "Not done"}
-                </button>
-                <button type="button" className={BUTTON_CLASS} aria-expanded={isExpanded} onClick={() => setIsExpanded(!isExpanded)}>
-                    Info
-                </button>
+        <li className="flex items-stretch gap-1 border-t border-ariadne-border">
+            <button
+                type="button"
+                role="checkbox"
+                aria-checked={isChosen}
+                aria-label={`Include ${task.label} in the plan`}
+                className="ariadne-tap flex min-w-12 items-center justify-center"
+                onClick={() => toggleSciencePlanTask(knotId, task.task_id)}
+            >
+                <CheckBoxMark isChecked={isChosen} />
+            </button>
+            <div className={labelClass}>
+                <span className="block break-words">{task.label}</span>
+                <span className="block text-xs text-ariadne-muted">
+                    {Math.round(task.duration_minutes)} min, {task.sample_mass_kg.toFixed(1)} kg
+                    <EstimateBadge />
+                </span>
             </div>
-            {isExpanded && <TaskProvenance task={task} />}
-        </div>
+            <button
+                type="button"
+                className={doneClass}
+                aria-pressed={isCompleted}
+                aria-label={`${task.label}: mark done (simulated)`}
+                onClick={() => setTaskCompleted(task.task_id, !isCompleted)}
+            >
+                done
+            </button>
+            <button
+                type="button"
+                className={SMALL_BUTTON_CLASS}
+                aria-label={`Source of ${task.label} estimate`}
+                onClick={() => setIsSourceOpen(true)}
+            >
+                src
+            </button>
+            {isSourceOpen && (
+                <ProvenanceDialog
+                    title={task.label}
+                    valueText={`${Math.round(task.duration_minutes)} min, ${task.sample_mass_kg.toFixed(1)} kg`}
+                    provenance={task.provenance}
+                    onClose={() => setIsSourceOpen(false)}
+                />
+            )}
+        </li>
     );
 }
 
 
-function StopCard({ stopNumber, knot, chosenTaskIds, isFirst, isLast }: {
+function StopBlock({ stopNumber, knot, chosenTaskIds, isFirst, isLast }: {
     stopNumber: number;
     knot: Knot;
     chosenTaskIds: string[];
@@ -142,25 +166,46 @@ function StopCard({ stopNumber, knot, chosenTaskIds, isFirst, isLast }: {
     const removeSciencePlanStop = useAriadneStore((state) => state.removeSciencePlanStop);
 
     return (
-        <div className="flex flex-col gap-1 rounded border border-ariadne-border bg-ariadne-panel p-2">
-            <div className="flex items-center gap-1">
-                <span className="w-7 text-lg font-bold text-ariadne-accent">{stopNumber}.</span>
-                <span className="flex-1 font-bold">{knot.name}</span>
-                <button type="button" className={BUTTON_CLASS} disabled={isFirst} onClick={() => moveSciencePlanStop(knot.knot_id, "earlier")}>
-                    Earlier
+        <li className="border border-ariadne-border bg-ariadne-panel">
+            <div className="flex items-center gap-1 pl-2">
+                <span className="w-6 shrink-0 text-base font-bold text-ariadne-accent">{stopNumber}</span>
+                <span className="min-w-0 flex-1 break-words text-sm font-bold">{knot.name}</span>
+                <button
+                    type="button"
+                    className={SMALL_BUTTON_CLASS}
+                    aria-label={`Move ${knot.name} earlier`}
+                    disabled={isFirst}
+                    onClick={() => moveSciencePlanStop(knot.knot_id, "earlier")}
+                >
+                    up
                 </button>
-                <button type="button" className={BUTTON_CLASS} disabled={isLast} onClick={() => moveSciencePlanStop(knot.knot_id, "later")}>
-                    Later
+                <button
+                    type="button"
+                    className={SMALL_BUTTON_CLASS}
+                    aria-label={`Move ${knot.name} later`}
+                    disabled={isLast}
+                    onClick={() => moveSciencePlanStop(knot.knot_id, "later")}
+                >
+                    down
                 </button>
-                <button type="button" className={BUTTON_CLASS} onClick={() => removeSciencePlanStop(knot.knot_id)}>
-                    Remove
+                <button
+                    type="button"
+                    className={SMALL_BUTTON_CLASS}
+                    aria-label={`Remove ${knot.name} from the plan`}
+                    onClick={() => removeSciencePlanStop(knot.knot_id)}
+                >
+                    x
                 </button>
             </div>
-            {knot.science_tasks.length === 0 && <div className="text-xs text-ariadne-muted">No science tasks defined at this Knot.</div>}
-            {knot.science_tasks.map((task) => (
-                <TaskRow key={task.task_id} knotId={knot.knot_id} task={task} isChosen={chosenTaskIds.includes(task.task_id)} />
-            ))}
-        </div>
+            {knot.science_tasks.length === 0 && <div className="border-t border-ariadne-border px-2 py-2 text-xs text-ariadne-muted">No tasks.</div>}
+            {knot.science_tasks.length > 0 && (
+                <ul>
+                    {knot.science_tasks.map((task) => (
+                        <TaskRow key={task.task_id} knotId={knot.knot_id} task={task} isChosen={chosenTaskIds.includes(task.task_id)} />
+                    ))}
+                </ul>
+            )}
+        </li>
     );
 }
 
@@ -172,56 +217,68 @@ function PlanResults({ plan, knots }: { plan: SciencePlan; knots: Knot[] }) {
     const knotNameById = useMemo(() => new Map(knots.map((knot) => [knot.knot_id, knot.name])), [knots]);
     const legRows = buildLegRows(plan);
     const display = feasibilityDisplay(plan.feasibility);
-    const colour = feasibilityColour(display.label);
     const unreachableNames = unreachableKnotNames(plan, knotNameById);
     const suggestion = plan.drop_task_suggestion;
 
     return (
         <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2 rounded border-2 p-2" style={{ borderColor: colour }}>
-                <FeasibilityShapeIcon shape={display.shape} colour={colour} />
-                <div>
-                    <div className="text-lg font-bold" style={{ color: colour }}>{display.label}</div>
-                    <div className="text-xs text-ariadne-muted">{display.explanation}</div>
-                </div>
-            </div>
-
             {unreachableNames.length > 0 && (
-                <div className="text-ariadne-no-go">NO-GO: cannot reach {unreachableNames.join(", ")} on the walkable ground.</div>
+                <div className="flex items-center gap-2 border border-ariadne-no-go p-2 text-sm text-ariadne-no-go">
+                    <StateShape state="no_go" />
+                    <span>NO-GO: cannot reach {unreachableNames.join(", ")}.</span>
+                </div>
             )}
 
-            <div className="flex flex-col gap-1">
-                {legRows.map((row, index) => (
-                    <div key={`${row.leg_kind}-${index}`} className="rounded border border-ariadne-border px-2 py-1 text-sm">
-                        <div className="font-bold">
-                            {row.title}
-                            {row.is_walk_back && <span className="text-xs text-ariadne-muted"> (dashed on the map)</span>}
-                        </div>
-                        <div>{row.time_text}, {row.distance_text}</div>
-                        <div className="text-xs text-ariadne-muted">{row.load_text}</div>
-                    </div>
-                ))}
-            </div>
-
-            <div className="rounded border border-ariadne-border p-2 text-sm">
-                <div>Task time: {formatMinutesEstimate(plan.total_task_time_s)}</div>
-                <div>Walking: {formatMinutesEstimate(plan.total_walking_time_s)}</div>
-                <div className="font-bold">Total plan time: {formatMinutesEstimate(plan.total_plan_time_s)}</div>
-                <div>
-                    Limit: {formatMinutesEstimate(plan.plan_time_limit_s)} ({formatPlanLimit(parameters)})
+            <div className="border border-ariadne-border bg-ariadne-panel p-2">
+                <div className="flex items-baseline justify-between gap-2">
+                    <span className={LABEL_CLASS}>Total</span>
+                    <span className="text-base text-ariadne-data">{formatMinutesEstimate(plan.total_plan_time_s)}</span>
                 </div>
-                <div className="font-bold">Science budget: {formatBudgetLeft(plan.science_budget_left_s)}</div>
+                <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
+                    <span className={LABEL_CLASS}>Science budget</span>
+                    <span className="flex flex-wrap items-center gap-2">
+                        <span className="text-base text-ariadne-data">{formatBudgetLeft(plan.science_budget_left_s)}</span>
+                        <StateBadge state={plan.feasibility} />
+                    </span>
+                </div>
             </div>
 
             {suggestion !== null && (
-                <button
-                    type="button"
-                    className="min-h-12 rounded border border-ariadne-accent px-3 text-left text-sm hover:bg-ariadne-accent hover:text-ariadne-background"
-                    onClick={() => toggleSciencePlanTask(suggestion.knot_id, suggestion.task_id)}
-                >
-                    {formatDropSuggestion(suggestion, knotNameById)}. Tap to apply.
-                </button>
+                <div className="flex items-center gap-2 border border-ariadne-caution pl-2 text-sm text-ariadne-caution">
+                    <StateShape state="caution" />
+                    <span className="min-w-0 flex-1 break-words py-1">{formatDropSuggestion(suggestion, knotNameById)}</span>
+                    <button
+                        type="button"
+                        className="ariadne-tap shrink-0 border-l border-ariadne-caution px-3 text-xs font-bold uppercase tracking-wider hover:bg-ariadne-caution hover:text-ariadne-background"
+                        onClick={() => toggleSciencePlanTask(suggestion.knot_id, suggestion.task_id)}
+                    >
+                        Drop
+                    </button>
+                </div>
             )}
+
+            <HelpRow title="Walks and basis" helpLabel="Walks and basis">
+                <ul className="py-1">
+                    {legRows.map((row, index) => (
+                        <li key={`${row.leg_kind}-${index}`} className="py-1">
+                            <span className="block text-ariadne-text">
+                                {row.title}
+                                {row.is_walk_back && " (dashed)"}
+                            </span>
+                            <span className="block">{row.time_text}, {row.distance_text}</span>
+                            <span className="block text-ariadne-dim">{row.load_text}</span>
+                        </li>
+                    ))}
+                </ul>
+                <div className="pb-1">
+                    <span className="block">Tasks: {formatMinutesEstimate(plan.total_task_time_s)}</span>
+                    <span className="block">Walking: {formatMinutesEstimate(plan.total_walking_time_s)}</span>
+                    <span className="block">
+                        Limit: {formatMinutesEstimate(plan.plan_time_limit_s)} ({formatPlanLimit(parameters)})
+                    </span>
+                    <span className="block">{display.explanation}</span>
+                </div>
+            </HelpRow>
         </div>
     );
 }
@@ -284,13 +341,13 @@ export function SciencePlanPanel() {
     };
 
     // Stops whose Knot is missing from the data are skipped (should not happen).
-    const stopCards = sciencePlanStops.map((stop, index) => {
+    const stopBlocks = sciencePlanStops.map((stop, index) => {
         const knot = knots.find((candidate) => candidate.knot_id === stop.knot_id);
         if (knot === undefined) {
             return null;
         }
         return (
-            <StopCard
+            <StopBlock
                 key={stop.knot_id}
                 stopNumber={index + 1}
                 knot={knot}
@@ -301,65 +358,68 @@ export function SciencePlanPanel() {
         );
     });
 
+    let walkSourceText = "walking model";
+    if (returnFieldEntry !== undefined) {
+        walkSourceText = `${returnFieldEntry.source_dataset}, product ${returnFieldEntry.product_id}`;
+    }
+
     return (
         <div className="flex flex-col gap-3">
-            <div>
-                <div className="mb-1 text-xs uppercase tracking-widest text-ariadne-muted">Add a Knot</div>
-                <div className="grid grid-cols-2 gap-1">
-                    {unplannedKnots.map((knot) => (
-                        <button
-                            key={knot.knot_id}
-                            type="button"
-                            className="min-h-12 rounded border border-ariadne-border bg-ariadne-panel px-2 text-left text-sm hover:border-ariadne-accent"
-                            onClick={() => addSciencePlanStop(knot.knot_id, knot.science_tasks.map((task) => task.task_id))}
-                        >
-                            + {knot.name}
-                        </button>
-                    ))}
-                </div>
-                <div className="mt-1 flex gap-1">
-                    {unplannedKnots.length > 1 && (
-                        <button type="button" className={BUTTON_CLASS} onClick={planAllKnots}>
-                            Plan all Knots (suggested order, nearest first)
-                        </button>
-                    )}
-                    {sciencePlanStops.length > 0 && (
-                        <button type="button" className={BUTTON_CLASS} onClick={() => clearSciencePlan()}>
-                            Clear plan
-                        </button>
-                    )}
-                </div>
-            </div>
+            {unplannedKnots.length > 0 && (
+                <button type="button" className={MAIN_ACTION_CLASS} onClick={planAllKnots}>
+                    Plan all Knots
+                </button>
+            )}
 
-            {stopCards.length > 0 && (
+            {stopBlocks.length > 0 && <ol className="flex flex-col gap-1">{stopBlocks}</ol>}
+
+            {sciencePlanStops.length > 0 && unplannedKnots.length > 0 && (
                 <div className="flex flex-col gap-1">
-                    <div className="text-xs uppercase tracking-widest text-ariadne-muted">Stops, in order</div>
-                    {stopCards}
+                    <span className={LABEL_CLASS}>Add</span>
+                    <div className="flex flex-wrap gap-1">
+                        {unplannedKnots.map((knot) => (
+                            <button
+                                key={knot.knot_id}
+                                type="button"
+                                className={OUTLINE_BUTTON_CLASS}
+                                onClick={() => addSciencePlanStop(knot.knot_id, knot.science_tasks.map((task) => task.task_id))}
+                            >
+                                + {knot.name}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             )}
 
-            <div className="rounded border border-ariadne-border p-2 text-xs text-ariadne-muted">
-                <div className="text-sm text-ariadne-text">
-                    Carried load now: {formatCarriedLoad(carriedNowKg, carriedNowFactor)}
-                </div>
-                "Done" simulates the task being done, so its sample mass is carried from now on. The real check-off happens at the Knot.
-            </div>
-
-            {sciencePlanStatus === "idle" && (
-                <div className="text-ariadne-muted">Add a Knot to build a plan. It shows each walk, the total time and the science budget left.</div>
+            {sciencePlanStatus === "idle" && sciencePlanStops.length === 0 && (
+                <div className="text-sm text-ariadne-muted">No stops yet.</div>
             )}
-            {sciencePlanStatus === "computing" && <div className="text-ariadne-muted">Computing the plan...</div>}
-            {sciencePlanStatus === "plan_failed" && <div className="text-ariadne-no-go">Plan failed: {sciencePlanError}</div>}
+            {sciencePlanStatus === "computing" && <div className="text-sm text-ariadne-muted">Computing...</div>}
+            {sciencePlanStatus === "plan_failed" && (
+                <div className="flex items-center gap-2 text-sm text-ariadne-no-go">
+                    <StateShape state="no_go" />
+                    <span>Plan failed: {sciencePlanError}</span>
+                </div>
+            )}
             {sciencePlan !== null && (sciencePlanStatus === "plan_ready" || sciencePlanStatus === "computing") && (
                 <PlanResults plan={sciencePlan} knots={knots} />
             )}
 
-            {sciencePlan !== null && (
-                <div className="text-xs text-ariadne-muted">
-                    Walking times: {returnFieldEntry !== undefined ? `${returnFieldEntry.source_dataset}, product ${returnFieldEntry.product_id}` : "walking model"}
-                    , Tobler x suit factor. Load factor {formatLoadRule(loadParameters)}. Task times and sample masses are
-                    estimates; tap Info on a task for its source. <span className={EST_BADGE_CLASS}>est.</span>
-                </div>
+            <HelpRow title="Load and sources" helpLabel="Load and sources">
+                <span className="block py-1 text-ariadne-text">Carried now: {formatCarriedLoad(carriedNowKg, carriedNowFactor)}</span>
+                <span className="block pb-1">
+                    "done" simulates a finished task: its sample mass is carried from now on. The real check-off happens at the Knot.
+                </span>
+                <span className="block pb-1">
+                    Walking times: {walkSourceText}, Tobler x suit factor. Load factor {formatLoadRule(loadParameters)}. Task times
+                    and sample masses are estimates; "src" on a task shows its source. <EstimateBadge />
+                </span>
+            </HelpRow>
+
+            {sciencePlanStops.length > 0 && (
+                <button type="button" className={OUTLINE_BUTTON_CLASS} onClick={() => clearSciencePlan()}>
+                    Clear plan
+                </button>
             )}
         </div>
     );

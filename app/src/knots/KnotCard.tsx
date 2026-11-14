@@ -1,15 +1,15 @@
-// Knot card (owner: Letta, Stage 3): a readable science stop card with the rationale, the
-// measured values and their provenance, the real Curiosity photos with credits, the science tasks
-// with check-off (D-027) and a one-tap route to the Knot. Photos are local (app/public/knots/), so
-// the demo works offline (D-024). Contract values are shown exactly; nothing is recomputed here.
+// Knot card (owner: Letta, Stage 3): a readable science stop card. Photo on top with its credit, the name,
+// the science text, measurements as label/value rows with provenance, the tasks with check boxes (D-027)
+// and "Route here" / "Close". Photos are local (app/public/knots/), so the demo works offline (D-024).
+// Contract values are shown exactly; nothing is recomputed here. Square corners, 1 px phosphor frame,
+// dark backdrop, fits a 375 px phone.
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import type { Knot, KnotMeasurement, ScienceTask } from "../data/contracts";
 import { planRoute } from "../planning/routingService";
 import type { RouteEndpoint } from "../state/routeSlice";
 import { useAriadneStore } from "../state/store";
-import { EstimateBadge } from "../theme/EstimateBadge";
 import { ProvenanceButton } from "../theme/ProvenancePopover";
 import { localPhotoPath } from "./knotPhotos";
 
@@ -18,33 +18,27 @@ import { localPhotoPath } from "./knotPhotos";
 const CARD_TITLE_ID_PREFIX = "knot-card-title-";
 
 const ACTION_BUTTON_CLASS =
-    "ariadne-tap inline-flex items-center justify-center gap-2 border-2 border-ariadne-accent px-4 text-sm font-bold uppercase tracking-wider text-ariadne-accent hover:bg-ariadne-accent hover:text-ariadne-background disabled:opacity-40";
+    "ariadne-tap inline-flex items-center justify-center border border-ariadne-accent bg-ariadne-accent px-4 text-sm font-bold uppercase tracking-wider text-ariadne-background hover:bg-ariadne-text disabled:opacity-40";
 
 const CLOSE_BUTTON_CLASS =
-    "ariadne-tap inline-flex min-w-12 items-center justify-center border border-ariadne-border px-3 text-sm hover:border-ariadne-accent";
+    "ariadne-tap inline-flex items-center justify-center border border-ariadne-border px-4 text-sm font-bold uppercase tracking-wider text-ariadne-text hover:border-ariadne-accent";
 
-const ESTIMATE_NOTE_CLASS = "text-xs text-ariadne-dim";
+const LABEL_CLASS = "text-xs uppercase tracking-widest text-ariadne-muted";
 
 
 
 function formatGridPosition(knot: Knot): string {
-    return `Local grid x ${knot.x_m.toFixed(1)} m, z ${knot.z_m.toFixed(1)} m`;
+    return `x ${knot.x_m.toFixed(1)} m, z ${knot.z_m.toFixed(1)} m (local grid)`;
 }
 
 
-function taskTypeLabel(task: ScienceTask): string {
-    // The contract stores descriptive snake_case strings; show them as words.
-    return task.task_type.replace(/_/g, " ");
-}
-
-
-// Shape plus word, so the done state never depends on colour alone.
-function DoneStateMark({ isDone }: { isDone: boolean }) {
-    if (isDone) {
+// Square check box drawn as a shape, so the done state never depends on colour alone.
+function CheckBoxMark({ isChecked }: { isChecked: boolean }) {
+    if (isChecked) {
         return (
             <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}>
-                <rect x="2" y="2" width="20" height="20" fill="var(--ariadne-go)" />
-                <path d="M6 12 L10 16 L18 7" stroke="var(--ariadne-screen-black)" strokeWidth="2.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                <rect x="2" y="2" width="20" height="20" fill="var(--ariadne-accent)" />
+                <path d="M6 12 L10 16 L18 7" stroke="var(--ariadne-screen-black)" strokeWidth="2.6" fill="none" />
             </svg>
         );
     }
@@ -58,14 +52,14 @@ function DoneStateMark({ isDone }: { isDone: boolean }) {
 
 function MeasurementRow({ measurement }: { measurement: KnotMeasurement }) {
     return (
-        <li className="border-b border-ariadne-border py-2 last:border-b-0">
-            <span className="block text-sm text-ariadne-muted">{measurement.label}</span>
+        <li className="flex items-center justify-between gap-3 border-b border-ariadne-border last:border-b-0">
+            <span className="min-w-0 text-sm text-ariadne-muted">{measurement.label}</span>
             <ProvenanceButton
                 label={measurement.label}
                 value={String(measurement.value)}
                 unit={measurement.unit}
                 provenance={measurement.provenance}
-                className="text-base text-ariadne-data"
+                className="shrink-0 text-sm text-ariadne-data"
             />
         </li>
     );
@@ -78,46 +72,52 @@ function ScienceTaskRow({ task }: { task: ScienceTask }) {
     const isDone = completedTaskIds.includes(task.task_id);
 
     return (
-        <li className="border-b border-ariadne-border py-2 last:border-b-0">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0 flex-1">
-                    <div className="font-bold">{task.label}</div>
-                    <div className="text-sm text-ariadne-muted">
-                        {taskTypeLabel(task)}, {task.duration_minutes} min, {task.sample_mass_kg.toFixed(1)} kg sample
-                        <EstimateBadge />
-                    </div>
-                    {task.equipment.length > 0 && (
-                        <div className="text-sm text-ariadne-muted">Equipment: {task.equipment.join(", ")}</div>
-                    )}
-                    <div className="mt-1 flex flex-wrap items-center gap-1">
-                        <ProvenanceButton
-                            label={`${task.label} task estimate`}
-                            value={`${task.duration_minutes} min, ${task.sample_mass_kg.toFixed(1)} kg`}
-                            provenance={task.provenance}
-                            className="text-xs text-ariadne-muted"
-                        />
-                    </div>
-                </div>
-                <div className="flex shrink-0 items-center gap-2">
-                    <span
-                        className="inline-flex items-center gap-1 text-xs uppercase tracking-wider"
-                        aria-label={isDone ? "Done" : "Not done"}
-                        style={{ color: isDone ? "var(--ariadne-go)" : "var(--ariadne-muted-green)" }}
-                    >
-                        <DoneStateMark isDone={isDone} />
-                        <span>{isDone ? "Done" : "Not done"}</span>
-                    </span>
-                    <button
-                        type="button"
-                        className={CLOSE_BUTTON_CLASS}
-                        aria-pressed={isDone}
-                        onClick={() => setTaskCompleted(task.task_id, !isDone)}
-                    >
-                        {isDone ? "Undo" : "Done"}
-                    </button>
-                </div>
+        <li className="flex items-center gap-1 border-b border-ariadne-border last:border-b-0">
+            <button
+                type="button"
+                role="checkbox"
+                aria-checked={isDone}
+                aria-label={`${task.label}: ${isDone ? "done" : "not done"}`}
+                className="ariadne-tap flex min-w-12 items-center justify-center"
+                onClick={() => setTaskCompleted(task.task_id, !isDone)}
+            >
+                <CheckBoxMark isChecked={isDone} />
+            </button>
+            <div className="min-w-0 flex-1 py-1">
+                <div className="break-words text-sm font-bold">{task.label}</div>
+                {task.equipment.length > 0 && <div className="text-xs text-ariadne-muted">{task.equipment.join(", ")}</div>}
             </div>
+            <ProvenanceButton
+                label={`${task.label} task estimate`}
+                value={`${task.duration_minutes} min, ${task.sample_mass_kg.toFixed(1)} kg`}
+                provenance={task.provenance}
+                className="shrink-0 text-xs text-ariadne-muted"
+            />
         </li>
+    );
+}
+
+
+// A "?" toggle for the one explanation the tasks need.
+function TaskHelp() {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+        <>
+            <button
+                type="button"
+                className="ariadne-tap min-w-12 border border-ariadne-border text-sm text-ariadne-muted hover:border-ariadne-accent"
+                aria-label="Tasks: more info"
+                aria-expanded={isOpen}
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                ?
+            </button>
+            {isOpen && (
+                <p className="basis-full border-l border-ariadne-border pl-2 text-xs text-ariadne-dim">
+                    Done adds the sample mass to the carried load and slows the walk back (contracts.md 4.6, D-027).
+                </p>
+            )}
+        </>
     );
 }
 
@@ -178,97 +178,78 @@ export function KnotCardContent({ knot }: KnotCardContentProps) {
         closeCard();
     };
 
+    // The first photo goes on top at full width, the others below it in two columns.
+    const photoFigures = knot.photos.map((photo, index) => {
+        const isFirstPhoto = index === 0;
+        let figureClass = "min-w-0";
+        if (isFirstPhoto) {
+            figureClass += " col-span-2";
+        }
+        return (
+            <figure key={`${knot.knot_id}-photo-${index + 1}`} className={figureClass}>
+                <img
+                    src={localPhotoPath(knot.knot_id, index + 1)}
+                    alt={photo.caption}
+                    loading="lazy"
+                    className="aspect-[4/3] w-full border border-ariadne-border object-cover"
+                />
+                <figcaption className="mt-1 text-xs text-ariadne-dim">
+                    Sol {photo.sol}, {photo.camera}. Credit: {photo.credit}
+                </figcaption>
+            </figure>
+        );
+    });
+
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center sm:p-4"
-            role="presentation"
-            onClick={closeCard}
-        >
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 sm:items-center sm:p-4" role="presentation" onClick={closeCard}>
             <div
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby={titleId}
-                className="flex max-h-[92vh] w-full flex-col overflow-hidden border-2 border-ariadne-accent bg-ariadne-panel text-ariadne-text sm:max-h-[85vh] sm:max-w-[40rem]"
+                className="flex max-h-[92vh] w-full flex-col overflow-hidden border border-ariadne-accent bg-ariadne-panel text-ariadne-text sm:max-h-[85vh] sm:max-w-[40rem]"
                 onClick={(event) => event.stopPropagation()}
             >
-                <div className="flex items-start justify-between gap-3 border-b border-ariadne-border p-3">
-                    <div className="min-w-0">
+                <div className="ariadne-scroll flex flex-1 flex-col gap-4 overflow-y-auto p-3">
+                    {photoFigures.length > 0 && <div className="grid grid-cols-2 gap-2">{photoFigures}</div>}
+
+                    <div>
                         <h2 id={titleId} className="ariadne-display break-words text-2xl text-ariadne-accent">
                             {knot.name}
                         </h2>
-                        <div className="break-words text-sm text-ariadne-muted">{formatGridPosition(knot)}</div>
+                        <div className="break-words text-xs text-ariadne-dim">{formatGridPosition(knot)}</div>
                     </div>
-                    <button type="button" className={CLOSE_BUTTON_CLASS} onClick={closeCard} aria-label="Close Knot card">
-                        Close
-                    </button>
-                </div>
 
-                <div className="ariadne-scroll flex flex-1 flex-col gap-4 overflow-y-auto p-3">
-                    <section>
-                        <h3 className="mb-1 text-xs uppercase tracking-widest text-ariadne-muted">Why go here</h3>
-                        <p className="text-sm">{knot.science_rationale}</p>
-                    </section>
+                    <p className="text-sm">{knot.science_rationale}</p>
 
-                    <section>
-                        <h3 className="mb-1 text-xs uppercase tracking-widest text-ariadne-muted">Measurements</h3>
-                        <ul>
-                            {knot.measurements.map((measurement, index) => (
-                                <MeasurementRow key={`${knot.knot_id}-measurement-${index}`} measurement={measurement} />
-                            ))}
-                        </ul>
-                    </section>
+                    {knot.measurements.length > 0 && (
+                        <section>
+                            <h3 className={`${LABEL_CLASS} mb-1`}>Measurements</h3>
+                            <ul className="border-t border-ariadne-border">
+                                {knot.measurements.map((measurement, index) => (
+                                    <MeasurementRow key={`${knot.knot_id}-measurement-${index}`} measurement={measurement} />
+                                ))}
+                            </ul>
+                        </section>
+                    )}
 
                     <section>
-                        <h3 className="mb-1 text-xs uppercase tracking-widest text-ariadne-muted">Science tasks</h3>
-                        {knot.science_tasks.length === 0 && (
-                            <p className="text-sm text-ariadne-muted">No science tasks defined at this Knot.</p>
-                        )}
-                        {knot.science_tasks.length > 0 && (
-                            <>
-                                <ul>
-                                    {knot.science_tasks.map((task) => (
-                                        <ScienceTaskRow key={task.task_id} task={task} />
-                                    ))}
-                                </ul>
-                                <p className={ESTIMATE_NOTE_CLASS}>
-                                    Done adds the sample mass to the carried load and slows the walk back (contracts.md 4.6, D-027).
-                                </p>
-                            </>
-                        )}
-                    </section>
-
-                    <section>
-                        <h3 className="mb-1 text-xs uppercase tracking-widest text-ariadne-muted">Curiosity photos</h3>
-                        {knot.photos.length === 0 && <p className="text-sm text-ariadne-muted">No photos for this Knot.</p>}
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                            {knot.photos.map((photo, index) => (
-                                <figure key={`${knot.knot_id}-photo-${index + 1}`} className="min-w-0">
-                                    <img
-                                        src={localPhotoPath(knot.knot_id, index + 1)}
-                                        alt={photo.caption}
-                                        loading="lazy"
-                                        className="aspect-[4/3] w-full border border-ariadne-border object-cover"
-                                    />
-                                    <figcaption className="mt-1 text-xs text-ariadne-muted">
-                                        <span className="block text-ariadne-text">{photo.caption}</span>
-                                        <span className="block">
-                                            Sol {photo.sol}, {photo.camera}
-                                        </span>
-                                        <span className="block text-ariadne-dim">Credit: {photo.credit}</span>
-                                    </figcaption>
-                                </figure>
-                            ))}
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                            <h3 className={LABEL_CLASS}>Tasks</h3>
+                            {knot.science_tasks.length > 0 && <TaskHelp />}
                         </div>
+                        {knot.science_tasks.length === 0 && <p className="text-sm text-ariadne-muted">No tasks.</p>}
+                        {knot.science_tasks.length > 0 && (
+                            <ul className="mt-1 border-t border-ariadne-border">
+                                {knot.science_tasks.map((task) => (
+                                    <ScienceTaskRow key={task.task_id} task={task} />
+                                ))}
+                            </ul>
+                        )}
                     </section>
                 </div>
 
-                <div className="sticky bottom-0 flex gap-2 border-t border-ariadne-border bg-ariadne-panel p-3">
-                    <button
-                        type="button"
-                        className={`${ACTION_BUTTON_CLASS} flex-1`}
-                        onClick={routeHere}
-                        disabled={processedData === null}
-                    >
+                <div className="grid grid-cols-2 gap-2 border-t border-ariadne-border bg-ariadne-panel p-3">
+                    <button type="button" className={ACTION_BUTTON_CLASS} onClick={routeHere} disabled={processedData === null}>
                         Route here
                     </button>
                     <button type="button" className={CLOSE_BUTTON_CLASS} onClick={closeCard}>

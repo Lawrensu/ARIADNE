@@ -1,50 +1,112 @@
-// The terrain surface: the shared geometry with the HiRISE photo stretched over the grid extent.
-// The photo already contains real shadows, so the lighting is mostly ambient (the photo stays
-// readable) plus a gentle directional light from the HiRISE sun direction for a hint of relief.
+// The terrain surface: the shared geometry with the HiRISE photo drawn as a "phosphor hologram"
+// (visual_direction.md 6.3, D-031). The photo luminance becomes a green ramp on near-black, walkable
+// ground is lit, no-go ground (traversal_penalty = +Infinity) is dark with a fine diagonal hatch,
+// and a faint 100 m grid gives scale. The maths is in terrain/phosphorTerrain.ts (tested), the
+// shader in terrain/phosphorTerrainMaterial.ts. No new network asset: the same HiRISE texture and
+// the traversal_penalty layer that is already loaded.
 
 import { useLoader, useThree } from "@react-three/fiber";
-import { useLayoutEffect, useMemo } from "react";
+import { useEffect, useLayoutEffect, useMemo } from "react";
 import * as THREE from "three";
 
+import type { LuminanceStretch } from "../terrain/phosphorTerrain";
+import { luminanceHistogram, luminanceStretchFromHistogram } from "../terrain/phosphorTerrain";
+import { createNoGoMaskTexture, createPhosphorTerrainMaterial } from "../terrain/phosphorTerrainMaterial";
 import { useTerrain } from "../terrain/TerrainContext";
 import { sunDirectionVector } from "./sceneMath";
 
 
 
-const SUN_LIGHT_DISTANCE_M = 4000;
-const AMBIENT_LIGHT_INTENSITY = 2.2;
-const SUN_LIGHT_INTENSITY = 0.9;
+// The contrast stretch is measured on a small copy of the photo: enough for a histogram, a few ms.
+const HISTOGRAM_SAMPLE_WIDTH_PX = 512;
+const FULL_RANGE_STRETCH: LuminanceStretch = { low: 0, high: 1 };
+
+let hasLoggedBuildTime = false;
+
+
+
+// Reads the photo once through a small canvas. Falls back to the full range when the image cannot
+// be read (no 2D canvas, or a tainted canvas).
+function measureLuminanceStretch(image: unknown): LuminanceStretch {
+    if (typeof document === "undefined") {
+        return FULL_RANGE_STRETCH;
+    }
+    const source = image as CanvasImageSource & { width: number; height: number };
+    if (source === null || source === undefined || !(source.width > 0) || !(source.height > 0)) {
+        return FULL_RANGE_STRETCH;
+    }
+    const sampleWidth = Math.min(HISTOGRAM_SAMPLE_WIDTH_PX, source.width);
+    const sampleHeight = Math.max(1, Math.round((source.height / source.width) * sampleWidth));
+    try {
+        const canvas = document.createElement("canvas");
+        canvas.width = sampleWidth;
+        canvas.height = sampleHeight;
+        const context = canvas.getContext("2d", { willReadFrequently: true });
+        if (context === null) {
+            return FULL_RANGE_STRETCH;
+        }
+        context.drawImage(source, 0, 0, sampleWidth, sampleHeight);
+        const pixels = context.getImageData(0, 0, sampleWidth, sampleHeight).data;
+        return luminanceStretchFromHistogram(luminanceHistogram(pixels));
+    } catch (error) {
+        console.warn("Terrain contrast stretch skipped, using the full range", error);
+        return FULL_RANGE_STRETCH;
+    }
+}
 
 
 
 export function TerrainMesh() {
     const { processedData, geometry } = useTerrain();
     const maxAnisotropy = useThree((state) => state.gl.capabilities.getMaxAnisotropy());
+    const pixelRatio = useThree((state) => state.viewport.dpr);
     const texture = useLoader(THREE.TextureLoader, processedData.textureUrl);
 
     useLayoutEffect(() => {
-        texture.colorSpace = THREE.SRGBColorSpace;
+        // The shader reads the raw sRGB bytes and writes sRGB colours, so no colour conversion here.
+        texture.colorSpace = THREE.NoColorSpace;
         texture.anisotropy = maxAnisotropy;
         texture.needsUpdate = true;
     }, [texture, maxAnisotropy]);
 
     const sun = processedData.meta.sun;
-    const sunPosition = useMemo<[number, number, number]>(() => {
-        const direction = sunDirectionVector(sun.sun_azimuth_deg, sun.sun_incidence_deg);
-        return [
-            direction.x * SUN_LIGHT_DISTANCE_M,
-            direction.y * SUN_LIGHT_DISTANCE_M,
-            direction.z * SUN_LIGHT_DISTANCE_M,
-        ];
-    }, [sun.sun_azimuth_deg, sun.sun_incidence_deg]);
+    const grid = processedData.meta.grid;
+    const traversalPenalty = processedData.float32Layers.traversal_penalty;
 
-    return (
-        <>
-            <ambientLight intensity={AMBIENT_LIGHT_INTENSITY} />
-            <directionalLight position={sunPosition} intensity={SUN_LIGHT_INTENSITY} />
-            <mesh geometry={geometry}>
-                <meshLambertMaterial map={texture} />
-            </mesh>
-        </>
-    );
+    const material = useMemo(() => {
+        const startMs = performance.now();
+        const noGoMaskTexture = createNoGoMaskTexture(grid, traversalPenalty);
+        const luminanceStretch = measureLuminanceStretch(texture.image);
+        const direction = sunDirectionVector(sun.sun_azimuth_deg, sun.sun_incidence_deg);
+        const built = createPhosphorTerrainMaterial({
+            hiriseTexture: texture,
+            noGoMaskTexture,
+            luminanceStretch,
+            sunDirection: new THREE.Vector3(direction.x, direction.y, direction.z),
+            pixelRatio: 1,
+        });
+        if (!hasLoggedBuildTime) {
+            hasLoggedBuildTime = true;
+            const elapsedMs = performance.now() - startMs;
+            console.info(
+                `Phosphor terrain built in ${elapsedMs.toFixed(1)} ms ` +
+                    `(luminance stretch ${luminanceStretch.low.toFixed(3)} to ${luminanceStretch.high.toFixed(3)})`,
+            );
+        }
+        return built;
+    }, [texture, grid, traversalPenalty, sun.sun_azimuth_deg, sun.sun_incidence_deg]);
+
+    useEffect(() => {
+        material.uniforms.uPixelRatio.value = pixelRatio;
+    }, [material, pixelRatio]);
+
+    useEffect(() => {
+        return () => {
+            const noGoMaskTexture = material.uniforms.uNoGoMask.value as THREE.Texture;
+            noGoMaskTexture.dispose();
+            material.dispose();
+        };
+    }, [material]);
+
+    return <mesh geometry={geometry} material={material} />;
 }

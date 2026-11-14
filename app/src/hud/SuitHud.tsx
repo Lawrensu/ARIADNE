@@ -9,7 +9,8 @@
 import { useMemo } from "react";
 import type { ReactNode } from "react";
 
-import type { EnvironmentSample, Knot } from "../data/contracts";
+import type { EnvironmentSample, Knot, LocalPosition, Provenance } from "../data/contracts";
+import type { ProcessedData } from "../data/loadProcessed";
 import { carriedLoadKg, loadFactor, loadParametersFromMeta } from "../science/loadFactor";
 import { computeConsumablesState } from "../sim/clock";
 import type { SciencePlan } from "../state/scienceSlice";
@@ -20,6 +21,8 @@ import { StateBadge } from "../theme/StateBadge";
 import { CompassTape } from "./CompassTape";
 import { HudTile } from "./HudTile";
 import {
+    bearingDegrees,
+    bearingWord,
     computeHudNumbers,
     emptyHudNumbers,
     formatDistanceMetres,
@@ -27,6 +30,7 @@ import {
     formatMinutesEstimate,
     formatScienceBudgetChip,
     nearestEnvironmentSample,
+    normalizeBearing,
     selectNextKnot,
 } from "./hudMath";
 
@@ -42,6 +46,68 @@ export interface SuitHudProps {
     // The main agent passes the AlertStack here; the HUD never imports app/src/alerts/.
     alertSlot?: ReactNode;
 }
+
+
+
+interface ReadingProvenance {
+    distance: Provenance;
+    threadMargin: Provenance;
+    o2: Provenance;
+}
+
+
+// Provenance for the three big readings (contracts.md 1.5). The Thread margin reads the
+// return_field layer entry from meta.json when present, so the dataset and product ID are real.
+function buildReadingProvenance(
+    processedData: ProcessedData | null,
+    nextKnot: Knot | null,
+    simElapsedSeconds: number,
+): ReadingProvenance {
+    const timestampText = `sim T+${Math.floor(Math.max(simElapsedSeconds, 0) / 60)} min`;
+
+    let returnFieldDataset = "ARIADNE return_field.bin (pipeline)";
+    let returnFieldProductId = "return_field";
+    let returnFieldResolutionM: number | undefined = undefined;
+    if (processedData !== null) {
+        const entry = processedData.meta.layers.find((layer) => layer.layer_id === "return_field");
+        if (entry !== undefined) {
+            returnFieldDataset = entry.source_dataset;
+            returnFieldProductId = entry.product_id;
+            returnFieldResolutionM = entry.native_resolution_m;
+        }
+    }
+
+    let distanceProductId = "no Knot selected";
+    if (nextKnot !== null) {
+        distanceProductId = nextKnot.knot_id;
+    }
+
+    return {
+        distance: {
+            source_dataset: "ARIADNE local grid: your position and Knot position",
+            product_id: distanceProductId,
+            timestamp: timestampText,
+            is_estimate: true,
+            uncertainty: "straight line unless taken from the planned leg",
+        },
+        threadMargin: {
+            source_dataset: returnFieldDataset,
+            product_id: returnFieldProductId,
+            resolution_m: returnFieldResolutionM,
+            timestamp: timestampText,
+            is_estimate: true,
+            uncertainty: "walking model, carried load included",
+        },
+        o2: {
+            source_dataset: "ARIADNE suit consumables model (meta.json parameters)",
+            product_id: "suit_capability_hours",
+            timestamp: timestampText,
+            is_estimate: true,
+            uncertainty: "8 h suit capability minus elapsed simulation time",
+        },
+    };
+}
+
 
 
 
@@ -262,8 +328,7 @@ export function SuitHud({ alertSlot }: SuitHudProps) {
     const sciencePlan = useAriadneStore((state) => state.sciencePlan);
     const completedTaskIds = useAriadneStore((state) => state.completedTaskIds);
     const setTaskCompleted = useAriadneStore((state) => state.setTaskCompleted);
-    const viewMode = useAriadneStore((state) => state.viewMode);
-    const requestViewReset = useAriadneStore((state) => state.requestViewReset);
+    const walkDetour = useAriadneStore((state) => state.walkDetour);
 
     const position = astronautPosition ?? processedData?.meta.staging_point ?? null;
     const parameters = processedData?.meta.parameters;
@@ -350,42 +415,44 @@ export function SuitHud({ alertSlot }: SuitHudProps) {
 
     const replaySol = processedData === null ? null : processedData.environmentTimeline.replay_source.sol;
     const sunAzimuthDeg = processedData === null ? null : processedData.meta.sun.sun_azimuth_deg;
-    const nextKnotBearingDeg = selection.knot === null ? null : selection.bearingDeg;
     const budgetText = formatScienceBudgetChip(sciencePlan === null ? null : sciencePlan.science_budget_left_s);
 
-    let nextKnotSourceText = "No data";
-    if (selection.source === "science_plan") {
-        nextKnotSourceText = "Science plan";
-    } else if (selection.source === "nearest_knot") {
-        nextKnotSourceText = "Nearest Knot";
+    // While rerouted the HUD points at the shelter (the end of the detour path), not at the Knot.
+    let shelterPosition: LocalPosition | null = null;
+    if (walkDetour !== null && walkDetour.path_positions.length > 0) {
+        shelterPosition = walkDetour.path_positions[walkDetour.path_positions.length - 1];
     }
 
-    let nextKnotDistanceText = "Distance unknown";
-    if (selection.knot !== null) {
-        nextKnotDistanceText = `${formatDistanceMetres(selection.distanceM)} away`;
+    let nextKnotBearingDeg: number | null = null;
+    let bearingWordText = "";
+    let distanceTileText = hudNumbers.distanceText;
+    let distanceTileState = hudNumbers.distanceState;
+    let distanceTileLabel = "Next Knot";
+
+    if (walkDetour !== null && shelterPosition !== null && position !== null) {
+        nextKnotBearingDeg = bearingDegrees(position.x_m, position.z_m, shelterPosition.x_m, shelterPosition.z_m);
+        bearingWordText = bearingWord(nextKnotBearingDeg);
+        const shelterDistanceM = Math.hypot(shelterPosition.x_m - position.x_m, shelterPosition.z_m - position.z_m);
+        distanceTileText = formatDistanceMetres(shelterDistanceM);
+        distanceTileState = "go";
+        distanceTileLabel = "Shelter";
+    } else if (selection.knot !== null && Number.isFinite(selection.bearingDeg)) {
+        nextKnotBearingDeg = selection.bearingDeg;
+        bearingWordText = selection.bearingWord;
     }
 
-    let nextKnotDistanceSourceText = "Load the Marswalk data to see the next Knot.";
-    if (selection.knot !== null && selection.isDistanceFromPlan) {
-        nextKnotDistanceSourceText = "Distance from the planned walking leg.";
-    } else if (selection.knot !== null) {
-        nextKnotDistanceSourceText = "Straight-line distance, est. Walk time is from the walking model.";
+    let bearingText = "";
+    if (nextKnotBearingDeg !== null) {
+        bearingText = `${bearingWordText} ${Math.round(normalizeBearing(nextKnotBearingDeg))}°`;
     }
 
-    let nextKnotBearingText = "unknown";
-    if (selection.knot !== null && Number.isFinite(selection.bearingDeg)) {
-        nextKnotBearingText = `${selection.bearingWord} (${Math.round(selection.bearingDeg)}°)`;
-    }
+    const readingProvenance = buildReadingProvenance(processedData, selection.knot, simElapsedSeconds);
 
     let alertsContent: ReactNode;
     if (alertSlot === undefined || alertSlot === null) {
-        alertsContent = <p className="text-sm text-ariadne-dim">No active alerts.</p>;
+        alertsContent = <p className="ariadne-display text-2xl text-ariadne-dim">NO ALERTS</p>;
     } else {
         alertsContent = alertSlot;
-    }
-
-    function onResetViewClicked() {
-        requestViewReset(viewMode);
     }
 
     function onExitHudClicked() {
@@ -404,134 +471,134 @@ export function SuitHud({ alertSlot }: SuitHudProps) {
         setHudSheet("none");
     }
 
+    let nextBlock: ReactNode;
+    if (walkDetour !== null) {
+        nextBlock = (
+            <>
+                <div className="flex flex-wrap items-center gap-2">
+                    <StateBadge state="caution" sizePx={16} />
+                    <span className="ariadne-display text-xl leading-none text-ariadne-caution">REROUTED</span>
+                </div>
+                <div className="ariadne-display break-words text-4xl leading-none text-ariadne-caution sm:text-5xl">
+                    SHELTER: {walkDetour.target_label}
+                </div>
+            </>
+        );
+    } else {
+        nextBlock = (
+            <>
+                <div className="ariadne-display text-xl leading-none text-ariadne-muted">NEXT KNOT</div>
+                <div className="ariadne-display ariadne-glow break-words text-4xl leading-none text-ariadne-text sm:text-5xl">
+                    {selection.knot === null ? "NO KNOTS" : selection.knot.name}
+                </div>
+            </>
+        );
+    }
+
+    let nextBlockBorderColour = "var(--ariadne-border)";
+    if (walkDetour !== null) {
+        nextBlockBorderColour = "var(--ariadne-caution)";
+    }
+
     return (
-        <div className="fixed inset-0 z-50 flex flex-col gap-2 overflow-y-auto bg-ariadne-background p-2 text-ariadne-text">
-            <header className="flex shrink-0 flex-wrap items-center gap-2 border-b border-ariadne-border pb-2">
-                <div className="ariadne-display ariadne-glow text-2xl leading-none text-ariadne-accent sm:text-3xl">
-                    SUIT DISPLAY
+        <div
+            className="ariadne-scroll absolute inset-0 overflow-y-auto overflow-x-hidden bg-ariadne-background text-ariadne-text"
+            aria-label="Suit display"
+        >
+            <div className="mx-auto flex min-h-full w-full max-w-6xl flex-col gap-3 p-3">
+                <div className="grid min-w-0 gap-3 lg:grid-cols-2">
+                    <div className="flex min-w-0 flex-col gap-3">
+                        <CompassTape
+                            headingDeg={astronautHeadingDeg}
+                            nextKnotBearingDeg={nextKnotBearingDeg}
+                            sunAzimuthDeg={sunAzimuthDeg}
+                        />
+
+                        <section className="grid min-w-0 gap-2 sm:grid-cols-3" aria-label="Three main readings">
+                            <HudTile
+                                label={distanceTileLabel}
+                                value={distanceTileText}
+                                state={distanceTileState}
+                                ariaLabel={`Distance to ${distanceTileLabel}: ${distanceTileText}`}
+                                provenance={readingProvenance.distance}
+                            />
+                            <HudTile
+                                label="Thread margin"
+                                value={hudNumbers.threadMarginText}
+                                state={hudNumbers.threadState}
+                                isEstimate
+                                ariaLabel={`Thread margin: ${hudNumbers.threadMarginText}`}
+                                provenance={readingProvenance.threadMargin}
+                            />
+                            <HudTile
+                                label="O2 h:mm"
+                                value={hudNumbers.o2Text}
+                                state={hudNumbers.o2State}
+                                isEstimate
+                                ariaLabel={`O2 left: ${hudNumbers.o2Text} hours and minutes`}
+                                provenance={readingProvenance.o2}
+                            />
+                        </section>
+                    </div>
+
+                    <div className="flex min-w-0 flex-col gap-3">
+                        <section
+                            className="flex min-w-0 flex-col gap-1 border bg-ariadne-panel p-3"
+                            style={{ borderColor: nextBlockBorderColour }}
+                            aria-label={walkDetour === null ? "Next Knot" : "Shelter"}
+                        >
+                            {nextBlock}
+                            <div className="ariadne-display flex flex-wrap items-baseline gap-x-4 gap-y-1 text-3xl leading-none text-ariadne-data">
+                                {bearingText.length > 0 && <span>{bearingText}</span>}
+                                <span>{distanceTileText}</span>
+                                {walkDetour === null && selection.knot !== null && (
+                                    <span className="flex items-baseline gap-1">
+                                        WALK {formatMinutesEstimate(selection.walkTimeSeconds)}
+                                        <EstimateBadge />
+                                    </span>
+                                )}
+                            </div>
+                        </section>
+
+                        <section className="grid min-w-0 gap-2 sm:grid-cols-[1fr_auto]" aria-label="Science budget and conditions">
+                            <button
+                                type="button"
+                                className="ariadne-tap-hud flex min-w-0 items-center gap-2 border border-ariadne-border bg-ariadne-panel px-3 text-left hover:border-ariadne-accent"
+                                aria-label="Open the science budget sheet"
+                                onClick={onScienceBudgetClicked}
+                            >
+                                <span className="ariadne-display text-xl text-ariadne-muted">SCIENCE</span>
+                                <span className="ariadne-display min-w-0 flex-1 truncate text-3xl leading-none text-ariadne-data">
+                                    {budgetText}
+                                </span>
+                                {sciencePlan !== null && <StateBadge state={sciencePlan.feasibility} sizePx={16} />}
+                            </button>
+                            <button
+                                type="button"
+                                className="ariadne-tap-hud ariadne-display border border-ariadne-border px-4 text-2xl text-ariadne-text hover:border-ariadne-accent"
+                                aria-label="Open the conditions sheet"
+                                onClick={onConditionsClicked}
+                            >
+                                CONDITIONS
+                            </button>
+                        </section>
+
+                        <section className="flex min-w-0 flex-col gap-2" aria-label="Alerts">
+                            <div className="ariadne-display text-xl leading-none text-ariadne-muted">ALERTS</div>
+                            <div aria-live="polite">{alertsContent}</div>
+                        </section>
+                    </div>
                 </div>
-                <div className="flex min-w-0 flex-wrap items-center gap-1 text-[length:var(--ariadne-text-xs)] text-ariadne-muted">
-                    <span className="border border-ariadne-border px-1 uppercase tracking-widest">REPLAY</span>
-                    {environmentSample === null ? (
-                        <span>environment not loaded</span>
-                    ) : (
-                        <span>LMST {environmentSample.local_mean_solar_time}</span>
-                    )}
-                </div>
+
                 <button
                     type="button"
-                    className={`${CLOSE_BUTTON_CLASS} ml-auto`}
+                    className="ariadne-tap-hud ariadne-display mt-auto w-full shrink-0 border border-ariadne-border text-2xl text-ariadne-text hover:border-ariadne-accent"
                     aria-label="Exit suit display"
                     onClick={onExitHudClicked}
                 >
-                    EXIT HUD
+                    EXIT
                 </button>
-            </header>
-
-            <CompassTape
-                headingDeg={astronautHeadingDeg}
-                nextKnotBearingDeg={nextKnotBearingDeg}
-                sunAzimuthDeg={sunAzimuthDeg}
-            />
-
-            <section
-                className="flex shrink-0 flex-col gap-1 border border-ariadne-border bg-ariadne-panel p-2"
-                aria-label="Next Knot"
-            >
-                <div className="flex items-center justify-between gap-2">
-                    <span className="text-[length:var(--ariadne-text-xs)] uppercase tracking-widest text-ariadne-muted">
-                        Next Knot
-                    </span>
-                    <span className="text-[length:var(--ariadne-text-xs)] text-ariadne-dim">{nextKnotSourceText}</span>
-                </div>
-                <div className="ariadne-display text-2xl leading-none text-ariadne-text">
-                    {selection.knot === null ? "No Knots loaded" : selection.knot.name}
-                </div>
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ariadne-muted">
-                    <span>{nextKnotDistanceText}</span>
-                    <span>Bearing {nextKnotBearingText}</span>
-                    <span className="flex items-center gap-1">
-                        Walk <span className="text-ariadne-data">{formatMinutesEstimate(selection.walkTimeSeconds)}</span>
-                        <EstimateBadge />
-                    </span>
-                </div>
-                <div className="text-[length:var(--ariadne-text-xs)] text-ariadne-dim">{nextKnotDistanceSourceText}</div>
-            </section>
-
-            <section className="grid shrink-0 grid-cols-3 gap-2" aria-label="Three main readings">
-                <HudTile
-                    label="Next Knot"
-                    value={hudNumbers.distanceText}
-                    state={hudNumbers.distanceState}
-                    ariaLabel={`Distance to next Knot: ${hudNumbers.distanceText}`}
-                />
-                <HudTile
-                    label="Thread margin"
-                    value={hudNumbers.threadMarginText}
-                    state={hudNumbers.threadState}
-                    isEstimate
-                    ariaLabel={`Thread margin: ${hudNumbers.threadMarginText}`}
-                />
-                <HudTile
-                    label="O2 h:mm"
-                    value={hudNumbers.o2Text}
-                    state={hudNumbers.o2State}
-                    isEstimate
-                    ariaLabel={`O2 left: ${hudNumbers.o2Text} hours and minutes`}
-                />
-            </section>
-
-            <section className="flex shrink-0 flex-wrap gap-2" aria-label="Science budget and conditions">
-                <button
-                    type="button"
-                    className="ariadne-tap-hud flex min-w-0 flex-1 items-center gap-2 border border-ariadne-border bg-ariadne-panel px-3 text-left hover:border-ariadne-accent"
-                    aria-label="Open the science budget sheet"
-                    onClick={onScienceBudgetClicked}
-                >
-                    <span className="min-w-0 text-[length:var(--ariadne-text-xs)] uppercase tracking-widest text-ariadne-muted">
-                        Science budget
-                    </span>
-                    <span className="ariadne-display min-w-0 truncate text-xl text-ariadne-data">{budgetText}</span>
-                    {sciencePlan !== null && <StateBadge state={sciencePlan.feasibility} sizePx={14} />}
-                </button>
-                <button
-                    type="button"
-                    className={CLOSE_BUTTON_CLASS}
-                    aria-label="Open the conditions sheet"
-                    onClick={onConditionsClicked}
-                >
-                    CONDITIONS
-                </button>
-            </section>
-
-            <section
-                className="flex shrink-0 flex-col gap-1 border border-ariadne-border bg-ariadne-panel p-2"
-                aria-label="Alerts"
-            >
-                <div className="text-[length:var(--ariadne-text-xs)] uppercase tracking-widest text-ariadne-muted">
-                    ALERTS
-                </div>
-                <div aria-live="polite">{alertsContent}</div>
-            </section>
-
-            <footer className="mt-auto flex shrink-0 flex-wrap gap-2 pt-1">
-                <button
-                    type="button"
-                    className="ariadne-tap-hud min-w-0 flex-1 border border-ariadne-border px-3 text-xs uppercase tracking-wider text-ariadne-text hover:border-ariadne-accent sm:text-sm"
-                    aria-label="Reset the active view"
-                    onClick={onResetViewClicked}
-                >
-                    RESET VIEW
-                </button>
-                <button
-                    type="button"
-                    className="ariadne-tap-hud min-w-0 flex-1 border border-ariadne-border px-3 text-xs uppercase tracking-wider text-ariadne-text hover:border-ariadne-accent sm:text-sm"
-                    aria-label="Exit suit display"
-                    onClick={onExitHudClicked}
-                >
-                    EXIT HUD
-                </button>
-            </footer>
+            </div>
 
             {hudSheet === "science_budget" && (
                 <ScienceBudgetSheet
@@ -555,6 +622,7 @@ export function SuitHud({ alertSlot }: SuitHudProps) {
 
 
 
+// Kept exported for the shell; the SUIT tab in the tab bar is the normal way in now.
 export function HudLauncher() {
     const setSuitHudOpen = useAriadneStore((state) => state.setSuitHudOpen);
     const isSuitHudOpen = useAriadneStore((state) => state.isSuitHudOpen);

@@ -1,6 +1,6 @@
 # ARIADNE hand-off board
 
-Current stage: Stage 3 (Letta), started 2026-11-14. Stages 0, 1 and 2 signed off by Lawrence.
+Current stage: Stage 3 (started by Letta; finished by Lawrence on `dev-lawrence` after Letta's agent hit its usage limit, D-030), started 2026-11-14. Stages 0, 1 and 2 signed off by Lawrence.
 
 Last updated: 2026-11-14
 
@@ -25,8 +25,8 @@ This is the live status board. The main agent of the stage owner updates it when
    - Gate passed: Yes
    - Signed off by: Lawrence, 2026-11-14
 4. Stage 3: Suit HUD, alerts, Knot cards, simulation, CRT polish, demo
-   - Owner: Letta (Part C)
-   - Status: In progress
+   - Owner: Letta (Part C); finished by Lawrence (D-030)
+   - Status: In progress on `dev-lawrence` (Letta's `ba5515a` merged in `b6d6512`); demo recording and sign-off left
    - Gate passed: No
    - Signed off by: none yet
 
@@ -44,7 +44,7 @@ This is the live status board. The main agent of the stage owner updates it when
 - [x] Choose the REMS sol to replay and the DONKI event for the scenario.
 - [x] Decide how processed data is shared (Git LFS vs shared drive).
 - [x] Person B confirms the performance budget (≤ ~30 MB, texture ≤ 4096 × 4096): measured as gzip, 19.19 MB (D-028).
-- [ ] Person C proposes the exact colour palette values; the whole team approves.
+- [x] Person C proposes the exact colour palette values; the whole team approves: `app/design/visual_direction.md`, approved as built by Lawrence (D-030).
 - [x] Settle the remaining small TBDs (open questions 14 to 21 in docs/decisions.md): Knot text writer, photo hosting, Gale image, `state/` ownership, shelter list, Mars24 location, `scenario.json` path, nearest-shelter and viewshed formats.
 - [x] Fill in the names of the Stage 2 and Stage 3 owners: Malissa (Person B), Letta (Person C).
 - [x] Create `dev` from `main`, and each teammate creates their `dev-{firstname}` branch from `dev`.
@@ -84,17 +84,17 @@ Evidence re-verified on 2026-11-14 after merging contract v1.1.0 and adding the 
 
 ## Stage 3 gate (Person C to demo)
 
-- [ ] The Suit HUD shows at most 3 numbers at once, and the science budget is reachable in one tap.
-- [ ] Tasks can be checked off at a Knot; samples taken add to the carried load and the Thread updates.
-- [ ] Every number has provenance.
-- [ ] Responsive (D-029): usable with no horizontal scroll at 375 px (phone), 768 px (tablet) and 1280 px or wider (desktop); screenshots of all three.
-- [ ] Easy to navigate (D-029): clear sections, one main action per panel, a reset-view button; the Planning Table pans up, down, left and right when zoomed in.
-- [ ] Fonts self-hosted (D-029): bundled with the app (no font CDN at run time), at most 2 families, readable at arm's length.
-- [ ] Alerts come with actions.
-- [ ] The scenario runs end-to-end, identically twice.
+- [x] The Suit HUD shows at most 3 numbers at once, and the science budget is reachable in one tap: three tiles (next Knot distance, Thread margin, O2) and a science budget chip that opens the plan sheet with task check-off (`app/src/hud/SuitHud.tsx`; checked in the production preview, 2026-11-14).
+- [x] Tasks can be checked off at a Knot; samples taken add to the carried load and the Thread updates: Knot card and HUD sheet call `setTaskCompleted`; in the demo walk, tasks are checked off when their planned time ends (`app/src/sim/walkTimeline.test.ts`, 1.2 kg rock chip at Boxwork ridge before the storm).
+- [ ] Every number has provenance: the HUD, Knot cards, Mars clock and alerts carry "est." badges and provenance popovers, but no full audit of every number on every panel has been done.
+- [x] Responsive (D-029): no horizontal scroll at 375, 768 and 1280 px (Letta's `npm run browser-check`, screenshots in `docs/images/stage3/`); 375 and 1280 px re-checked after the D-030 overlays (scroll width equals the viewport).
+- [x] Easy to navigate (D-029): rail plus four tabs (Plan, Route, Layers, Time) with one main action each, Reset view in the status strip and the HUD, `screenSpacePanning` in `app/src/scene/CameraRig.tsx` (Letta's browser check: drag right, left, up, down, then reset).
+- [x] Fonts self-hosted (D-029): VT323 and IBM Plex Mono from `@fontsource`, bundled into `dist/assets/` by `npm run build`; no font CDN.
+- [x] Alerts come with actions: every alert shows what happened, the action, distance and est. walk time from the astronaut, and a one-tap [ROUTE] that reroutes the walk (`app/src/alerts/AlertStack.tsx`, also on the map).
+- [ ] The scenario runs end-to-end, identically twice: end-to-end run seen in the browser (walk, storm alert, reroute, "Sheltered in the rover"); frame-rate independence proven by `walkTimeline.test.ts` ("runs identically whatever the frame step sizes"). Still to do: two browser runs back to back with the pane visible.
 - [ ] Demo recorded.
-- [ ] Log entry written in `docs/log/person_c.md`.
-- [ ] Person C's branch pushed, merged into `dev` by Lawrence; integration check passed.
+- [ ] Log entry written: Stage 3 is finished by Lawrence, so the entry is in `docs/log/person_a.md` (2026-11-14, Stage 3 takeover); Letta's agent wrote none.
+- [ ] Person C's branch pushed, merged into `dev` by Lawrence; integration check passed: the work is on `dev-lawrence` (Letta's branch merged there); merge into `dev` after the demo checks.
 - [ ] `dev` merged into `main` for the demo.
 - [ ] Human sign-off.
 
@@ -115,6 +115,9 @@ Evidence re-verified on 2026-11-14 after merging contract v1.1.0 and adding the 
 12. Rule 4 of contracts.md 4.6 (drop the next task during the walk) is read as: drop when time left is less than the walk to the next Knot with the current load plus the task plus the walk back from there with its sample. The literal "margin < next task + walk back" would count the walk back twice. `checkNextTaskDuringWalk` implements it for Stage 3.
 13. The planner times a plan from the start of the walk; tasks marked done (carried load now) change the Thread but not the plan's own load sequence.
 14. Narrow screens: the Gale inset is hidden below 1280 px wide so it does not cover the map.
+15. The replay clock starts at LMST 00:00 of sol 4760, so the demo walk happens at Martian midnight (HUD "LMST 00:00:00"). A daytime start offset would be more realistic; not changed yet.
+16. The simulation clock runs on `requestAnimationFrame`: in a hidden or off-screen browser it stops. Rehearse and record with the window visible.
+17. Simulated walk (D-030): the walk follows the plan frozen at "walk started"; the plan panel can recompute as tasks are checked off, but the astronaut does not change course. Walk legs use constant speed along the leg (no slope-dependent speed inside a leg).
 
 
 ## Hand-off notes from the previous stage
@@ -203,7 +206,15 @@ Lawrence's integration changes on top of Stage 2 (2026-11-14, D-028):
 - Integration check on `dev` after the merge: validator 47 of 47, pipeline tests 68, app tests 133, typecheck clean, build works, payload 19.19 MB gzip, browser: Plan all Knots GO 5 h 03 min with 27 min left; Rover to Boxwork hollow fast 35 min, safe 36 min, smooth 31 min; Labyrinth view; no console errors.
 
 
+Stage 3 notes for the demo (Lawrence, 2026-11-14, D-030):
+- Letta's agent pushed one work-in-progress commit (`ba5515a`, "Free limit reached for opencode"): theme and fonts, shell with rail and tabs, Suit HUD, Knot cards with photos, alerts targets, Mars24, environment and storm replay, scenario engine, browser check script. None of the HUD, Knot card, Mars clock or alerts UI was mounted yet, and there was no scenario runner.
+- Lawrence's agent mounted them and added: `app/src/sim/walkTimeline.ts` (pure walk maths), `app/src/sim/walkDriver.ts` (scenario runner, simulated walk, reroute, "Run demo scenario"), `app/src/alerts/AlertStack.tsx`, `app/src/scene/AstronautMarker.tsx` (marker with heading and breadcrumb trail), `app/src/shell/WalkDemoPanel.tsx`, new walk fields in `app/src/state/walkSlice.ts`. The scenario now shelters at the rover (D-030).
+- How to run the demo: `npm run build` then `npm run preview` in `app/`, open http://localhost:4173, Time tab, "Run demo scenario". Use 300x to rehearse quickly.
+- Expected (all est.): plan of all five Knots GO, 5 h 03 min, 27 min left; order Boxwork first view, Boxwork ridge, Boxwork hollow, Channel west edge, Sulfur stones; walk starts at 0:05; the 1.2 kg rock chip at Boxwork ridge raises the carried load to 11.2 kg; storm alert at 1:51:40 on the walk to Boxwork hollow; reroute at 1:52:40; "Sheltered in the rover" at about 2:20 (est. 140.7 min).
+- Checks on `dev-lawrence`: `npm test` 221 passed (23 files), `npm run typecheck` clean, `npm run build` works, `npm run payload` 26.67 MB gzip (Knot photos add about 7.5 MB), no console errors in the preview.
+
 ## Next steps
 
-1. Letta: update `dev-letta` from `dev`, add her design inspiration to the Stage 3 prompt Lawrence sent her, and start her agent.
-2. Lawrence: when Letta pushes, merge `dev-letta` into `dev`, run the integration check from her commit message and hand-off notes, then merge `dev` into `main` for the demo.
+1. Lawrence: run the demo twice in a visible browser window (tick the scenario box), record it, and tick "Demo recorded".
+2. Lawrence: commit on `dev-lawrence`, merge into `dev`, run the integration check (validator, pipeline tests, app tests, build, payload, browser), then merge `dev` into `main` for the demo and sign off Stage 3.
+3. Letta: review the merged app and her visual direction; update `dev-letta` from `dev` before any further change.

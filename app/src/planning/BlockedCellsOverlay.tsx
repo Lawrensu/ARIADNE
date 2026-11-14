@@ -9,8 +9,9 @@ import { createGridOverlayTexture } from "../terrain/terrainGeometry";
 
 
 
-// Placeholder colour until the Stage 3 palette: magenta, distinct from the no-go red stripes.
-const BLOCKED_CELL_RGBA: [number, number, number, number] = [230, 60, 200, 230];
+// Solid no-go red-orange (--ariadne-no-go #ff6b4a): a runtime hazard reads as "do not walk", and the
+// solid fill tells it apart from the striped no-go layer and the dark hatched no-go terrain.
+const BLOCKED_CELL_RGBA: [number, number, number, number] = [255, 107, 74, 235];
 // Above the layer overlays (which use orders up to about 10), below lines.
 const BLOCKED_CELLS_LAYER_ORDER = 15;
 

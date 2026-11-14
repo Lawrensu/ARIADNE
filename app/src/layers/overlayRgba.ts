@@ -154,7 +154,18 @@ function buildNoGoRgba(processedData: ProcessedData): Uint8Array {
 }
 
 
-// Slope ramp from 0 to the walkable limit; steeper cells get the no-go colour. NaN is transparent.
+// Flat ground is mostly see-through so the lit phosphor terrain still shows that it is walkable;
+// the closer to the limit, the more opaque the caution colour (D-031 map look).
+export const SLOPE_MIN_ALPHA_FRACTION = 0.25;
+
+
+export function slopeAlphaFor(rampPosition: number): number {
+    const clamped = Math.min(Math.max(rampPosition, 0), 1);
+    return Math.round(255 * (SLOPE_MIN_ALPHA_FRACTION + (1 - SLOPE_MIN_ALPHA_FRACTION) * clamped));
+}
+
+
+// Slope ramp from 0 to the walkable limit; steeper cells get the no-go colour (opaque). NaN is transparent.
 function buildSlopeRgba(processedData: ProcessedData): Uint8Array {
     const { width, height } = processedData.meta.grid;
     const slope = processedData.float32Layers.slope_degrees;
@@ -169,7 +180,7 @@ function buildSlopeRgba(processedData: ProcessedData): Uint8Array {
             writeCell(rgba, cellIndex, SLOPE_ABOVE_LIMIT_COLOR, 255);
         } else {
             const position = rampPositionFor(value, 0, limitDegrees);
-            writeCell(rgba, cellIndex, sampleRamp(SLOPE_RAMP, position), 255);
+            writeCell(rgba, cellIndex, sampleRamp(SLOPE_RAMP, position), slopeAlphaFor(position));
         }
     }
     return rgba;

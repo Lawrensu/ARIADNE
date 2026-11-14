@@ -7,6 +7,7 @@
 
 import { Line } from "@react-three/drei";
 import { useEffect, useMemo, useRef, useState } from "react";
+import * as THREE from "three";
 
 import type { LocalPosition } from "../data/contracts";
 import { carriedLoadKg, loadFactor, loadParametersFromMeta } from "../science/loadFactor";
@@ -14,6 +15,16 @@ import { computeConsumablesState } from "../sim/clock";
 import { useAriadneStore } from "../state/store";
 import { sampleTerrainSceneY } from "../terrain/terrainFrame";
 import { useTerrain } from "../terrain/TerrainContext";
+import {
+    GLOW_EXTRA_WIDTH_PX,
+    GLOW_OPACITY,
+    GLOW_STENCIL_REF,
+    LINE_CASING_COLOUR,
+    LINE_CASING_EXTRA_WIDTH_PX,
+    LINE_CASING_OPACITY,
+    LINE_RENDER_ORDER,
+    MAP_COLOURS,
+} from "../scene/mapStyle";
 import {
     chooseThresholdQuantumSeconds,
     effectiveReturnFieldThresholdSeconds,
@@ -26,9 +37,12 @@ import {
 
 // Lift above the terrain surface in metres, so the line is not hidden by the mesh.
 const THREAD_LIFT_M = 1.5;
-// Phosphor green: the Thread is the app's signature line (Stage 3 palette).
-export const THREAD_COLOR = "#5ce87f";
-const THREAD_LINE_WIDTH_PX = 3;
+// Phosphor green: the Thread is the app's signature line (Stage 3 palette). It is the brightest line
+// on the map (D-031): a wide low-opacity phosphor glow, a thin dark casing, and a phosphor white core,
+// solid and thicker than any route. THREAD_COLOR stays the swatch colour other panels import.
+export const THREAD_COLOR = MAP_COLOURS.phosphor_green;
+export const THREAD_CORE_COLOR = MAP_COLOURS.phosphor_white;
+const THREAD_LINE_WIDTH_PX = 3.5;
 // Rings enclosing less than this area are not drawn: they are the outlines of single rocks and small
 // no-go spots inside the reachable region (or tiny reachable islands), which would bury the Thread in
 // hundreds of small loops. 2,000 m^2 is about a 45 x 45 m square. Only drawing is affected;
@@ -166,17 +180,45 @@ export function ThreadLine() {
         return null;
     }
 
+    // Three passes over the same segments: glow, casing, core (three draw calls in total).
     return (
-        <Line
-            name="thread"
-            segments
-            points={segmentPoints}
-            color={THREAD_COLOR}
-            lineWidth={THREAD_LINE_WIDTH_PX}
-            transparent
-            depthWrite={false}
-            toneMapped={false}
-            renderOrder={20}
-        />
+        <group name="thread">
+            <Line
+                segments
+                points={segmentPoints}
+                color={THREAD_COLOR}
+                lineWidth={THREAD_LINE_WIDTH_PX + GLOW_EXTRA_WIDTH_PX}
+                transparent
+                opacity={GLOW_OPACITY}
+                stencilWrite
+                stencilRef={GLOW_STENCIL_REF}
+                stencilFunc={THREE.NotEqualStencilFunc}
+                stencilZPass={THREE.ReplaceStencilOp}
+                depthWrite={false}
+                toneMapped={false}
+                renderOrder={LINE_RENDER_ORDER.thread_glow}
+            />
+            <Line
+                segments
+                points={segmentPoints}
+                color={LINE_CASING_COLOUR}
+                lineWidth={THREAD_LINE_WIDTH_PX + LINE_CASING_EXTRA_WIDTH_PX}
+                transparent
+                opacity={LINE_CASING_OPACITY}
+                depthWrite={false}
+                toneMapped={false}
+                renderOrder={LINE_RENDER_ORDER.thread_casing}
+            />
+            <Line
+                segments
+                points={segmentPoints}
+                color={THREAD_CORE_COLOR}
+                lineWidth={THREAD_LINE_WIDTH_PX}
+                transparent
+                depthWrite={false}
+                toneMapped={false}
+                renderOrder={LINE_RENDER_ORDER.thread_core}
+            />
+        </group>
     );
 }

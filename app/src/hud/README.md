@@ -1,6 +1,6 @@
 # Suit HUD components
 
-Stage 3 full-screen Suit HUD (owner: Letta). Local grid only, no latitude or longitude in the UI.
+Stage 3 Suit HUD, the SUIT mode (owner: Letta). Local grid only, no latitude or longitude in the UI.
 State is always colour, shape and word through `theme/StateBadge`. Tap targets are 64 px on the HUD
 (`ariadne-tap-hud`). Colours come only from `theme/tokens.css`.
 
@@ -8,18 +8,23 @@ State is always colour, shape and word through `theme/StateBadge`. Tap targets a
 ## Exports
 
 1. `SuitHud({ alertSlot })` from `SuitHud.tsx`
-   - Fixed inset-0 overlay, rendered only when `isSuitHudOpen` is true (from `state/hudSlice.ts`).
-   - `alertSlot?: ReactNode`: the main agent passes the AlertStack here. The HUD does not import
+   - Fills its `relative` parent (absolute inset-0) between the tab bar and the status bar; renders
+     nothing unless `isSuitHudOpen` is true (from `state/hudSlice.ts`). The shell treats SUIT as active then.
+   - `alertSlot?: ReactNode`: the shell passes `<AlertStack variant="hud" />`. The HUD does not import
      `app/src/alerts/`.
-   - Contains the header, compass tape, next Knot block, exactly three 64 px readings, the science
-     budget chip, the labelled ALERTS area, the footer and the on-demand sheets.
+   - Contains the compass tape, the next Knot block ("SHELTER: label" in caution while `walkDetour` is set),
+     exactly three 64 px readings (tap for provenance), the science budget chip, CONDITIONS, the ALERTS
+     area ("NO ALERTS" when empty), one EXIT button and the on-demand sheets.
+   - Layout: one column below 1024 px (readings 3 across from 640 px); two columns at 1024 px and up
+     (compass and readings left; next Knot, budget, alerts right).
 2. `HudLauncher()` from `SuitHud.tsx`
-   - A 64 px "SUIT HUD" button for the map corner. Calls `setSuitHudOpen(true)`.
+   - A 64 px "SUIT HUD" button (unused now, the SUIT tab replaces it). Calls `setSuitHudOpen(true)`.
 3. `CompassTape({ headingDeg, nextKnotBearingDeg, sunAzimuthDeg })` from `CompassTape.tsx`
    - Cardinal ticks, current heading, a marker for the next Knot and a marker for the sun.
    - Bearings are degrees clockwise from north. Pass `null` for a marker that is not known.
-4. `HudTile({ label, value, state, ariaLabel, isEstimate?, detail?, style? })` from `HudTile.tsx`
+4. `HudTile({ label, value, state, ariaLabel, isEstimate?, detail?, provenance? })` from `HudTile.tsx`
    - One big reading with a `StateBadge`. `value` is already formatted text.
+   - `provenance` makes the tile a button that opens the provenance dialog.
    - `isEstimate` adds the "est." badge. `detail` is short optional text after the badge.
 5. Pure helpers from `hudMath.ts`
    - `bearingDegrees`, `normalizeBearing`, `bearingWord`.

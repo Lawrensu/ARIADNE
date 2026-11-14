@@ -67,3 +67,12 @@ Instructions:
 - Broken or open: Stage 1 and Stage 2 sign-off waiting for Lawrence; Theta* search takes 0.5 to 2.2 s per route in the worker.
 - Next step: Lawrence signs off Stages 1 and 2; Letta starts Stage 3.
 - Delegated to sub-agents: Theta* (checked: its tests, all existing tests unchanged, real-data comparison, browser check of the smooth route).
+
+
+### 2026-11-14 16:45 | Claude Code (Opus) | Stage 3 takeover: merge Letta's WIP, wire HUD, alerts, simulated walk
+
+- Changed: merged `origin/dev-letta` (`ba5515a`, Letta's agent hit its opencode limit) into `dev-lawrence` as `b6d6512`. Mounted the Suit HUD, HUD launcher, Knot card, Knot list (Plan tab) and Mars clock (Time tab). Added the simulated "you are here" walk (D-030): `app/src/sim/walkTimeline.ts` and tests, `app/src/sim/walkDriver.ts` (scenario runner, walk, reroute, "Run demo scenario"), `app/src/alerts/AlertStack.tsx`, `app/src/shell/WalkDemoPanel.tsx`, walk fields in `app/src/state/walkSlice.ts`. The scenario now shelters at the rover, storm at 6700 s after the first samples. Docs: D-030 in decisions.md, system_design.md (Scenario, Simulated position), handoff.md (Stage 3 gate, notes, known issues 15 to 17, next steps), visual_direction.md status.
+- Verified (how): from `app/`: `npm test` 221 passed (23 files, including a frame-jitter determinism test of the whole scenario on the real data), `npm run typecheck` clean, `npm run build` works, `npm run payload` 26.67 MB gzip. Production preview: full demo seen end to end (walk, storm alert, reroute "En route", "Sheltered in the rover"), Suit HUD shows three numbers and the science budget chip, phone width 375 px has no horizontal scroll, no console errors.
+- Broken or open: two back-to-back browser runs not done (the browser pane stopped firing animation frames while hidden); demo not recorded; "every number has provenance" not audited; README, getting_started.md and AGENTS.md rewrite still uncommitted (held on Lawrence's request); the replay starts at LMST 00:00 (known issue 15). Nothing committed or pushed in this session.
+- Next step: run the demo twice in a visible window and record it; commit on `dev-lawrence`; merge into `dev`, integration check, then `main`.
+- Delegated to sub-agents (what, and how the result was checked): `app/src/scene/AstronautMarker.tsx` to a Sonnet sub-agent with a full brief; reviewed the code, typecheck and tests passed, and the marker with its trail was seen moving in the preview.

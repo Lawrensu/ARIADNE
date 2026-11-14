@@ -1,10 +1,15 @@
-// Draws the science plan legs on the terrain (D-027). Owner: Malissa, Stage 2.
-// Render inside the scene's TerrainProvider. Walking-out legs are solid, the walk back is dashed.
-// Numbered stop markers use drei <Html> (no network font needed).
+// Draws the science plan legs on the terrain (D-027; phosphor map look, D-031). Owner: Malissa, Stage 2.
+// Render inside the scene's TerrainProvider. The plan is parchment and dashed: walking-out legs in
+// dashes, the walk back to the rover in dots (isLegDashed marks the walk back). Every leg sits on a
+// dark casing so it reads on the green terrain. Numbered stop markers use the map label style,
+// drawn through drei <Html> (no network font needed).
 
 import { Html, Line } from "@react-three/drei";
 import { useMemo } from "react";
 
+import { LINE_CASING_COLOUR, LINE_CASING_EXTRA_WIDTH_PX, LINE_CASING_OPACITY, LINE_RENDER_ORDER, MAP_COLOURS } from "../../scene/mapStyle";
+import { MapLabel } from "../../scene/MapLabel";
+import { useScreenSpaceDashes } from "../../scene/useScreenSpaceDashes";
 import { useAriadneStore } from "../../state/store";
 import type { SciencePlanLeg } from "../../state/scienceSlice";
 import { useTerrain } from "../../terrain/TerrainContext";
@@ -13,11 +18,20 @@ import { isLegDashed } from "./planDisplay";
 
 
 
-// Placeholder colour until the Stage 3 palette: distinct from fast #ffb347, safe #7fd1ff and the Thread #ffd23f.
-export const SCIENCE_PLAN_LINE_COLOUR = "#c77dff";
+// Parchment: the science plan is data, not a control (visual_direction.md 6.1 rule 4).
+export const SCIENCE_PLAN_LINE_COLOUR = MAP_COLOURS.parchment;
+
+// Screen-pixel dash patterns (useScreenSpaceDashes).
+const WALK_OUT_DASH_PX = 10;
+const WALK_OUT_GAP_PX = 5;
+const WALK_BACK_DASH_PX = 2;
+const WALK_BACK_GAP_PX = 5;
+const PLAN_LINE_WIDTH_PX = 3;
 
 const PLAN_LIFT_ABOVE_TERRAIN_M = 2.5;
 const MARKER_LIFT_ABOVE_TERRAIN_M = 6;
+// The stop number sits up and to the left of the Knot glyph, so the Knot label on the right stays free.
+const STOP_NUMBER_OFFSET_PX = 16;
 
 
 
@@ -35,21 +49,42 @@ function SciencePlanLeg3D({ leg }: { leg: SciencePlanLeg }) {
         return null;
     }
 
-    const isDashed = isLegDashed(leg);
+    let dashSize: number;
+    let gapSize: number;
+    if (isLegDashed(leg)) {
+        dashSize = WALK_BACK_DASH_PX;
+        gapSize = WALK_BACK_GAP_PX;
+    } else {
+        dashSize = WALK_OUT_DASH_PX;
+        gapSize = WALK_OUT_GAP_PX;
+    }
 
     return (
-        <Line
-            points={points}
-            color={SCIENCE_PLAN_LINE_COLOUR}
-            lineWidth={4}
-            dashed={isDashed}
-            dashSize={10}
-            gapSize={6}
-            depthTest={false}
-            renderOrder={33}
-            transparent
-            opacity={0.95}
-        />
+        <group>
+            <Line
+                points={points}
+                color={LINE_CASING_COLOUR}
+                lineWidth={PLAN_LINE_WIDTH_PX + LINE_CASING_EXTRA_WIDTH_PX}
+                depthTest={false}
+                renderOrder={LINE_RENDER_ORDER.science_plan_casing}
+                transparent
+                opacity={LINE_CASING_OPACITY}
+                toneMapped={false}
+            />
+            <Line
+                points={points}
+                color={SCIENCE_PLAN_LINE_COLOUR}
+                lineWidth={PLAN_LINE_WIDTH_PX}
+                dashed
+                dashSize={dashSize}
+                gapSize={gapSize}
+                depthTest={false}
+                renderOrder={LINE_RENDER_ORDER.science_plan_line}
+                transparent
+                opacity={1}
+                toneMapped={false}
+            />
+        </group>
     );
 }
 
@@ -59,12 +94,18 @@ function StopMarker({ stopNumber, x_m, z_m }: { stopNumber: number; x_m: number;
     const y = sampleTerrainSceneY(frame, x_m, z_m) + MARKER_LIFT_ABOVE_TERRAIN_M;
 
     return (
-        <Html position={[x_m, y, z_m]} center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+        <Html position={[x_m, y, z_m]} zIndexRange={[18, 0]} style={{ pointerEvents: "none" }}>
             <div
-                className="flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs font-bold"
-                style={{ background: "#1f150e", borderColor: SCIENCE_PLAN_LINE_COLOUR, color: SCIENCE_PLAN_LINE_COLOUR }}
+                style={{
+                    position: "absolute",
+                    right: STOP_NUMBER_OFFSET_PX - 6,
+                    bottom: STOP_NUMBER_OFFSET_PX - 6,
+                    pointerEvents: "none",
+                }}
             >
-                {stopNumber}
+                <MapLabel tone="parchment" style={{ minWidth: 18, textAlign: "center", color: SCIENCE_PLAN_LINE_COLOUR }}>
+                    {stopNumber}
+                </MapLabel>
             </div>
         </Html>
     );
@@ -75,13 +116,14 @@ function StopMarker({ stopNumber, x_m, z_m }: { stopNumber: number; x_m: number;
 export function SciencePlanLines() {
     const sciencePlan = useAriadneStore((state) => state.sciencePlan);
     const processedData = useAriadneStore((state) => state.processedData);
+    const groupRef = useScreenSpaceDashes();
 
     if (sciencePlan === null || processedData === null) {
         return null;
     }
 
     return (
-        <group>
+        <group ref={groupRef}>
             {sciencePlan.legs.map((leg, index) => (
                 <SciencePlanLeg3D key={`${leg.leg_kind}-${index}`} leg={leg} />
             ))}

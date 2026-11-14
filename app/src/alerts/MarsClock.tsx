@@ -76,6 +76,7 @@ function useUtcNowMilliseconds(): number {
 
 export function MarsClock({ simElapsedSeconds, environmentTimeline, eastLongitudeDeg, variant = "panel" }: MarsClockProps) {
     const nowMilliseconds = useUtcNowMilliseconds();
+    const [isHelpOpen, setIsHelpOpen] = useState(false);
     const replaySample = replaySampleAt(environmentTimeline, simElapsedSeconds);
     const replaySol = environmentTimeline.replay_source.sol;
     const nowHours = marsLocalMeanSolarTimeHours(new Date(nowMilliseconds), eastLongitudeDeg);
@@ -113,57 +114,57 @@ export function MarsClock({ simElapsedSeconds, environmentTimeline, eastLongitud
 
     let replayBlock;
     if (replaySample === null) {
-        replayBlock = <div className="text-sm text-ariadne-dim">No replay sample in the environment timeline.</div>;
+        replayBlock = <div className="text-sm text-ariadne-dim">No replay sample.</div>;
     } else {
         replayBlock = (
-            <>
-                <div className="flex flex-wrap items-baseline gap-2">
-                    <span className="ariadne-display text-[length:var(--ariadne-text-display)] leading-none text-ariadne-accent">
-                        {replaySample.local_mean_solar_time}
-                    </span>
-                    <ProvenanceButton
-                        label="Replayed Local Mean Solar Time"
-                        value={replaySample.local_mean_solar_time}
-                        provenance={replaySample.provenance}
-                        className="text-xs text-ariadne-muted"
-                    />
-                </div>
-                <div className="mt-1 text-xs text-ariadne-muted">
-                    REMS sol {replaySol}, sample at {formatReplayElapsed(replaySample.seconds_since_replay_start)} of the replay.
-                    Not live data.
-                </div>
-            </>
+            <div className="flex flex-wrap items-center gap-x-2">
+                <span className="ariadne-display text-[length:var(--ariadne-text-display)] leading-none text-ariadne-accent">
+                    {replaySample.local_mean_solar_time}
+                </span>
+                <ProvenanceButton
+                    label="Replayed Local Mean Solar Time"
+                    value={`REMS sol ${replaySol}`}
+                    provenance={replaySample.provenance}
+                    className="text-xs text-ariadne-muted"
+                />
+            </div>
         );
     }
 
     return (
-        <section
-            className="flex flex-col gap-3 border border-ariadne-border bg-ariadne-panel p-3 text-ariadne-text"
-            aria-label="Mars clock"
-        >
+        <section className="flex flex-col gap-2 text-ariadne-text" aria-label="Mars clock">
             <div>
-                <div className="text-xs uppercase tracking-widest text-ariadne-dim">LMST (replay)</div>
+                <div className="text-xs uppercase tracking-widest text-ariadne-dim">LMST replay</div>
                 {replayBlock}
             </div>
 
-            <div className="border-t border-ariadne-border pt-3">
-                <div className="flex flex-wrap items-baseline gap-2">
-                    <span className="text-xs uppercase tracking-widest text-ariadne-dim">LMST now (est.)</span>
-                    <span className="ariadne-display text-[length:var(--ariadne-text-hud)] leading-none text-ariadne-data">
-                        {nowClockText}
-                    </span>
-                    <EstimateBadge />
+            <div className="border-t border-ariadne-border pt-2">
+                <div className="flex flex-wrap items-center gap-x-2">
+                    <span className="text-xs uppercase tracking-widest text-ariadne-dim">LMST now</span>
                     <ProvenanceButton
                         label="Mars local mean solar time now (est.)"
                         value={nowClockText}
                         provenance={MARS24_PROVENANCE}
-                        className="text-xs text-ariadne-muted"
+                        className="ariadne-display text-[length:var(--ariadne-text-hud)] leading-none text-ariadne-data"
                     />
+                    <button
+                        type="button"
+                        className="ariadne-tap ml-auto min-w-12 border border-ariadne-border text-sm text-ariadne-muted hover:border-ariadne-accent"
+                        aria-label="Mars clock: more info"
+                        aria-expanded={isHelpOpen}
+                        onClick={() => setIsHelpOpen(!isHelpOpen)}
+                    >
+                        ?
+                    </button>
                 </div>
-                <div className="mt-1 text-xs text-ariadne-muted">
-                    Mars24 mean solar time at {longitudeText} (patch centre), for UTC {formatUtcTime(nowMilliseconds)}. Mean
-                    solar time only, not true solar time. Shown as est.
-                </div>
+                {isHelpOpen && (
+                    <div className="border-l border-ariadne-border pl-2 text-xs text-ariadne-muted">
+                        Replay: not live data
+                        {replaySample !== null && <>, sample at {formatReplayElapsed(replaySample.seconds_since_replay_start)} of the replay</>}.
+                        Now: Mars24 mean solar time at {longitudeText} (patch centre), UTC {formatUtcTime(nowMilliseconds)}. Mean
+                        solar time only, not true solar time. <EstimateBadge />
+                    </div>
+                )}
             </div>
         </section>
     );

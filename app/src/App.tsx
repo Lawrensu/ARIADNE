@@ -1,22 +1,28 @@
-// ARIADNE app shell (Stage 2: Malissa; Stage 3 shell, tabs and CRT: Letta). Loads the processed
-// data, then shows the Planning Table or the Labyrinth view with the status strip, the icon rail and
-// the tabbed side panel. Stage 3 adds the Suit HUD, alerts and Knot cards alongside this shell.
+// ARIADNE app shell (Stage 2: Malissa; Stage 3: Letta; interface redesign: Lawrence, D-031). Loads
+// the processed data, then shows the full-size map between a mode tab bar (MAP, PLAN, SUIT, DATA)
+// and a status bar, with the objective card, alerts, control legend and mode sheets floating over
+// it (app/design/visual_direction.md section 6). SUIT shows the Suit HUD in the same area.
 
 import { useEffect } from "react";
 
+import { AlertStack } from "./alerts/AlertStack";
+import { SuitHud } from "./hud/SuitHud";
+import { KnotCard } from "./knots/KnotCard";
 import { LayerOverlays, RockMarkers } from "./layers";
 import { BlockedCellsOverlay } from "./planning/BlockedCellsOverlay";
 import { RouteLines } from "./planning/RouteLines";
 import { buildRouteEndpoints } from "./planning/RoutePlannerPanel";
 import { planRoute } from "./planning/routingService";
-import { GaleContextInset } from "./scene/GaleContextInset";
+import { AstronautMarker } from "./scene/AstronautMarker";
 import type { SceneMarker } from "./scene/markers";
 import { MarswalkCanvas } from "./scene/MarswalkCanvas";
 import { SciencePlanLines } from "./science/ui/SciencePlanLines";
 import { useSimClockDriver } from "./sim/clock";
-import { NavigationRail } from "./shell/NavigationRail";
-import { SidePanel } from "./shell/SidePanel";
-import { StatusStrip } from "./shell/StatusStrip";
+import { useWalkAndScenarioDriver } from "./sim/walkDriver";
+import { LegendSheet } from "./shell/LegendSheet";
+import { MapOverlays } from "./shell/MapOverlays";
+import { StatusBar } from "./shell/StatusBar";
+import { TabBar } from "./shell/TabBar";
 import type { RouteEndpoint } from "./state/routeSlice";
 import { useAriadneStore } from "./state/store";
 import { CrtOverlay } from "./theme/CrtOverlay";
@@ -82,14 +88,16 @@ function selectMarkerAsRouteEndpoint(marker: SceneMarker): void {
 
 function MainView() {
     useSimClockDriver();
+    useWalkAndScenarioDriver();
 
     return (
         <div className="flex h-full w-full flex-col overflow-hidden bg-ariadne-background text-ariadne-text">
-            <StatusStrip />
-            <div className="relative flex min-h-0 flex-1">
-                <NavigationRail />
-                <SidePanel />
-                <main className="relative min-h-0 min-w-0 flex-1">
+            <TabBar />
+            {/* The content area between the bars: the map always fills it; overlays float on top. */}
+            <div className="relative min-h-0 flex-1 overflow-hidden">
+                {/* isolate: marker labels drawn as HTML by the scene keep their z-index inside the map,
+                    so cards and sheets always sit above them. */}
+                <main className="absolute inset-0 isolate">
                     <MarswalkCanvas onMarkerSelect={selectMarkerAsRouteEndpoint}>
                         <LayerOverlays />
                         <RockMarkers />
@@ -97,13 +105,15 @@ function MainView() {
                         <ThreadLine />
                         <SciencePlanLines />
                         <RouteLines />
+                        <AstronautMarker />
                     </MarswalkCanvas>
-                    {/* The inset is about 260 px wide: on narrow screens it would cover the map, so it is hidden there. */}
-                    <div className="absolute bottom-3 right-3 z-30 hidden xl:block">
-                        <GaleContextInset />
-                    </div>
                 </main>
+                <MapOverlays />
+                <SuitHud alertSlot={<AlertStack variant="hud" />} />
             </div>
+            <StatusBar />
+            <KnotCard />
+            <LegendSheet />
             <CrtOverlay />
         </div>
     );

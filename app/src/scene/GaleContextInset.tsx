@@ -14,8 +14,6 @@ import type { PlaneRect } from "./sceneMath";
 
 
 
-const PANEL_WIDTH_PX = 260;
-const CANVAS_HEIGHT_PX = 260;
 const MARKER_COLOUR = "#e0892f";
 const MARKER_BACKING_COLOUR = "#120c08";
 const RING_RADIUS_PX = 13;
@@ -180,36 +178,20 @@ export function GaleContextInset() {
         caption = `${vikingSource.source_dataset}. ${vikingSource.licence_credit}`;
     }
 
+    // Fluid: as wide as the sheet, the image keeps its aspect ratio. No frame and no title:
+    // the DATA sheet supplies both. Credit line and "N up" stay under the image.
     return (
-        <div
-            style={{
-                width: PANEL_WIDTH_PX,
-                background: "var(--color-ariadne-panel)",
-                border: "1px solid var(--color-ariadne-border)",
-            }}
-        >
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "3px 8px",
-                    fontSize: 12,
-                    letterSpacing: "0.1em",
-                    color: "var(--color-ariadne-muted)",
-                }}
-            >
-                <span>GALE CRATER</span>
-                <span>N up</span>
-            </div>
-            <div style={{ position: "relative", width: "100%", height: CANVAS_HEIGHT_PX }}>
+        <figure className="m-0 w-full" aria-label="Gale Crater regional context">
+            <div className="relative w-full border border-ariadne-border" style={{ aspectRatio: `${context.width_px} / ${context.height_px}` }}>
                 <Canvas dpr={[1, 2]} flat>
                     <color attach="background" args={["#120c08"]} />
                     <GaleContextScene context={context} imageUrl={imageUrl} />
                 </Canvas>
             </div>
-            <div style={{ padding: "3px 8px", fontSize: 11, lineHeight: 1.3, color: "var(--color-ariadne-muted)" }}>
+            <figcaption className="mt-1 text-xs leading-snug text-ariadne-dim">
+                <span className="uppercase tracking-wider text-ariadne-muted">N up. </span>
                 {caption}
-            </div>
-        </div>
+            </figcaption>
+        </figure>
     );
 }

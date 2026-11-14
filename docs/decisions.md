@@ -332,6 +332,35 @@ Rules:
 - Affects docs: docs/system_design.md, docs/handoff.md
 
 
+### D-030: Lawrence finishes Stage 3; rover is the storm shelter; simulated "you are here" walk
+
+- Date: 2026-11-14
+- Status: accepted (Lawrence)
+- Decision:
+  1. Letta's agent (opencode, DeepSeek) hit its usage limit after pushing work in progress (`ba5515a` on `dev-letta`). Lawrence's agent merged it into `dev-lawrence` and finishes Stage 3 there.
+  2. The visual direction in `app/design/visual_direction.md` is approved as built: phosphor green and parchment on near-black, VT323 for display and IBM Plex Mono for text, both self-hosted.
+  3. The demo storm sends the astronaut to the pressurised rover (`shelter_rover`), not a terrain overhang. Overhangs stay on the map as est. fallbacks.
+  4. The demo shows a simulated "you are here": the astronaut walks a frozen copy of the science plan on the simulation clock (each leg in its planned time at constant speed, a stay at each Knot for the planned task durations), tasks are checked off when their planned time ends, a breadcrumb trail shows where they walked, and a reroute walks the routed path to its target with the current load factor. The position is labelled "sim." everywhere; Mars has no GPS.
+  5. The scenario fires the storm at 6700 s, on the walk from Boxwork ridge to Boxwork hollow, after the first samples are carried, and reroutes to the rover at 6760 s; the astronaut is in the rover at est. 140.7 min.
+- Why: Overhangs only block part of the sky (sky-view 0.65 to 0.69, est.), while the rover is pressurised and shielded, so it is the honest shelter for a solar particle event. A moving position makes the HUD numbers and the Thread change live, which is the core of the demo; timing it from the plan keeps it consistent with the numbers shown and deterministic.
+- Alternatives considered: overhang shelter as Letta's agent built it (weak protection); a fixed position per scenario step (the HUD would not change between steps); a scripted position list (would drift from the plan's numbers).
+- Affects docs: docs/system_design.md, docs/handoff.md, README.md (demo already says the rover), app/design/visual_direction.md
+
+### D-031: Interface redesign: mode tabs, phosphor-hologram map, flat default view
+
+- Date: 2026-11-14
+- Status: accepted (Lawrence)
+- Decision:
+  1. One navigation: a top tab bar with MAP, PLAN, SUIT and DATA plus a gear menu (demo, walk, CRT, credits). The left rail and the "CONSOLE" side panel with its second row of tabs are removed.
+  2. The map is always full screen. Over it: an objective card with the next Knot's task checklist (top left), the newest alert (top right) and a control legend with real buttons (zoom, Center on me, Reset view, 2D/3D, Legend). A status bar at the bottom shows sol and LMST, the sim clock, O2 and the Thread margin.
+  3. PLAN and DATA open as a sheet over the map (left card on desktop, bottom sheet on phone and tablet); SUIT shows the Suit HUD between the two bars.
+  4. The terrain is drawn as a phosphor hologram: the real HiRISE relief in green shades, walkable ground lit, no-go ground dark and hatched, a 100 m grid.
+  5. The app opens on the flat north-up map; 3D is one tap away.
+  6. Short labels instead of paragraphs, square corners, 1 px lines, 48 px targets (64 px in SUIT). Inspired by a retro field-terminal map and a 3D game map menu without copying their look, names or icons. Spec: `app/design/visual_direction.md` section 6.
+- Why: The Stage 3 interface duplicated navigation, used long explanatory text and many boxed panels, and felt generic; an astronaut needs to find where to go, what to do and whether they can get home at a glance.
+- Alternatives considered: map with a single drawer and no tabs; keeping the grey orthoimage with green overlays; opening in 3D (slower on phones, harder to plan on).
+- Affects docs: app/design/visual_direction.md, docs/system_design.md, docs/handoff.md, README.md (screenshots later)
+
 ## Open questions (Stage 0)
 
 Status 2026-11-14: questions 1 to 10 and 12 to 21 are resolved by D-017 to D-025. Question 11 (colour palette) stays with Person C.

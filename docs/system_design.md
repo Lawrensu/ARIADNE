@@ -306,7 +306,8 @@ Example: "Solar storm: shelter at Knot B, 340 m, 6 min. [ROUTE]". An alert witho
 No one is on Mars, so the app does not claim live data. It replays real historical data on a simulation clock with a speed multiplier (D-014, D-025).
 
 - **Replay.** REMS sol 4760 and RAD dose rate drive the environment readings over the sim clock.
-- **Scenario.** A scripted event runs on the same clock: a solar particle event alert mid-walk (the May 2024 storm RAD measured). The alert fires, D* Lite reroutes to the nearest shelter, and the Thread updates.
+- **Scenario.** A scripted event runs on the same clock: a solar particle event alert mid-walk (the May 2024 storm RAD measured). The alert fires, the astronaut is rerouted to the pressurised rover (the safest shelter; overhangs are est. fallbacks, D-030), and the Thread updates.
+- **Simulated position ("you are here", D-030).** Mars has no GPS, so the demo simulates the astronaut: they walk a frozen copy of the science plan on the clock (each leg in its planned time, a stay at each Knot for the planned tasks), tasks are checked off when their planned time ends, and a reroute walks the routed path with the current load factor. The map shows a marker with heading and a breadcrumb trail, labelled "sim.". The run depends only on simulation time, so it is identical every time (`app/src/sim/walkTimeline.ts`, `walkDriver.ts`).
 - **Honesty.** The UI and pitch state the sources openly, including that the weather sol and the storm come from different dates.
 
 

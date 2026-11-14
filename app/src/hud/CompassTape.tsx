@@ -7,6 +7,7 @@ import { normalizeBearing } from "./hudMath";
 
 
 const TAPE_HALF_SPAN_DEG = 60;
+const MARKER_KEY_CLASS = "ariadne-display text-2xl leading-none";
 const TAPE_TICK_STEP_DEG = 15;
 
 
@@ -91,18 +92,18 @@ export function CompassTape({ headingDeg, nextKnotBearingDeg, sunAzimuthDeg }: C
 
     return (
         <section className="flex min-w-0 flex-col gap-1" aria-label={tapeLabel}>
-            <div className="flex min-w-0 items-center justify-between gap-2 text-[length:var(--ariadne-text-xs)] uppercase tracking-widest text-ariadne-muted">
-                <span>HDG {formatBearing(safeHeading)}</span>
-                <span>KNOT {formatBearing(nextKnotBearingDeg)}</span>
-                <span>SUN {formatBearing(sunAzimuthDeg)}</span>
+            <div className="ariadne-display flex min-w-0 items-baseline justify-between gap-2 text-2xl leading-none uppercase text-ariadne-muted sm:text-3xl">
+                <span className="text-ariadne-caution">KNOT {formatBearing(nextKnotBearingDeg)}</span>
+                <span className="ariadne-glow text-4xl text-ariadne-data sm:text-5xl">{formatBearing(safeHeading)}</span>
+                <span className="text-ariadne-data">SUN {formatBearing(sunAzimuthDeg)}</span>
             </div>
 
-            <div className="relative h-16 min-w-0 overflow-hidden border border-ariadne-border bg-ariadne-panel" role="img" aria-label={tapeLabel}>
+            <div className="relative h-24 min-w-0 overflow-hidden border border-ariadne-border bg-ariadne-panel sm:h-28" role="img" aria-label={tapeLabel}>
                 {ticks.map((tick) => {
                     const left = 50 + (signedDeltaDegrees(tick, safeHeading) / TAPE_HALF_SPAN_DEG) * 50;
                     const word = cardinalLabel(tick);
                     const isCardinal = word !== null;
-                    const tickHeight = isCardinal ? 14 : 7;
+                    const tickHeight = isCardinal ? 20 : 10;
                     return (
                         <div
                             key={tick}
@@ -111,7 +112,7 @@ export function CompassTape({ headingDeg, nextKnotBearingDeg, sunAzimuthDeg }: C
                             aria-hidden="true"
                         >
                             {isCardinal && (
-                                <span className="mb-0.5 text-[length:var(--ariadne-text-xs)] text-ariadne-muted">{word}</span>
+                                <span className="ariadne-display text-3xl leading-none text-ariadne-text">{word}</span>
                             )}
                             <span
                                 className="w-px"
@@ -127,8 +128,8 @@ export function CompassTape({ headingDeg, nextKnotBearingDeg, sunAzimuthDeg }: C
                         style={{ left: `${knotLeft}%` }}
                         aria-hidden="true"
                     >
-                        <span className="text-[length:var(--ariadne-text-xs)] font-bold text-ariadne-caution">K</span>
-                        <span className="h-2 w-0.5" style={{ background: "var(--ariadne-caution)" }} />
+                        <span className={`${MARKER_KEY_CLASS} text-ariadne-caution`}>KNOT</span>
+                        <span className="h-3 w-0.5" style={{ background: "var(--ariadne-caution)" }} />
                     </div>
                 )}
 
@@ -138,25 +139,14 @@ export function CompassTape({ headingDeg, nextKnotBearingDeg, sunAzimuthDeg }: C
                         style={{ left: `${sunLeft}%` }}
                         aria-hidden="true"
                     >
-                        <span className="text-[length:var(--ariadne-text-xs)] text-ariadne-data">SUN</span>
-                        <span className="h-2 w-0.5" style={{ background: "var(--ariadne-data)" }} />
+                        <span className={`${MARKER_KEY_CLASS} text-ariadne-data`}>SUN</span>
+                        <span className="h-3 w-0.5" style={{ background: "var(--ariadne-data)" }} />
                     </div>
                 )}
 
                 <div
                     className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2"
                     style={{ background: "var(--ariadne-accent)" }}
-                    aria-hidden="true"
-                />
-                <div
-                    className="absolute left-1/2 top-0 -translate-x-1/2"
-                    style={{
-                        width: 0,
-                        height: 0,
-                        borderLeft: "6px solid transparent",
-                        borderRight: "6px solid transparent",
-                        borderTop: "8px solid var(--ariadne-accent)",
-                    }}
                     aria-hidden="true"
                 />
             </div>

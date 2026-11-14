@@ -8,6 +8,7 @@ import type { ReactNode } from "react";
 import { useAriadneStore } from "../state/store";
 import { TerrainProvider } from "../terrain/TerrainContext";
 import { LabyrinthCamera, PlanningTableCamera } from "./CameraRig";
+import { MAP_COLOURS } from "./mapStyle";
 import type { SceneMarker } from "./markers";
 import { SceneMarkers } from "./SceneMarkers";
 import { TerrainMesh } from "./TerrainMesh";
@@ -32,10 +33,10 @@ export function MarswalkCanvas({ children, onMarkerSelect }: MarswalkCanvasProps
         <Canvas
             dpr={[1, 2]}
             flat
-            gl={{ antialias: true }}
+            gl={{ antialias: true, stencil: true }}
             style={{ position: "absolute", inset: 0 }}
         >
-            <color attach="background" args={["#050a06"]} />
+            <color attach="background" args={[MAP_COLOURS.screen_black]} />
             <TerrainProvider processedData={processedData}>
                 <TerrainMesh />
                 <SceneMarkers onMarkerSelect={onMarkerSelect} />

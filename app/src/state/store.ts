@@ -14,12 +14,15 @@
 //   knotsSlice.ts       selected Knot card (Stage 3)
 //   alertsSlice.ts      active alerts (Stage 3)
 //   scenarioSlice.ts    scripted scenario run bookkeeping (Stage 3)
+//   cameraSlice.ts      center-on-me and zoom requests for the camera rig (redesign, D-031)
 //
 // Never rename or remove fields of the existing slices (deprecate-only, D-012).
 
 import { create } from "zustand";
 
 import type { AlertsSlice } from "./alertsSlice";
+import type { CameraSlice } from "./cameraSlice";
+import { createCameraSlice } from "./cameraSlice";
 import { createAlertsSlice } from "./alertsSlice";
 import type { DataSlice } from "./dataSlice";
 import { createDataSlice } from "./dataSlice";
@@ -60,7 +63,8 @@ export type AriadneState = DataSlice &
     HudSlice &
     KnotsSlice &
     AlertsSlice &
-    ScenarioSlice;
+    ScenarioSlice &
+    CameraSlice;
 
 
 
@@ -78,4 +82,5 @@ export const useAriadneStore = create<AriadneState>()((...args) => ({
     ...createKnotsSlice(...args),
     ...createAlertsSlice(...args),
     ...createScenarioSlice(...args),
+    ...createCameraSlice(...args),
 }));

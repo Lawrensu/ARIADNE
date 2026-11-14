@@ -176,7 +176,7 @@ describe("nearestShelter", () => {
 describe("the shipped scenario", () => {
     it("matches contracts.md 3.15 and is ordered by time", () => {
         expect(SOLAR_STORM_SCENARIO.scenario_id).toBe("solar_particle_event_reroute");
-        expect(SOLAR_STORM_SCENARIO.events).toHaveLength(5);
+        expect(SOLAR_STORM_SCENARIO.events).toHaveLength(3);
 
         for (let index = 1; index < SOLAR_STORM_SCENARIO.events.length; index++) {
             const previous = SOLAR_STORM_SCENARIO.events[index - 1];
@@ -196,10 +196,7 @@ describe("the shipped scenario", () => {
         const shelterIds = SOLAR_STORM_SCENARIO.events
             .filter((event) => event.payload.shelter_id !== undefined)
             .map((event) => event.payload.shelter_id);
-        expect(shelterIds).toEqual([
-            "shelter_overhang_05",
-            "shelter_overhang_05",
-            "shelter_overhang_05",
-        ]);
+        // The pressurised rover is the shelter (D-030): overhangs give weak protection.
+        expect(shelterIds).toEqual(["shelter_rover", "shelter_rover"]);
     });
 });

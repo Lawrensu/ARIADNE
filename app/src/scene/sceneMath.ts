@@ -110,3 +110,90 @@ export function pixelRectToPlaneRect(imageWidthPx: number, imageHeightPx: number
         height: rect.height,
     };
 }
+
+
+
+// Screen pixels per metre at the camera target, for screen-space line dashes.
+// Orthographic: the zoom is pixels per metre (the frustum is the viewport size in pixels).
+// Perspective: pixels per metre at the distance from the camera to the target.
+export interface CameraScaleInput {
+    is_orthographic: boolean;
+    zoom: number;
+    fov_deg: number;
+    camera_position: Vector3Like;
+    target_position: Vector3Like | null;
+}
+
+
+export const FALLBACK_PIXELS_PER_METRE = 1;
+
+
+export function pixelsPerMetreAtTarget(input: CameraScaleInput, viewportHeightPx: number): number {
+    if (input.is_orthographic) {
+        if (input.zoom > 0) {
+            return input.zoom;
+        }
+        return FALLBACK_PIXELS_PER_METRE;
+    }
+    if (input.target_position === null) {
+        return FALLBACK_PIXELS_PER_METRE;
+    }
+    const distance = Math.hypot(
+        input.camera_position.x - input.target_position.x,
+        input.camera_position.y - input.target_position.y,
+        input.camera_position.z - input.target_position.z,
+    );
+    const halfFovRad = (input.fov_deg * Math.PI) / 360;
+    const visibleHeightM = 2 * distance * Math.tan(halfFovRad);
+    if (!(visibleHeightM > 0) || !(viewportHeightPx > 0)) {
+        return FALLBACK_PIXELS_PER_METRE;
+    }
+    return viewportHeightPx / visibleHeightM;
+}
+
+
+
+// Camera button maths (control legend: zoom in, zoom out, Center on me). Pure, no Three.js.
+
+// One button tap zooms by this factor (a few wheel ticks).
+export const ZOOM_STEP_FACTOR = 1.5;
+export const CAMERA_ANIMATION_DURATION_S = 0.35;
+
+
+export function clampNumber(value: number, low: number, high: number): number {
+    return Math.min(Math.max(value, low), high);
+}
+
+
+// Orthographic zoom after one step: direction +1 zooms in (bigger zoom), -1 zooms out.
+// Clamped to the same limits as the mouse wheel (the controls' minZoom and maxZoom).
+export function orthographicZoomStep(currentZoom: number, direction: number, minZoom: number, maxZoom: number): number {
+    let factor = ZOOM_STEP_FACTOR;
+    if (direction < 0) {
+        factor = 1 / ZOOM_STEP_FACTOR;
+    }
+    return clampNumber(currentZoom * factor, minZoom, maxZoom);
+}
+
+
+// Perspective camera distance to its target after one step: zooming in moves closer.
+// Clamped to the controls' minDistance and maxDistance, like the wheel.
+export function perspectiveDistanceStep(currentDistance: number, direction: number, minDistance: number, maxDistance: number): number {
+    let factor = 1 / ZOOM_STEP_FACTOR;
+    if (direction < 0) {
+        factor = ZOOM_STEP_FACTOR;
+    }
+    return clampNumber(currentDistance * factor, minDistance, maxDistance);
+}
+
+
+// Ease-out cubic on 0..1: quick start, soft landing.
+export function easeOutCubic(t: number): number {
+    const clamped = clampNumber(t, 0, 1);
+    return 1 - Math.pow(1 - clamped, 3);
+}
+
+
+export function lerpNumber(from: number, to: number, weight: number): number {
+    return from + (to - from) * weight;
+}
