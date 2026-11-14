@@ -166,11 +166,38 @@ Stage 2 to Stage 3 (Malissa to Letta):
 - Contract changes during the stage: none by Stage 2; the app follows Lawrence's v1.1.0 (D-027), merged from `dev`.
 - Where the data or build lives: `app/` on `dev-malissa`; the build goes to `app/dist/` (git-ignored).
 
+Stage 2 notes for Lawrence and his agents (merge, integration, pipeline):
+1. Merge and integration check
+   - `dev-malissa` holds three commits on top of `dev`: `44cea1f` (Stage 2 core), `e858c6e` (merge of `origin/dev` with contract v1.1.0) and `8e0693c` (science plan). It already contains every `dev` commit up to `6fe0c8e`, so merging into `dev` should be a fast-forward or conflict-free.
+   - From `app/`: `npm ci` (Node 20 or newer; `package-lock.json` is committed, never `npm install` during the check), `npm test` (expect 16 files, 120 tests), `npm run typecheck`, `npm run build`, `npm run payload` (expect 31.50 MB raw, 19.19 MB gzip), `npm run preview` and open http://localhost:4173.
+   - Browser check: Science plan, "Plan all Knots" gives GO, total est. 5 h 03 min, est. 27 min left; Rover to Boxwork hollow gives fast est. 35 min; switch to the Labyrinth view; toggle layers. The console should show no errors (3 "THREE.Clock deprecated" warnings come from inside R3F and are harmless).
+   - Git may warn "LF will be replaced by CRLF" on Windows; the repo keeps LF, nothing to fix.
+2. Decisions waiting for Lawrence (Part B did not edit contracts.md or decisions.md)
+   - Payload budget: 31.50 MB raw (about 5% over 30 MB) and 19.19 MB gzip. Decide which measure counts, then tick the Stage 2 payload box and the Stage 0 box "Person B confirms the performance budget".
+   - contracts.md 4.6 rule 4: read literally ("margin below the next task plus its walk back"), the walk back is counted twice, because the margin already subtracts the walk back from the current position. The app implements: drop the next task when time left is less than the walk to the next Knot with the current load plus the task plus the walk back from there with its sample (`checkNextTaskDuringWalk`). Consider a decisions.md entry that clarifies the wording.
+   - The Thread now follows contracts.md 4.6 (planned 6 h minus elapsed minus 30 min reserve) instead of the 8 h suit used before v1.1.0. system_design.md (Design rationale 1, Algorithms 4) says "remaining consumable time"; it could name the planned time explicitly so nobody reads it as the 8 h suit.
+   - system_design.md lists Theta* for any-angle smoothing; it is not built (routes follow 8-connected cell centres). Either keep it as stretch or remove it from the design.
+   - The Stage 1 gate box "Human sign-off" is still unticked although the Stages list says Stage 1 was signed off.
+3. What the app expects from the pipeline (changes here break the app or its tests)
+   - The app reads grids by `layer_id` in `meta.json` layers[]: `heightmap`, `slope_degrees`, `traversal_penalty`, `return_field`, `sky_view_factor`, `thermal_inertia`, `mineralogy_class`, `viewshed_rover`. Byte sizes are checked against `grid.width` x `grid.height`. Renaming any of these breaks loading.
+   - The loader accepts `contract_version` 1.x only; a 2.0.0 is rejected with a clear error until the app is updated.
+   - Load parameters and `science_tasks` are read from `meta.json` and `knots.json`; if missing, the app falls back to the contract values (10 kg, 0.01 per kg) and empty task lists.
+   - Only the files listed in `app/scripts/copyProcessedData.mjs` are shipped (all contract files except `roughness_m.bin`). A new processed file the app should use must be added there.
+   - `npm test` reads `data/processed/` directly: after re-running the pipeline, run it again. The Knot-to-rover cross-check (`app/src/routing/realData.test.ts`, within 1%) and the science plan real-data test print their numbers with `npx vitest run src/routing/realData.test.ts src/science/sciencePlanRealData.test.ts --reporter=verbose`.
+   - The TypeScript walking function (`app/src/routing/walkingTime.ts`) and load factor (`app/src/science/loadFactor.ts`) mirror the Python ones and pass the same vectors (contracts.md 4.5 and 4.6). Any change to the formula or vectors needs both sides updated in the same change.
+4. Things that look odd but are intended
+   - `app/public/data/` and `app/dist/` are git-ignored; `npm run dev`, `build` and `test` refresh the copy automatically.
+   - vitest is 4.1.12, not 3.x: 3.x had npm audit advisories (tinypool, @vitest/mocker).
+   - `window.__ariadneStore` exists only in the dev server (not in production builds) for debugging and demo rehearsal.
+   - Dev server only: after many hot reloads Vite can re-optimise dependencies and leave React unresponsive; a full page reload fixes it. Never seen in the production build.
+   - The routing worker and the Thread worker each hold a copy of the grids they need (a few MB each), so the main thread never blocks on routing or contours.
+   - `.claude/` is git-ignored (local agent tool settings).
+
 
 ## Next steps
 
-1. Malissa: confirm the payload measure (known issue 6), then notify Lawrence that `dev-malissa` is pushed.
-2. Lawrence: merge `dev-malissa` into `dev`, run the integration check (validator, pipeline tests, `npm ci`, `npm test`, `npm run build`, `npm run payload`, browser check), tick the last Stage 2 boxes and sign off.
+1. Malissa: notify Lawrence that `dev-malissa` is pushed (done when this note is read).
+2. Lawrence: merge `dev-malissa` into `dev`, run the integration check (validator, pipeline tests, then the app checks in "Stage 2 notes for Lawrence and his agents"), decide the payload measure and the open points listed there, tick the last Stage 2 boxes and sign off.
 3. Letta: after Stage 2 is in `dev`, update `dev-letta` from `dev`, then paste the Stage 3 prompt below.
 
 
