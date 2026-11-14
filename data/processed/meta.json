@@ -1,7 +1,7 @@
 {
-  "contract_version": "1.0.0",
-  "generated_at_utc": "2026-11-14T02:03:32Z",
-  "pipeline_commit": "206679e",
+  "contract_version": "1.1.0",
+  "generated_at_utc": "2026-11-14T03:29:05Z",
+  "pipeline_commit": "836f207",
   "grid": {
     "width": 1013,
     "height": 934,
@@ -193,7 +193,9 @@
     "max_walkable_slope_deg": 25.0,
     "suit_capability_hours": 8.0,
     "planned_marswalk_hours": 6.0,
-    "reserve_minutes": 30.0
+    "reserve_minutes": 30.0,
+    "base_carried_load_kg": 10.0,
+    "load_time_factor_per_kg": 0.01
   },
   "regional_context": {
     "file": "gale_context.jpg",

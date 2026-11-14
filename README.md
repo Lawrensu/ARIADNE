@@ -48,7 +48,8 @@ Pitch opener: every Mars map today is made for scientists studying a planet. Nob
 - **Suit HUD:** the minimal in-suit display: compass bar, next Knot, Thread margin, O2, alerts. At most about 3 numbers at once.
 - **Labyrinth view:** the 3D terrain view of the Marswalk site.
 - **The Thread:** the safe-return ring. The boundary of everywhere the astronaut can reach and still walk back to the staging point with the remaining consumables minus a reserve. It shrinks as they walk.
-- **Knots:** science waypoints along the route, with real Curiosity photos and science notes.
+- **Knots:** science waypoints along the route, with real Curiosity photos, science notes and the tasks to do there (imaging, samples, measurements).
+- **Science plan:** choose the Knots and tasks, see the walking time with the load carried, and a science budget that says what fits before the crew must turn back.
 - **Route planning with rerouting:** fast and safe route options, and fast replanning when a hazard changes.
 - **Conditions panel:** local time, sun position and time to sunset, weather, radiation dose budget.
 - **Actionable alerts:** every alert comes with an action, for example "Solar storm: shelter at Knot B, 340 m, 6 min. [ROUTE]".
@@ -244,29 +245,21 @@ Current stage, gate checklists, known issues and next steps: [docs/handoff.md](d
 
 ## Space Apps submission
 
-Prerequisite: every team member must be added to the team on spaceappchallenge.org before submitting. Deadline: 14 November 2026, 12 pm. Check the form for a character limit; use the short version if needed.
+Prerequisite: every team member must be added to the team on spaceappchallenge.org before submitting. Deadline: 14 November 2026, 12 pm.
 
 Tagline:
 
 > ARIADNE: the Marswalk map with a thread that always leads the astronaut home.
 
-Short version:
+Project summary (197 words; the form suggests 50 to 200):
 
-> ARIADNE is a map and suit display for one astronaut on one Marswalk in Gale Crater. It layers real NASA data, plans a route, and draws The Thread: the boundary within which the astronaut can still walk back to the rover. It replays historical data and gives estimates.
+> Imagine the first astronauts walking on Mars. They are there for science, collecting samples and carrying tools in stiff spacesuits, with limited oxygen, steep broken ground and solar storms that strike without warning. Yet every Mars map today was made for planetary scientists, not for an explorer asking: where can I safely go, how much science can I do, and can I still get home?
+>
+> We built ARIADNE, named after the thread that led Theseus out of the labyrinth. Our pipeline fuses real NASA data (HiRISE terrain, Curiosity weather, radiation and photos, CRISM minerals, THEMIS thermal inertia) into one map of a 2 km Marswalk in Gale Crater. On it we are building a planning table, a 3D view and a suit display. ARIADNE routes the crew through science stops, like Curiosity's sulfur stones and boxwork ridges, each with its sampling task, while avoiding steep ground and large rocks. Walking times account for the suit and the load carried. The Thread marks how far the crew can go and still walk back to their rover, so they always know their remaining science time.
+>
+> Exploration succeeds only when explorers return with discoveries. ARIADNE balances both at every step.
 
-Main version (high-level summary):
-
-> For the challenge "Interplanetary Survival Guide: Martian Map", we are building ARIADNE (Astronaut Route Intelligence And Data for Navigation & Exploration, "Ari").
->
-> The problem: Mars maps such as Mars Trek and the USGS geologic maps are regional or global. They are not made for the small patch of ground one astronaut covers on one Marswalk.
->
-> Our solution is a map and suit display for a single ~2 × 2 km patch in Gale Crater. It joins the Gediz Vallis sulfur stones with the boxwork ridges that Curiosity studied in 2024 to 2025. A planning table shows every layer and a planned route. A 3D Labyrinth view shows the terrain. A minimal suit display shows the next waypoint, oxygen and alerts. Science waypoints ("Knots") carry real Curiosity photos. Every alert comes with an action, such as rerouting to shelter.
->
-> Safety comes first. The Thread is the boundary of everywhere the astronaut can reach and still walk back to the rover with a reserve. It shrinks as they walk.
->
-> We layer HiRISE terrain and imagery, Curiosity REMS weather and RAD radiation, CRISM minerals, THEMIS thermal inertia, Curiosity ground photos and DONKI space weather.
->
-> Honest limits: ARIADNE replays real historical data and does not use live data. Walking times are estimates, labelled "est.". It is being built during the hackathon.
+Update "we are building" to "we built" once Stages 2 and 3 are merged.
 
 
 ## Documentation map

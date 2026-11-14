@@ -56,6 +56,16 @@ def build_meta():
         "staging_point": {"x_m": 1.0, "z_m": 1.0},
         "texture": {"file": "texture_hirise.jpg", "width_px": 16, "height_px": 12},
         "sun": {"sun_azimuth_deg": 100.0, "sun_incidence_deg": 50.0},
+        "parameters": {
+            "suit_speed_factor": 0.6,
+            "gravity_adjustment": 1.1,
+            "max_walkable_slope_deg": 25.0,
+            "suit_capability_hours": 8.0,
+            "planned_marswalk_hours": 4.0,
+            "reserve_minutes": 30.0,
+            "base_carried_load_kg": 10.0,
+            "load_time_factor_per_kg": 0.01,
+        },
         "layers": layers,
         "mineralogy_classes": {"0": "no_data", "1": "test_mineral"},
         "sources": [{"source_dataset": "HiRISE DTM", "product_id": "TEST_ID", "url": "https://example.org", "licence_credit": "test"}],
@@ -99,6 +109,15 @@ def build_knots():
             "measurements": [{"label": "Slope", "value": 5.0, "unit": "degrees", "provenance": provenance()}],
             "photos": [],
         })
+    knots[0]["science_tasks"] = [{
+        "task_id": "task_test_0",
+        "label": "Test core sample",
+        "task_type": "core_sample",
+        "duration_minutes": 20,
+        "sample_mass_kg": 0.5,
+        "equipment": ["drill"],
+        "provenance": provenance(),
+    }]
     return knots
 
 
@@ -308,3 +327,37 @@ def test_command_line_exit_codes(folder, tmp_path):
     bad = subprocess.run([sys.executable, str(run_script), "--processed-dir", str(tmp_path / "nothing")], capture_output=True, text=True)
     assert bad.returncode == 1
     assert "Traceback" not in bad.stderr
+
+
+def test_bad_science_task_type_fails(folder):
+    rewrite_json(folder, "knots.json", lambda knots: knots[0]["science_tasks"][0].__setitem__("task_type", "dancing"))
+    report = run_validation(folder)
+    assert "task_type must be one of" in failure_text(report)
+
+
+def test_duplicate_task_id_fails(folder):
+    def duplicate(knots):
+        second = copy.deepcopy(knots[0]["science_tasks"][0])
+        knots[1]["science_tasks"] = [second]
+
+    rewrite_json(folder, "knots.json", duplicate)
+    report = run_validation(folder)
+    assert "duplicate task_id" in failure_text(report)
+
+
+def test_negative_sample_mass_fails(folder):
+    rewrite_json(folder, "knots.json", lambda knots: knots[0]["science_tasks"][0].__setitem__("sample_mass_kg", -1.0))
+    report = run_validation(folder)
+    assert "sample_mass_kg must be a number >= 0" in failure_text(report)
+
+
+def test_missing_new_parameter_fails(folder):
+    rewrite_json(folder, "meta.json", lambda meta: meta["parameters"].pop("load_time_factor_per_kg"))
+    report = run_validation(folder)
+    assert "parameters.load_time_factor_per_kg" in failure_text(report)
+
+
+def test_science_task_is_estimate_false_fails(folder):
+    rewrite_json(folder, "knots.json", lambda knots: knots[0]["science_tasks"][0]["provenance"].__setitem__("is_estimate", False))
+    report = run_validation(folder)
+    assert "provenance.is_estimate must be true" in failure_text(report)

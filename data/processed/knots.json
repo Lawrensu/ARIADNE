@@ -95,6 +95,43 @@
         "caption": "Navcam view of rippled sand and gravel beside the rover near the sulfur field.",
         "credit": "NASA/JPL-Caltech"
       }
+    ],
+    "science_tasks": [
+      {
+        "task_id": "task_sulfur_imaging",
+        "label": "Image the sulfur stone field",
+        "task_type": "imaging",
+        "duration_minutes": 12,
+        "sample_mass_kg": 0,
+        "equipment": [
+          "camera",
+          "scale bar"
+        ],
+        "provenance": {
+          "source_dataset": "ARIADNE science plan (Apollo and analog EVA practice)",
+          "product_id": "https://ntrs.nasa.gov/api/citations/20200001774/downloads/20200001774.pdf",
+          "is_estimate": true,
+          "uncertainty": "Estimate: panorama plus close-ups with a hand camera, kept short because Apollo 17 EVA 2 time was dominated by sampling and traverse, not photography."
+        }
+      },
+      {
+        "task_id": "task_sulfur_collect_fragments",
+        "label": "Collect loose sulfur stone fragments",
+        "task_type": "surface_sample",
+        "duration_minutes": 20,
+        "sample_mass_kg": 0.4,
+        "equipment": [
+          "tongs",
+          "scoop",
+          "sample bag"
+        ],
+        "provenance": {
+          "source_dataset": "ARIADNE science plan (Apollo and analog EVA practice)",
+          "product_id": "https://an.rsl.wustl.edu/apollo/data/A16/pages/time/time.html",
+          "is_estimate": true,
+          "uncertainty": "Apollo 16 sampling intervals at single stops ran about 6 to 7 minutes per documented sample; 20 minutes allows a few photographed and bagged fragments."
+        }
+      }
     ]
   },
   {
@@ -182,6 +219,43 @@
         "camera": "Navcam Right B",
         "caption": "Layered, wind carved rocks in the robotic arm workspace, sol 4386.",
         "credit": "NASA/JPL-Caltech"
+      }
+    ],
+    "science_tasks": [
+      {
+        "task_id": "task_channel_vein_chip",
+        "label": "Chip a light coloured vein",
+        "task_type": "rock_chip_sample",
+        "duration_minutes": 25,
+        "sample_mass_kg": 1.0,
+        "equipment": [
+          "geology hammer",
+          "tongs",
+          "sample bag"
+        ],
+        "provenance": {
+          "source_dataset": "ARIADNE science plan (Apollo and analog EVA practice)",
+          "product_id": "https://an.rsl.wustl.edu/apollo/data/A16/pages/time/time.html",
+          "is_estimate": true,
+          "uncertainty": "Estimate from Apollo 16 stations that took 23 to 85 minutes in total, with a hammer chip fitting inside the shorter ones."
+        }
+      },
+      {
+        "task_id": "task_channel_imaging",
+        "label": "Image the fractured bedrock",
+        "task_type": "imaging",
+        "duration_minutes": 12,
+        "sample_mass_kg": 0,
+        "equipment": [
+          "camera",
+          "scale bar"
+        ],
+        "provenance": {
+          "source_dataset": "ARIADNE science plan (Apollo and analog EVA practice)",
+          "product_id": "https://ntrs.nasa.gov/api/citations/20200001774/downloads/20200001774.pdf",
+          "is_estimate": true,
+          "uncertainty": "Estimate: documentation photos before and after sampling, a small share of a station like the Apollo 17 EVA 2 science stops."
+        }
       }
     ]
   },
@@ -291,6 +365,42 @@
         "caption": "Cracked, ridged bedrock slabs in front of the rover, sol 4526.",
         "credit": "NASA/JPL-Caltech"
       }
+    ],
+    "science_tasks": [
+      {
+        "task_id": "task_firstview_panorama",
+        "label": "Panorama of the boxwork",
+        "task_type": "imaging",
+        "duration_minutes": 20,
+        "sample_mass_kg": 0,
+        "equipment": [
+          "camera",
+          "tripod"
+        ],
+        "provenance": {
+          "source_dataset": "ARIADNE science plan (Apollo and analog EVA practice)",
+          "product_id": "https://science.nasa.gov/blog/sols-4527-4528-boxwork-ahoy/",
+          "is_estimate": true,
+          "uncertainty": "The Curiosity team took a 76 frame stereo Mastcam mosaic of the boxwork here; a suited crew would need a comparable, shorter pass (estimate)."
+        }
+      },
+      {
+        "task_id": "task_firstview_brushed_bedrock",
+        "label": "Brush bedrock and measure its chemistry",
+        "task_type": "in_situ_measurement",
+        "duration_minutes": 15,
+        "sample_mass_kg": 0,
+        "equipment": [
+          "brush",
+          "handheld XRF"
+        ],
+        "provenance": {
+          "source_dataset": "ARIADNE science plan (Apollo and analog EVA practice)",
+          "product_id": "https://science.nasa.gov/blog/sols-4527-4528-boxwork-ahoy/",
+          "is_estimate": true,
+          "uncertainty": "Curiosity brushed and analysed the bedrock target Tamarack Valley at this stop; handheld XRF reads in about 60 s (see XRF paper), so 15 minutes covers brushing plus a few points (estimate)."
+        }
+      }
     ]
   },
   {
@@ -399,6 +509,42 @@
         "caption": "View over the rover deck toward a valley and layered slopes, sol 4602.",
         "credit": "NASA/JPL-Caltech"
       }
+    ],
+    "science_tasks": [
+      {
+        "task_id": "task_ridge_rock_chip",
+        "label": "Chip clay-bearing ridge rock",
+        "task_type": "rock_chip_sample",
+        "duration_minutes": 25,
+        "sample_mass_kg": 1.2,
+        "equipment": [
+          "geology hammer",
+          "tongs",
+          "sample bag"
+        ],
+        "provenance": {
+          "source_dataset": "ARIADNE science plan (Apollo and analog EVA practice)",
+          "product_id": "https://an.rsl.wustl.edu/apollo/data/A16/pages/time/time.html",
+          "is_estimate": true,
+          "uncertainty": "Estimate from Apollo 16 stations that took 23 to 85 minutes in total, with a hammer chip fitting inside the shorter ones."
+        }
+      },
+      {
+        "task_id": "task_ridge_xrf_scan",
+        "label": "Handheld XRF on ridge and veins",
+        "task_type": "in_situ_measurement",
+        "duration_minutes": 10,
+        "sample_mass_kg": 0,
+        "equipment": [
+          "handheld XRF"
+        ],
+        "provenance": {
+          "source_dataset": "ARIADNE science plan (Apollo and analog EVA practice)",
+          "product_id": "https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/20120001846.pdf",
+          "is_estimate": true,
+          "uncertainty": "A NASA paper puts handheld XRF at about 60 seconds per reading; 10 minutes allows several readings plus positioning."
+        }
+      }
     ]
   },
   {
@@ -479,6 +625,42 @@
         "camera": "Navcam Left B",
         "caption": "Pale, fractured ground beside the rover wheel at the ridge and hollow edge, sol 4650.",
         "credit": "NASA/JPL-Caltech"
+      }
+    ],
+    "science_tasks": [
+      {
+        "task_id": "task_hollow_soil_nodules",
+        "label": "Scoop soil and pea-sized nodules",
+        "task_type": "soil_sample",
+        "duration_minutes": 20,
+        "sample_mass_kg": 0.8,
+        "equipment": [
+          "scoop",
+          "sample bag"
+        ],
+        "provenance": {
+          "source_dataset": "ARIADNE science plan (Apollo and analog EVA practice)",
+          "product_id": "https://an.rsl.wustl.edu/apollo/data/A16/pages/time/time.html",
+          "is_estimate": true,
+          "uncertainty": "Apollo 16 sampling intervals at single stops ran about 6 to 7 minutes per sample; 20 minutes allows documentation plus a scoop and nodule pick (estimate)."
+        }
+      },
+      {
+        "task_id": "task_hollow_short_core",
+        "label": "Optional short core of hollow soil",
+        "task_type": "core_sample",
+        "duration_minutes": 15,
+        "sample_mass_kg": 0.6,
+        "equipment": [
+          "drive tube",
+          "hammer"
+        ],
+        "provenance": {
+          "source_dataset": "ARIADNE science plan (Apollo and analog EVA practice)",
+          "product_id": "https://lsc.apolloinrealtime.org/general/drive_tubes/drive_tubes/",
+          "is_estimate": true,
+          "uncertainty": "Apollo drive tubes needed 9 to 70 hammer blows and held about 0.4 to 1 kg each; 15 minutes is an estimate for one short tube."
+        }
       }
     ]
   }

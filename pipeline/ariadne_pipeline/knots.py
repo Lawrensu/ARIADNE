@@ -111,6 +111,32 @@ def content_measurements(entry):
 
 
 
+# ---------------------------------------------------------------- science tasks (contracts.md 3.12, v1.1.0)
+
+
+def science_tasks(entry):
+    """Science tasks at a Knot, with provenance. Durations and masses are estimates."""
+    tasks = []
+    for task in entry.get("science_tasks", []):
+        tasks.append({
+            "task_id": task["task_id"],
+            "label": task["label"],
+            "task_type": task["task_type"],
+            "duration_minutes": task["duration_minutes"],
+            "sample_mass_kg": task["sample_mass_kg"],
+            "equipment": list(task["equipment"]),
+            "provenance": {
+                "source_dataset": "ARIADNE science plan (Apollo and analog EVA practice)",
+                "product_id": task.get("basis_url", ""),
+                "is_estimate": True,
+                "uncertainty": task.get("basis_note", "duration and mass are planning estimates"),
+            },
+        })
+    return tasks
+
+
+
+
 # ---------------------------------------------------------------- knots.json
 
 
@@ -145,6 +171,7 @@ def build_knots(export_grid, layers, return_seconds, penalty_grid):
             "science_rationale": entry["science_rationale"],
             "measurements": terrain_measurements(layers, return_seconds, row, col) + content_measurements(entry),
             "photos": photos,
+            "science_tasks": science_tasks(entry),
         })
         if moved_m > 0:
             print(f"  {knot['knot_id']} moved {moved_m:.1f} m to the nearest walkable cell")

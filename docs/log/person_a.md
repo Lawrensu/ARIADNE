@@ -49,3 +49,12 @@ Instructions:
 - Broken or open: mineralogy is weak (890 agreed cells); environment UV level, dust tau and dose equivalent are estimates; the regional image cache must be built once with network (`data/raw/regional/`), later runs are offline.
 - Next step: commit and push `dev-lawrence`, merge into `dev`, integration check, sign off Stage 1, brief Malissa.
 - Delegated to sub-agents: research (REMS/RAD/SPE, THEMIS/CRISM, Knot photos), modules (rocks, sky_view, validator, regional, surface, environment), docs (high-level summary, getting started, data sources refresh, problem statement). Each result checked by running its tests, the validator and real-data numbers; two outputs corrected by the main agent (CRISM agreement rule, UV upper envelope) and one weak spot fixed (regional image now cached offline).
+
+
+### 2026-11-14 11:30 | Claude Code | Science plan (D-027, contract v1.1.0), docs consolidated
+
+- Changed: contract v1.1.0 (science_tasks on Knots, carried-load parameters, section 4.6 load factor and science plan rule, validator check 11); D-026 (docs merged to 8 plus logs) and D-027 (science plan); load factor in `walking.py`; science tasks passed through `knots.py`; Knot task content in `pipeline/content/knots_content.json`; README summary rewritten as a story with the science balance; system_design, handoff gates and README features updated.
+- Verified (how): pipeline rerun; `uv run python validate/run.py` 47 of 47 pass; `uv run pytest` 68 pass; knots.json has 2 tasks per Knot (174 min, 4.0 kg).
+- Broken or open: task durations and masses are estimates anchored to Apollo 16 station times; load factor 0.01 per kg is an estimate.
+- Next step: merge into dev; Malissa's agent adds the science planner to her Stage 2 work before committing.
+- Delegated to sub-agents: science task content (checked: valid JSON, totals, sources), validator v1.1.0 (checked: tests pass, full validator run on real data).

@@ -56,6 +56,24 @@ EXPECTED_KNOT_COUNT = 5
 SHELTER_TYPES = ["pressurised_rover", "habitat", "terrain_overhang"]
 UV_INDEX_LEVELS = ["low", "moderate", "high", "very_high", "extreme"]
 LAYER_ENTRY_STRING_FIELDS = ["layer_id", "file", "dtype", "unit", "source_dataset", "product_id", "description"]
+PARAMETER_FIELDS = [
+    "suit_speed_factor",
+    "gravity_adjustment",
+    "max_walkable_slope_deg",
+    "suit_capability_hours",
+    "planned_marswalk_hours",
+    "reserve_minutes",
+    "base_carried_load_kg",
+    "load_time_factor_per_kg",
+]
+SCIENCE_TASK_TYPES = [
+    "imaging",
+    "surface_sample",
+    "rock_chip_sample",
+    "soil_sample",
+    "core_sample",
+    "in_situ_measurement",
+]
 SAMPLE_NUMBER_FIELDS = [
     "seconds_since_replay_start",
     "air_temperature_c",
@@ -300,6 +318,20 @@ def meta_field_problems(meta):
     if regional is not None:
         problems += regional_context_problems(regional)
 
+    problems += parameter_problems(meta.get("parameters"))
+
+    return problems
+
+
+def parameter_problems(parameters):
+    """meta.json parameters must hold all eight numbers (contracts.md 3.1, v1.1.0)."""
+    if not isinstance(parameters, dict):
+        return ["parameters missing"]
+    problems = []
+    for key in PARAMETER_FIELDS:
+        value = parameters.get(key)
+        if not is_number(value) or value < 0:
+            problems.append(f"parameters.{key} must be a number >= 0")
     return problems
 
 
@@ -680,6 +712,7 @@ def knot_problems(knots, width_m, height_m):
     problems = []
     if len(knots) != EXPECTED_KNOT_COUNT:
         problems.append(f"expected {EXPECTED_KNOT_COUNT} Knots, found {len(knots)}")
+    seen_task_ids = set()
     for index, knot in enumerate(knots):
         if not isinstance(knot, dict):
             problems.append(f"knots[{index}] must be an object")
@@ -709,6 +742,43 @@ def knot_problems(knots, width_m, height_m):
                 problems += provenance_problems(measurement.get("provenance"), measurement_label)
         if not isinstance(knot.get("photos"), list):
             problems.append(f"{label}: photos must be an array")
+        if "science_tasks" in knot:
+            problems += science_task_problems(knot["science_tasks"], label, seen_task_ids)
+    return problems
+
+
+def science_task_problems(tasks, knot_label, seen_task_ids):
+    """Problems with one Knot's optional science_tasks array. seen_task_ids is shared across Knots."""
+    if not isinstance(tasks, list):
+        return [f"{knot_label}: science_tasks must be an array"]
+    problems = []
+    for task_index, task in enumerate(tasks):
+        label = f"{knot_label} science task {task_index}"
+        if not isinstance(task, dict):
+            problems.append(f"{label}: must be an object")
+            continue
+        task_id = task.get("task_id")
+        if not is_string(task_id):
+            problems.append(f"{label}: task_id missing")
+        else:
+            label = f"{knot_label} task {task_id}"
+            if task_id in seen_task_ids:
+                problems.append(f"{label}: duplicate task_id")
+            seen_task_ids.add(task_id)
+        if not isinstance(task.get("label"), str):
+            problems.append(f"{label}: label missing")
+        if task.get("task_type") not in SCIENCE_TASK_TYPES:
+            problems.append(f"{label}: task_type must be one of {SCIENCE_TASK_TYPES}")
+        duration = task.get("duration_minutes")
+        if not is_number(duration) or duration <= 0:
+            problems.append(f"{label}: duration_minutes must be a number > 0")
+        mass = task.get("sample_mass_kg")
+        if not is_number(mass) or mass < 0:
+            problems.append(f"{label}: sample_mass_kg must be a number >= 0")
+        equipment = task.get("equipment")
+        if not isinstance(equipment, list) or not all(isinstance(item, str) for item in equipment):
+            problems.append(f"{label}: equipment must be an array of strings")
+        problems += provenance_problems(task.get("provenance"), label, must_be_estimate=True)
     return problems
 
 
@@ -789,6 +859,19 @@ def check_walking_vectors(report):
 
 
 
+# ---------------------------------------------------------------- check 11: load factor test vectors
+
+def check_load_factor_vectors(report):
+    name = "load factor test vectors"
+    if not hasattr(walking, "load_factor") or not hasattr(walking, "check_load_factor_vectors"):
+        report.failed(name, "walking.load_factor missing")
+        return
+    failures = walking.check_load_factor_vectors()
+    report.check(name, failures, "all rows of contracts.md 4.6 pass")
+
+
+
+
 # ---------------------------------------------------------------- run everything
 
 def run_validation(processed_dir, contracts_doc_path=None):
@@ -802,6 +885,7 @@ def run_validation(processed_dir, contracts_doc_path=None):
     steps = [
         ("file existence", lambda: check_files_exist(processed_dir, report)),
         ("walking test vectors", lambda: check_walking_vectors(report)),
+        ("load factor test vectors", lambda: check_load_factor_vectors(report)),
     ]
     for step_name, step in steps:
         run_step(step_name, step, report)

@@ -135,6 +135,7 @@ app/src/
              orthographic top-down (Planning Table); static Gale regional plane
   layers/    overlay toggles (slope, rocks, sky-view, thermal inertia, mineralogy, viewshed...)
   routing/   A*, Theta*, D* Lite on the grid, using the shared walking-time function
+  science/   science plan: ordered Knots and tasks, load factor, science budget (D-027)
   thread/    contour of return_field at the remaining-time threshold (marching squares)
   sim/       simulation clock with speed multiplier; scenario engine; scenario.json
   hud/       Suit HUD
@@ -145,8 +146,8 @@ app/src/
 
 Ownership (D-024):
 
-- **Malissa (Person B, Stage 2):** app shell, `scene/`, `layers/`, `routing/`, `thread/`, Planning Table, Labyrinth view, and the shape of the `state/` store.
-- **Letta (Person C, Stage 3):** `hud/`, `alerts/`, `knots/`, `sim/` (clock and scenario engine), CRT look polish, demo and pitch. She adds store slices in separate files under `state/`.
+- **Malissa (Person B, Stage 2):** app shell, `scene/`, `layers/`, `routing/`, `thread/`, `science/` (the planner logic), Planning Table, Labyrinth view, and the shape of the `state/` store.
+- **Letta (Person C, Stage 3):** `hud/`, `alerts/`, `knots/`, `sim/` (clock and scenario engine), the science budget on the Suit HUD and task check-off at Knots, CRT look polish, demo and pitch. She adds store slices in separate files under `state/`.
 - The scenario lives at `app/src/sim/scenario.json` (contracts.md 3.15). The Mars24 sun and time calculation runs in the app.
 - Knot photos are copied into the app with credits, so the demo never needs the network.
 
@@ -195,6 +196,13 @@ Problems and the algorithm used for each:
    - Algorithm: shadow-based; height from shadow length and sun incidence from image metadata.
    - Runs in: pipeline.
    - Notes: about 1.5 m and larger; smaller is statistical, "est.". SAM is stretch only (D-007).
+10. Science plan (D-027)
+   - Algorithm: multi-stop route (A* legs between the rover and the chosen Knots, in the chosen order), each leg timed with the load carried at that point (`load_factor = 1 + 0.01 × kg`, 10 kg tool kit, samples added after each task), plus task durations and the walk back.
+   - Runs in: app (task content from `knots.json`, load values from `meta.json` parameters).
+   - Notes:
+     - Feasible only if total plan time fits the 6 hour Marswalk minus the 30 minute reserve (contracts.md 4.6).
+     - The Thread scales with load: `return_field × load_factor`, exact because the factor is uniform.
+     - When the margin gets tight, the planner suggests dropping the next task instead of cutting the walk back.
 
 
 ## UX design principles
@@ -218,7 +226,8 @@ Problems and the algorithm used for each:
 Use these names consistently in code, UI and docs.
 
 - **The Thread:** the safe-return ring. The boundary of everywhere the astronaut can reach and still walk back to the staging point with the remaining consumables minus a reserve. It shrinks as they walk.
-- **Knots:** science waypoints along the route.
+- **Knots:** science waypoints along the route, each with science tasks (imaging, samples, measurements).
+- **Science budget:** science time still available after the walk back and the reserve; shrinks with every step and every sample carried.
 - **Labyrinth view:** the 3D terrain view of the Marswalk site.
 - **Planning Table:** the habitat/rover display: big map, all layers, plan the route.
 - **Suit HUD:** the minimal in-suit display: compass bar, next Knot, Thread margin, O2, alerts.

@@ -66,13 +66,16 @@ This is the live status board. The main agent of the stage owner updates it when
 
 ## Stage 2 gate (Person B to Person C)
 
+Evidence below is from the Stage 2 core checkpoint (contract v1.0.0); every box is re-verified after the v1.1.0 merge and the science plan.
+
 - [x] The app loads the real data with no console errors (production build via `npm run preview`, 2026-11-14: console empty after loading, routing, rerouting, all 7 layer toggles and both views).
 - [x] Terrain matches the texture (Planning Table screenshot matches `docs/images/stage1_overlay_check.png`: no-go stripes sit on the scarps of the photo, rover upper middle, Knots on Curiosity's stops).
 - [x] Layer toggles work (no-go, slope, sky view, thermal inertia, minerals, rover radio view, rocks; each with legend, source, product ID and "est." badge from `meta.json` layers[]).
 - [x] A route computes between Knots (in the browser through the routing Web Worker, for example rover to Boxwork hollow: fast est. 35 min over 1.3 km, safe est. 36 min over 1.4 km; D* Lite reroute around a blocked passage).
+- [ ] Science plan (D-027): an ordered multi-Knot route with chosen tasks, timed with the load factor, shows total time, science budget and feasibility; load factor test vectors (contracts.md 4.6) pass in TypeScript.
 - [x] Walking-time test vectors pass in TypeScript (`npm test`: all 8 rows of contracts.md 4.5 within 1e-3 s).
 - [x] Cross-check: the TypeScript route time from each Knot to the rover matches `return_field.bin` at that Knot within 1% (largest relative difference 5.6e-6, `app/src/routing/realData.test.ts`).
-- [x] The Thread draws and shrinks with simulation time (area inside it est. 3.0 km² at 0 h, 0.8 km² at 7 h 14 min, gone at 8 h; screenshots in the browser).
+- [ ] The Thread draws and shrinks with simulation time and scales with the carried load (shrinking shown at v1.0.0: est. 3.0 km² at 0 h, 0.8 km² at 7 h 14 min, gone at 8 h; load scaling not built yet).
 - [ ] Data payload is within the budget: production build is 31.5 MB raw and 19.2 MB gzip (`npm run payload`). Within budget as transferred; about 5% over 30 MB raw. Malissa to confirm which measure counts (Stage 0 box "Person B confirms the performance budget").
 - [x] Log entry written in `docs/log/person_b.md`.
 - [ ] Person B's branch pushed, merged into `dev` by Lawrence; integration check passed.
@@ -81,7 +84,8 @@ This is the live status board. The main agent of the stage owner updates it when
 
 ## Stage 3 gate (Person C to demo)
 
-- [ ] The Suit HUD shows at most 3 numbers at once.
+- [ ] The Suit HUD shows at most 3 numbers at once, and the science budget is reachable in one tap.
+- [ ] Tasks can be checked off at a Knot; samples taken add to the carried load and the Thread updates.
 - [ ] Every number has provenance.
 - [ ] Alerts come with actions.
 - [ ] The scenario runs end-to-end, identically twice.
@@ -132,6 +136,12 @@ Stage 1 to Stage 2 (Lawrence to Malissa):
   - Your TypeScript walking function must pass the 8 test vectors in `docs/contracts.md` 4.5.
 - Contract changes during the stage: none after v1.0.0 sign-off.
 - Where the data lives: `data/processed/` on `dev-lawrence` (committed, D-022). Overlay preview: `docs/images/stage1_overlay_check.png`.
+
+Change after the Stage 1 hand-off (science plan, D-027, contract v1.1.0):
+- `knots.json` now has `science_tasks` per Knot (2 each, 174 minutes and 4.0 kg in total, all "est.").
+- `meta.json` parameters add `base_carried_load_kg` (10) and `load_time_factor_per_kg` (0.01).
+- New contract section 4.6: load factor, science plan rule and load factor test vectors.
+- Stage 2 and Stage 3 gates have new science plan boxes. Malissa's follow-up prompt is in Lawrence's chat; her agent merges `origin/dev` and adds the planner.
 
 Stage 2 to Stage 3 (Malissa to Letta):
 - From stage: Stage 2, app shell, Planning Table, Labyrinth view, layers, routing, the Thread.
@@ -211,6 +221,7 @@ BUILD, inside app/ only, adding your own Zustand slices in separate files (never
 2. Provenance: tap any number to see dataset, product ID, resolution, timestamp, uncertainty and an "est." badge.
 3. Alerts: what happened, action, distance and time, one-tap [ROUTE] to the nearest shelter using Malissa's router. An alert without an action is a bug.
 4. Knot cards: copy the photos from knots.json URLs into app/public/knots/ once, with credits; show science text and measurements.
+4b. Science plan (D-027, contracts.md 4.6): show the science budget on the Suit HUD (one tap away), let the crew check off science_tasks at each Knot, add each task's sample_mass_kg to the carried load so the Thread and walking times update, and warn with an action ("drop task X to keep the walk back safe") when the margin gets tight.
 5. Simulation: extend app/src/sim/ to replay environment_timeline.json ("replaying REMS sol 4760") and run app/src/sim/scenario.json (contracts.md 3.15). Build the solar storm from the real curve in data/reference/spe_profile_sol4190.json and say in the UI that weather and storm come from different dates. The scenario must run identically twice.
 6. Mars local time and sun position with the Mars24 algorithm in TypeScript, with tests.
 7. CRT look: scanlines, ochre/rust monochrome, pixel font (e.g. VT323), slight curvature, all reducible; ARIADNE's own identity, never a Pip-Boy copy. Propose the exact palette to Letta and record it in docs/decisions.md as proposed.
