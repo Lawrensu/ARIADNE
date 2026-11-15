@@ -20,7 +20,10 @@ import { returnFieldSecondsAt } from "../science/sciencePlan";
 import type { SciencePlan } from "../state/scienceSlice";
 import { useAriadneStore } from "../state/store";
 import type { WalkDetour, WalkPhase } from "../state/walkSlice";
+import { StateShape } from "../theme/StateBadge";
 import { selectMode } from "./modes";
+import { useStormCountdown } from "./StormCountdownChip";
+import { formatStormWatchLine } from "./stormCountdownText";
 
 
 
@@ -295,6 +298,7 @@ export interface ObjectiveCardProps {
 export function ObjectiveCard({ isCollapsible }: ObjectiveCardProps) {
     const view = useObjectiveView();
     const [isExpanded, setExpanded] = useState(false);
+    const stormWatchLine = formatStormWatchLine(useStormCountdown());
 
     if (view === null) {
         return null;
@@ -365,6 +369,12 @@ export function ObjectiveCard({ isCollapsible }: ObjectiveCardProps) {
                     </div>
                 ) : (
                     distanceLine
+                )}
+                {stormWatchLine !== null && (
+                    <div className="flex items-center gap-1.5 text-sm" style={{ color: "var(--ariadne-caution)" }} role="status">
+                        <StateShape state="caution" sizePx={14} />
+                        <span>{stormWatchLine}</span>
+                    </div>
                 )}
             </div>
             <TaskChecklist tasks={view.tasks} />

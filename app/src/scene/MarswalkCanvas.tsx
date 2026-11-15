@@ -10,6 +10,7 @@ import { TerrainProvider } from "../terrain/TerrainContext";
 import { FirstPersonCamera, LabyrinthCamera, PlanningTableCamera } from "./CameraRig";
 import { MAP_COLOURS } from "./mapStyle";
 import type { SceneMarker } from "./markers";
+import { FIRST_PERSON_SCENE_LINE_STYLE, MAP_SCENE_LINE_STYLE, SceneLineStyleContext } from "./sceneLineStyle";
 import { SceneMarkers } from "./SceneMarkers";
 import { TerrainMesh } from "./TerrainMesh";
 
@@ -37,6 +38,12 @@ export function MarswalkCanvas({ children, cameraKind = "map", onMarkerSelect }:
         return null;
     }
 
+    // Lines hug the ground and hide behind hills in first person; the map keeps its floating lines.
+    let lineStyle = MAP_SCENE_LINE_STYLE;
+    if (cameraKind === "first_person") {
+        lineStyle = FIRST_PERSON_SCENE_LINE_STYLE;
+    }
+
     return (
         <Canvas
             dpr={[1, 2]}
@@ -46,16 +53,18 @@ export function MarswalkCanvas({ children, cameraKind = "map", onMarkerSelect }:
         >
             <color attach="background" args={[MAP_COLOURS.screen_black]} />
             <TerrainProvider processedData={processedData}>
-                <TerrainMesh />
-                <SceneMarkers onMarkerSelect={onMarkerSelect} />
-                {cameraKind === "first_person" ? (
-                    <FirstPersonCamera key="first_person" />
-                ) : viewMode === "planning_table" ? (
-                    <PlanningTableCamera key="planning_table" />
-                ) : (
-                    <LabyrinthCamera key="labyrinth_view" />
-                )}
-                {children}
+                <SceneLineStyleContext.Provider value={lineStyle}>
+                    <TerrainMesh />
+                    <SceneMarkers onMarkerSelect={onMarkerSelect} />
+                    {cameraKind === "first_person" ? (
+                        <FirstPersonCamera key="first_person" />
+                    ) : viewMode === "planning_table" ? (
+                        <PlanningTableCamera key="planning_table" />
+                    ) : (
+                        <LabyrinthCamera key="labyrinth_view" />
+                    )}
+                    {children}
+                </SceneLineStyleContext.Provider>
             </TerrainProvider>
         </Canvas>
     );

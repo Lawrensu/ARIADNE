@@ -11,6 +11,7 @@ import { VisorCompass } from "./VisorCompass";
 import { VisorHeader } from "./VisorHeader";
 import { VisorMinimap } from "./VisorMinimap";
 import { VisorReadings } from "./VisorReadings";
+import { VisorStormCountdown } from "./VisorStormCountdown";
 import { formatNextStepLine, formatTaskLine, relativeBearingWord } from "./visorMath";
 
 
@@ -25,11 +26,18 @@ export interface VisorHudProps {
 export function VisorHud({ target }: VisorHudProps) {
     const processedData = useAriadneStore((state) => state.processedData);
     const astronautHeadingDeg = useAriadneStore((state) => state.astronautHeadingDeg);
+    const viewHeadingDeg = useAriadneStore((state) => state.viewHeadingDeg);
     const simElapsedSeconds = useAriadneStore((state) => state.simElapsedSeconds);
     const setTaskCompleted = useAriadneStore((state) => state.setTaskCompleted);
 
     const currentTask = useVisorCurrentTask(target);
     const numbers = useVisorReadings(target);
+
+    // What the astronaut sees: the camera's own smoothed heading, else the look-ahead travel heading.
+    let displayedHeadingDeg = astronautHeadingDeg;
+    if (viewHeadingDeg !== null) {
+        displayedHeadingDeg = viewHeadingDeg;
+    }
 
     const sunAzimuthDeg = processedData === null ? null : processedData.meta.sun.sun_azimuth_deg;
 
@@ -43,7 +51,7 @@ export function VisorHud({ target }: VisorHudProps) {
             distanceM: target.distanceM,
             walkSeconds: target.walkSeconds,
         });
-        directionText = relativeBearingWord(target.bearingDeg, astronautHeadingDeg);
+        directionText = relativeBearingWord(target.bearingDeg, displayedHeadingDeg);
         if (target.kind === "shelter") {
             nextStepColour = "var(--ariadne-no-go)";
         }
@@ -53,7 +61,8 @@ export function VisorHud({ target }: VisorHudProps) {
         <div className="visor-glass" aria-label="Visor display">
             <div className="flex flex-col gap-2">
                 <VisorHeader />
-                <VisorCompass headingDeg={astronautHeadingDeg} target={target} sunAzimuthDeg={sunAzimuthDeg} />
+                <VisorCompass headingDeg={displayedHeadingDeg} target={target} sunAzimuthDeg={sunAzimuthDeg} />
+                <VisorStormCountdown />
             </div>
 
             <div className="flex min-h-0 flex-1 items-start gap-2 pt-1">

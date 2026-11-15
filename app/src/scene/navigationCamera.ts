@@ -32,6 +32,8 @@ export const FIRST_PERSON_PITCH_DOWN_DEG = 8;
 export const FIRST_PERSON_FOV_DEG = 70;
 export const FIRST_PERSON_NEAR_M = 0.1;
 export const FIRST_PERSON_HEADING_TIME_CONSTANT_SECONDS = 0.3;
+// The view turns like a head: never faster than this, so a 180 degree turn sweeps over about 2 s.
+export const FIRST_PERSON_MAX_TURN_RATE_DEG_PER_SECOND = 120;
 
 
 
@@ -99,6 +101,36 @@ export function dampAngleDeg(currentDeg: number, targetDeg: number, deltaSeconds
 }
 
 
+// Like dampAngleDeg, but the turn never goes faster than `maxTurnRateDegPerSecond`, like a person
+// turning their head. Far from the target the turn runs at the maximum rate; within about
+// (rate x time constant) degrees it eases out exponentially, so small corrections still settle.
+// Frame-rate independent: both the exponential fraction and the cap scale with deltaSeconds.
+export function stepHeadingTowardsDeg(
+    currentDeg: number,
+    targetDeg: number,
+    deltaSeconds: number,
+    maxTurnRateDegPerSecond: number,
+    timeConstantSeconds: number,
+): number {
+    if (deltaSeconds <= 0) {
+        return currentDeg;
+    }
+    let fraction = 1;
+    if (timeConstantSeconds > 0) {
+        fraction = 1 - Math.exp(-deltaSeconds / timeConstantSeconds);
+    }
+    const delta = shortestAngleDeltaDeg(currentDeg, targetDeg);
+    let step = delta * fraction;
+    const maxStepDeg = Math.max(maxTurnRateDegPerSecond, 0) * deltaSeconds;
+    if (step > maxStepDeg) {
+        step = maxStepDeg;
+    } else if (step < -maxStepDeg) {
+        step = -maxStepDeg;
+    }
+    return normalizeHeadingDeg(currentDeg + step);
+}
+
+
 // 2D zoom (pixels per metre) that shows `acrossMetres` of terrain across the shorter viewport side.
 export function navigationZoom(viewportWidthPx: number, viewportHeightPx: number, acrossMetres: number): number {
     const shorterSidePx = Math.min(viewportWidthPx, viewportHeightPx);
@@ -156,13 +188,15 @@ export function computeChaseRig(input: ChaseInput): ChaseRig {
 
     const cameraX = input.position.x_m - direction.x * behindM;
     const cameraZ = input.position.z_m - direction.z * behindM;
+    // Heights come from the astronaut's own ground, which changes smoothly along the walk. The rough
+    // ground under the camera only matters when a ridge would otherwise hide the view.
     const terrainAtCameraY = input.sampleTerrainY(cameraX, cameraZ);
     const terrainAtAstronautY = input.sampleTerrainY(input.position.x_m, input.position.z_m);
-    const cameraY = Math.max(terrainAtCameraY + heightM, terrainAtAstronautY + CHASE_MIN_CLEARANCE_M);
+    const cameraY = Math.max(terrainAtAstronautY + heightM, terrainAtCameraY + CHASE_MIN_CLEARANCE_M);
 
     const lookX = input.position.x_m + direction.x * CHASE_LOOK_AHEAD_M;
     const lookZ = input.position.z_m + direction.z * CHASE_LOOK_AHEAD_M;
-    const lookY = input.sampleTerrainY(lookX, lookZ) + CHASE_LOOK_HEIGHT_ABOVE_TERRAIN_M;
+    const lookY = terrainAtAstronautY + CHASE_LOOK_HEIGHT_ABOVE_TERRAIN_M;
 
     return {
         cameraPosition: { x: cameraX, y: cameraY, z: cameraZ },

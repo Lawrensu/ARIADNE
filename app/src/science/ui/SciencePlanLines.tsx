@@ -9,6 +9,7 @@ import { useMemo } from "react";
 
 import { LINE_CASING_COLOUR, LINE_CASING_EXTRA_WIDTH_PX, LINE_CASING_OPACITY, LINE_RENDER_ORDER, MAP_COLOURS } from "../../scene/mapStyle";
 import { MapLabel } from "../../scene/MapLabel";
+import { lineLiftM, useSceneLineStyle } from "../../scene/sceneLineStyle";
 import { useScreenSpaceDashes } from "../../scene/useScreenSpaceDashes";
 import { useAriadneStore } from "../../state/store";
 import type { SciencePlanLeg } from "../../state/scienceSlice";
@@ -37,13 +38,15 @@ const STOP_NUMBER_OFFSET_PX = 16;
 
 function SciencePlanLeg3D({ leg }: { leg: SciencePlanLeg }) {
     const { frame } = useTerrain();
+    const lineStyle = useSceneLineStyle();
+    const liftM = lineLiftM(PLAN_LIFT_ABOVE_TERRAIN_M, lineStyle);
 
     const points = useMemo(() => {
         return leg.path_positions.map((position) => {
-            const y = sampleTerrainSceneY(frame, position.x_m, position.z_m) + PLAN_LIFT_ABOVE_TERRAIN_M;
+            const y = sampleTerrainSceneY(frame, position.x_m, position.z_m) + liftM;
             return [position.x_m, y, position.z_m] as [number, number, number];
         });
-    }, [leg, frame]);
+    }, [leg, frame, liftM]);
 
     if (points.length < 2) {
         return null;
@@ -65,7 +68,8 @@ function SciencePlanLeg3D({ leg }: { leg: SciencePlanLeg }) {
                 points={points}
                 color={LINE_CASING_COLOUR}
                 lineWidth={PLAN_LINE_WIDTH_PX + LINE_CASING_EXTRA_WIDTH_PX}
-                depthTest={false}
+                depthTest={lineStyle.depth_test}
+                depthWrite={false}
                 renderOrder={LINE_RENDER_ORDER.science_plan_casing}
                 transparent
                 opacity={LINE_CASING_OPACITY}
@@ -78,7 +82,8 @@ function SciencePlanLeg3D({ leg }: { leg: SciencePlanLeg }) {
                 dashed
                 dashSize={dashSize}
                 gapSize={gapSize}
-                depthTest={false}
+                depthTest={lineStyle.depth_test}
+                depthWrite={false}
                 renderOrder={LINE_RENDER_ORDER.science_plan_line}
                 transparent
                 opacity={1}

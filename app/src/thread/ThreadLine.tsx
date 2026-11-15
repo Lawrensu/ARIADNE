@@ -15,6 +15,7 @@ import { computeConsumablesState } from "../sim/clock";
 import { useAriadneStore } from "../state/store";
 import { sampleTerrainSceneY } from "../terrain/terrainFrame";
 import { useTerrain } from "../terrain/TerrainContext";
+import { lineLiftM, useSceneLineStyle } from "../scene/sceneLineStyle";
 import {
     GLOW_EXTRA_WIDTH_PX,
     GLOW_OPACITY,
@@ -115,6 +116,8 @@ function useThreadContourWorker(returnField: Float32Array, grid: { width: number
 
 export function ThreadLine() {
     const { processedData, frame } = useTerrain();
+    // The Thread always depth tests (map and visor); only its lift changes in first person.
+    const liftM = lineLiftM(THREAD_LIFT_M, useSceneLineStyle());
     const simElapsedSeconds = useAriadneStore((state) => state.simElapsedSeconds);
     const isSimPlaying = useAriadneStore((state) => state.isSimPlaying);
     const simSpeedMultiplier = useAriadneStore((state) => state.simSpeedMultiplier);
@@ -164,7 +167,7 @@ export function ThreadLine() {
             for (const point of ring) {
                 const current: [number, number, number] = [
                     point.x_m,
-                    sampleTerrainSceneY(frame, point.x_m, point.z_m) + THREAD_LIFT_M,
+                    sampleTerrainSceneY(frame, point.x_m, point.z_m) + liftM,
                     point.z_m,
                 ];
                 if (previous !== null) {
@@ -174,7 +177,7 @@ export function ThreadLine() {
             }
         }
         return points;
-    }, [rings, frame]);
+    }, [rings, frame, liftM]);
 
     if (segmentPoints.length < 2) {
         return null;

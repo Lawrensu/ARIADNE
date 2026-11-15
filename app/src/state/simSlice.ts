@@ -25,7 +25,7 @@ export interface SimSlice {
 export const createSimSlice: StateCreator<AriadneState, [], [], SimSlice> = (set) => ({
     simElapsedSeconds: 0,
     isSimPlaying: false,
-    simSpeedMultiplier: 60,
+    simSpeedMultiplier: 1,
 
     setSimPlaying: (isPlaying) => set({ isSimPlaying: isPlaying }),
     setSimSpeedMultiplier: (multiplier) => set({ simSpeedMultiplier: Math.max(multiplier, 0) }),

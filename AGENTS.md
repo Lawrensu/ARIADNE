@@ -31,6 +31,7 @@ CLAUDE.md                    Contains only "@AGENTS.md" (Claude Code import)
 docs/
   system_design.md           Architecture, design rationale, pipeline, app layout, algorithms, UX design principles
   development_conventions.md Code, doc and git conventions
+  getting_started.md         Setup, run and test commands for the pipeline and the app
   contracts.md               Exact file formats between stages (source of truth for data formats)
   data_sources.md            Every dataset: product ID, URL, resolution, licence, processing, status
   decisions.md               Append-only decision log
@@ -78,37 +79,42 @@ Doc file names are lowercase snake_case, except `README.md`, `AGENTS.md` and `CL
    - Read when: before writing any code or doc.
    - Updated by: a person's main agent, with team agreement.
    - Update when: the team agrees a convention change.
-6. `docs/contracts.md`
+6. `docs/getting_started.md`
+   - Source of truth for: setup, run and test commands (pipeline and app, raw data, troubleshooting).
+   - Read when: setting up a machine or running checks.
+   - Updated by: whoever changes setup steps.
+   - Update when: a setup, run or test command changes.
+7. `docs/contracts.md`
    - Source of truth for: exact file formats between stages, walking-time formula, test vectors.
    - Read when: before any code that reads or writes pipeline outputs.
    - Updated by: proposed by the main agent, approved by a human.
    - Update when: a format change is approved (deprecate-only for fields in use).
-7. `docs/data_sources.md`
+8. `docs/data_sources.md`
    - Source of truth for: every dataset (product ID, URL, resolution, licence, processing, status).
    - Read when: before using, downloading or citing a dataset.
    - Updated by: the main agent of whoever touches the dataset (usually Person A).
    - Update when: a dataset is added, downloaded, processed or its status changes.
-8. `docs/decisions.md`
+9. `docs/decisions.md`
    - Source of truth for: decision log (append-only), including open and accepted decisions.
    - Read when: before changing anything the team already decided.
    - Updated by: proposed by the main agent, approved by a human.
    - Update when: a decision is proposed or accepted. Never edit past entries, add new ones.
-9. `docs/handoff.md`
+10. `docs/handoff.md`
    - Source of truth for: current stage, gate checklists, known issues, next steps.
    - Read when: start of every session.
    - Updated by: the main agent of the stage owner.
    - Update when: stage status, checklist, known issue or next step changes.
-10. `docs/log/person_a.md`
+11. `docs/log/person_a.md`
     - Source of truth for: Person A's session history.
     - Read when: picking up Person A's work.
     - Updated by: Person A's main agent only.
     - Update when: end of every session.
-11. `docs/log/person_b.md`
+12. `docs/log/person_b.md`
     - Source of truth for: Person B's session history.
     - Read when: picking up Person B's work.
     - Updated by: Person B's main agent only.
     - Update when: end of every session.
-12. `docs/log/person_c.md`
+13. `docs/log/person_c.md`
     - Source of truth for: Person C's session history.
     - Read when: picking up Person C's work.
     - Updated by: Person C's main agent only.

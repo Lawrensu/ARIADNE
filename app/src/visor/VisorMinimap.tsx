@@ -8,6 +8,7 @@ import { useMemo } from "react";
 
 import type { LocalPosition } from "../data/contracts";
 import { MAP_COLOURS } from "../scene/mapStyle";
+import { isRoverAway, useRoverState } from "../scene/RoverMarker";
 import { useAriadneStore } from "../state/store";
 import type { VisorTarget } from "./useVisorState";
 import {
@@ -73,6 +74,7 @@ export function VisorMinimap({ target }: VisorMinimapProps) {
     const walkPlanSnapshot = useAriadneStore((state) => state.walkPlanSnapshot);
     const walkDetour = useAriadneStore((state) => state.walkDetour);
     const walkTrail = useAriadneStore((state) => state.walkTrail);
+    const roverState = useRoverState();
 
     const centre: LocalPosition | null = astronautPosition ?? processedData?.meta.staging_point ?? null;
 
@@ -89,7 +91,16 @@ export function VisorMinimap({ target }: VisorMinimapProps) {
 
     const plan = walkPlanSnapshot ?? sciencePlan;
     const half = VIEWBOX_UNITS / 2;
-    const rover = projectToMinimap(processedData.meta.staging_point, view);
+    // The rover is drawn at its live position (D-033); a faint square stays where it was parked.
+    const roverPosition = roverState === null ? processedData.meta.staging_point : roverState.position;
+    const rover = projectToMinimap(roverPosition, view);
+    const parked = projectToMinimap(processedData.meta.staging_point, view);
+    const isAway = isRoverAway(roverState);
+    const roverDrive = walkDetour === null ? null : (walkDetour.rover_drive ?? null);
+    let driveLinePoints: string | null = null;
+    if (roverState !== null && roverState.phase === "driving" && roverDrive !== null) {
+        driveLinePoints = minimapPolylinePoints([roverState.position, roverDrive.meet_position], view);
+    }
 
     let heading = 0;
     if (Number.isFinite(astronautHeadingDeg)) {
@@ -165,7 +176,28 @@ export function VisorMinimap({ target }: VisorMinimapProps) {
                         />
                     )}
 
-                    {isInsideMinimap(processedData.meta.staging_point, view) && <RoverGlyph x={rover.x} y={rover.y} />}
+                    {isAway && isInsideMinimap(processedData.meta.staging_point, view) && (
+                        <rect
+                            x={parked.x - 5}
+                            y={parked.y - 5}
+                            width={10}
+                            height={10}
+                            fill="none"
+                            stroke={MAP_COLOURS.phosphor_green}
+                            strokeWidth={1}
+                            opacity={0.4}
+                        />
+                    )}
+                    {driveLinePoints !== null && (
+                        <polyline
+                            points={driveLinePoints}
+                            fill="none"
+                            stroke={MAP_COLOURS.phosphor_green}
+                            strokeWidth={1.6}
+                            strokeDasharray="4 3"
+                        />
+                    )}
+                    {isInsideMinimap(roverPosition, view) && <RoverGlyph x={rover.x} y={rover.y} />}
                     {sheltersInRange.map((shelter) => {
                         const point = projectToMinimap({ x_m: shelter.x_m, z_m: shelter.z_m }, view);
                         return <ShelterGlyph key={shelter.shelter_id} x={point.x} y={point.y} isTarget={false} />;

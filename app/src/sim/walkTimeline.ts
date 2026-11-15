@@ -130,6 +130,35 @@ export function pointAlongPath(path: LocalPosition[], cumulative: number[], frac
 
 
 
+// Planned paths step from 2 m cell centre to cell centre, so on a diagonal they zigzag about a metre
+// sideways every few cells. The simulated astronaut walks a smoothed copy (a moving average of the
+// path points, ends kept), so the marker, the chase camera and the visor do not shake. Leg times are
+// unchanged; only the drawn line on the map keeps the exact cell path.
+export const WALK_PATH_SMOOTHING_RADIUS_POINTS = 3;
+
+
+export function smoothWalkPath(path: LocalPosition[], radiusPoints: number = WALK_PATH_SMOOTHING_RADIUS_POINTS): LocalPosition[] {
+    if (path.length < 3 || radiusPoints < 1) {
+        return path;
+    }
+    const smoothed: LocalPosition[] = [];
+    const lastIndex = path.length - 1;
+    for (let index = 0; index <= lastIndex; index++) {
+        // Near the ends the window shrinks symmetrically, so the first and last points stay exact.
+        const radius = Math.min(radiusPoints, index, lastIndex - index);
+        let sumX = 0;
+        let sumZ = 0;
+        for (let offset = -radius; offset <= radius; offset++) {
+            sumX += path[index + offset].x_m;
+            sumZ += path[index + offset].z_m;
+        }
+        const count = radius * 2 + 1;
+        smoothed.push({ x_m: sumX / count, z_m: sumZ / count });
+    }
+    return smoothed;
+}
+
+
 // Build the timeline of a plan walked from startedAtSimSeconds. Legs with no stored path are walked
 // in a straight line between their ends (the planner leaves the path empty only for legs timed from
 // return_field).
@@ -160,7 +189,7 @@ export function buildWalkTimeline(
 
         let path: LocalPosition[];
         if (leg.path_positions.length >= 2) {
-            path = leg.path_positions;
+            path = smoothWalkPath(leg.path_positions);
         } else {
             path = [previousEnd, legEnd];
         }
@@ -205,6 +234,73 @@ export function buildWalkTimeline(
 
 
 
+// The heading points at a spot this far ahead on the path still to walk, like car navigation. It
+// turns early and smoothly into corners, and at a Knot or the rover it already faces the next leg,
+// so the compass, the chase camera and the visor never lag behind a sharp turn.
+export const HEADING_LOOK_AHEAD_M = 10;
+
+
+interface PathAhead {
+    path: LocalPosition[];
+    cumulative: number[];
+    // Distance along this path where the walk currently is (0 for paths still to come).
+    fromDistanceM: number;
+}
+
+
+// The point aheadM along the given paths in order, starting at the first one's fromDistanceM; the
+// last point when the paths end sooner. Null when there is no path at all.
+function pointAhead(paths: PathAhead[], aheadM: number): LocalPosition | null {
+    let remaining = aheadM;
+    let lastPoint: LocalPosition | null = null;
+    for (const entry of paths) {
+        if (entry.path.length === 0) {
+            continue;
+        }
+        const total = entry.cumulative[entry.cumulative.length - 1];
+        const available = total - entry.fromDistanceM;
+        lastPoint = entry.path[entry.path.length - 1];
+        if (available >= remaining && total > 0) {
+            const fraction = (entry.fromDistanceM + remaining) / total;
+            return pointAlongPath(entry.path, entry.cumulative, fraction).position;
+        }
+        remaining -= Math.max(available, 0);
+    }
+    return lastPoint;
+}
+
+
+// Look-ahead heading from position, or null when nothing is ahead (end of the walk).
+function headingTowardsAhead(position: LocalPosition, paths: PathAhead[]): number | null {
+    const ahead = pointAhead(paths, HEADING_LOOK_AHEAD_M);
+    if (ahead === null) {
+        return null;
+    }
+    if (distanceMetres(position, ahead) < 0.5) {
+        return null;
+    }
+    return bearingBetween(position, ahead);
+}
+
+
+// The walking legs from segment index startIndex on (tasks skipped), the first from fromDistanceM.
+function legsAhead(timeline: WalkTimeline, startIndex: number, fromDistanceM: number): PathAhead[] {
+    const paths: PathAhead[] = [];
+    for (let index = startIndex; index < timeline.segments.length; index++) {
+        const segment = timeline.segments[index];
+        if (segment.segment_kind !== "walk_leg") {
+            continue;
+        }
+        let from = 0;
+        if (index === startIndex) {
+            from = fromDistanceM;
+        }
+        paths.push({ path: segment.path_positions, cumulative: segment.cumulative_distance_m, fromDistanceM: from });
+    }
+    return paths;
+}
+
+
 function planStateAt(timeline: WalkTimeline, simSeconds: number): WalkState {
     const atRover: WalkState = {
         position: timeline.start_position,
@@ -214,8 +310,12 @@ function planStateAt(timeline: WalkTimeline, simSeconds: number): WalkState {
         task_id: null,
         is_on_detour: false,
     };
-    if (simSeconds < timeline.started_at_sim_seconds || timeline.segments.length === 0) {
+    if (timeline.segments.length === 0) {
         return atRover;
+    }
+    if (simSeconds < timeline.started_at_sim_seconds) {
+        // Waiting at the rover: already facing the first leg.
+        return { ...atRover, heading_deg: headingTowardsAhead(atRover.position, legsAhead(timeline, 0, 0)) };
     }
     if (simSeconds >= timeline.end_s) {
         const lastSegment = timeline.segments[timeline.segments.length - 1];
@@ -223,14 +323,17 @@ function planStateAt(timeline: WalkTimeline, simSeconds: number): WalkState {
         return { ...atRover, position: lastPath[lastPath.length - 1] };
     }
 
-    for (const segment of timeline.segments) {
+    for (let segmentIndex = 0; segmentIndex < timeline.segments.length; segmentIndex++) {
+        const segment = timeline.segments[segmentIndex];
         if (simSeconds >= segment.end_s) {
             continue;
         }
         if (segment.segment_kind === "science_task") {
+            // At a Knot the astronaut turns to face the next leg before setting off.
+            const knotPosition = segment.path_positions[0];
             return {
-                position: segment.path_positions[0],
-                heading_deg: null,
+                position: knotPosition,
+                heading_deg: headingTowardsAhead(knotPosition, legsAhead(timeline, segmentIndex + 1, 0)),
                 phase: "at_knot",
                 knot_id: segment.knot_id,
                 task_id: segment.task_id,
@@ -243,9 +346,12 @@ function planStateAt(timeline: WalkTimeline, simSeconds: number): WalkState {
             fraction = (simSeconds - segment.start_s) / duration;
         }
         const point = pointAlongPath(segment.path_positions, segment.cumulative_distance_m, fraction);
+        const totalLength = segment.cumulative_distance_m[segment.cumulative_distance_m.length - 1] ?? 0;
+        const walkedM = Math.min(Math.max(fraction, 0), 1) * totalLength;
+        const aheadHeading = headingTowardsAhead(point.position, legsAhead(timeline, segmentIndex, walkedM));
         return {
             position: point.position,
-            heading_deg: point.heading_deg,
+            heading_deg: aheadHeading ?? point.heading_deg,
             phase: "walking",
             knot_id: segment.knot_id,
             task_id: null,
@@ -364,10 +470,13 @@ export function walkStateAt(
         if (detour.walking_time_s > 0) {
             fraction = elapsed / detour.walking_time_s;
         }
-        const point = pointAlongPath(path, cumulativeDistances(path), fraction);
+        const cumulative = cumulativeDistances(path);
+        const point = pointAlongPath(path, cumulative, fraction);
+        const walkedM = Math.min(Math.max(fraction, 0), 1) * (cumulative[cumulative.length - 1] ?? 0);
+        const aheadHeading = headingTowardsAhead(point.position, [{ path, cumulative, fromDistanceM: walkedM }]);
         return {
             position: point.position,
-            heading_deg: point.heading_deg,
+            heading_deg: aheadHeading ?? point.heading_deg,
             phase: "walking",
             knot_id: null,
             task_id: null,
@@ -411,4 +520,63 @@ export function tasksFinishedBetween(
         }
     }
     return finished;
+}
+
+
+
+
+// Where the pressurised rover is (D-033).
+// "parked": at the staging point. "driving": on its way to meet the astronaut. "with_crew": at the
+// meeting point with the astronaut on board.
+export type RoverPhase = "parked" | "driving" | "with_crew";
+
+
+export interface RoverState {
+    position: LocalPosition;
+    phase: RoverPhase;
+    heading_deg: number | null;
+}
+
+
+// Without a rover drive the rover stays parked. With one it leaves at depart_at_sim_seconds, drives
+// the path at constant speed (heading looks ahead like the walker's) and stays at the meeting point.
+export function roverStateAt(detour: WalkDetour | null, stagingPoint: LocalPosition, simSeconds: number): RoverState {
+    const parked: RoverState = {
+        position: { x_m: stagingPoint.x_m, z_m: stagingPoint.z_m },
+        phase: "parked",
+        heading_deg: null,
+    };
+    if (detour === null || detour.rover_drive === undefined || detour.rover_drive === null) {
+        return parked;
+    }
+    const drive = detour.rover_drive;
+    const path = drive.path_positions;
+    if (path.length === 0 || simSeconds < drive.depart_at_sim_seconds) {
+        return parked;
+    }
+
+    if (simSeconds >= drive.arrive_at_sim_seconds) {
+        // Keep facing the way it arrived.
+        let arrivedHeading: number | null = null;
+        if (path.length >= 2) {
+            arrivedHeading = bearingBetween(path[path.length - 2], path[path.length - 1]);
+        }
+        return {
+            position: { x_m: drive.meet_position.x_m, z_m: drive.meet_position.z_m },
+            phase: "with_crew",
+            heading_deg: arrivedHeading,
+        };
+    }
+
+    const duration = drive.arrive_at_sim_seconds - drive.depart_at_sim_seconds;
+    const fraction = (simSeconds - drive.depart_at_sim_seconds) / duration;
+    const cumulative = cumulativeDistances(path);
+    const point = pointAlongPath(path, cumulative, fraction);
+    const drivenM = Math.min(Math.max(fraction, 0), 1) * (cumulative[cumulative.length - 1] ?? 0);
+    const aheadHeading = headingTowardsAhead(point.position, [{ path, cumulative, fromDistanceM: drivenM }]);
+    return {
+        position: point.position,
+        phase: "driving",
+        heading_deg: aheadHeading ?? point.heading_deg,
+    };
 }

@@ -14,6 +14,7 @@ import { computeSciencePlan } from "../science/sciencePlan";
 import { nearestNeighbourOrder } from "../science/ui/planDisplay";
 import type { SciencePlan } from "../state/scienceSlice";
 import type { WalkDetour } from "../state/walkSlice";
+import { computeRoverMeet } from "./roverMeet";
 import { SOLAR_STORM_SCENARIO } from "./scenarioEngine";
 import {
     bearingBetween,
@@ -22,8 +23,8 @@ import {
     knotStayEndSeconds,
     pointAlongPath,
     tasksFinishedBetween,
-    walkStateAt,
-} from "./walkTimeline";
+    roverStateAt,
+    walkStateAt, smoothWalkPath, HEADING_LOOK_AHEAD_M } from "./walkTimeline";
 
 
 
@@ -219,6 +220,78 @@ describe("walk timeline (synthetic plan)", () => {
 
 
 
+describe("rover state (D-033)", () => {
+    const detour: WalkDetour = {
+        started_at_sim_seconds: 100,
+        path_positions: [{ x_m: 100, z_m: 0 }, { x_m: 50, z_m: 0 }],
+        walking_time_s: 25,
+        target_kind: "shelter",
+        target_id: "shelter_rover",
+        target_label: "Rover (meets you)",
+        phase_on_arrival: "sheltering",
+        rover_drive: {
+            path_positions: [{ x_m: 0, z_m: 0 }, { x_m: 0, z_m: 100 }, { x_m: 50, z_m: 100 }],
+            depart_at_sim_seconds: 120,
+            arrive_at_sim_seconds: 195,
+            meet_position: { x_m: 50, z_m: 100 },
+            is_estimate: true,
+        },
+        is_estimate: true,
+    };
+
+    it("stays parked without a rover drive", () => {
+        expect(roverStateAt(null, ROVER, 500).phase).toBe("parked");
+        const plain: WalkDetour = { ...detour, rover_drive: null };
+        expect(roverStateAt(plain, ROVER, 500).phase).toBe("parked");
+        expect(roverStateAt({ ...detour, rover_drive: undefined }, ROVER, 500).position).toEqual(ROVER);
+    });
+
+    it("stays parked until it departs", () => {
+        const state = roverStateAt(detour, ROVER, 119);
+        expect(state.phase).toBe("parked");
+        expect(state.position).toEqual(ROVER);
+    });
+
+    it("drives at constant speed along the path with a look-ahead heading", () => {
+        // Path 150 m in 75 s: 2 m/s. 30 s after departure it is 60 m along: 40 m down the second piece.
+        const state = roverStateAt(detour, ROVER, 150);
+        expect(state.phase).toBe("driving");
+        expect(state.position.x_m).toBeCloseTo(0, 9);
+        expect(state.position.z_m).toBeCloseTo(60, 9);
+        expect(state.heading_deg).toBeCloseTo(180, 6);
+        // 5 m before the corner the heading already turns towards east.
+        const nearCorner = roverStateAt(detour, ROVER, 120 + 47.5);
+        expect(nearCorner.heading_deg as number).toBeLessThan(180);
+        expect(nearCorner.heading_deg as number).toBeGreaterThan(90);
+    });
+
+    it("is with the crew at the meeting point from the arrival on", () => {
+        for (const at of [195, 400]) {
+            const state = roverStateAt(detour, ROVER, at);
+            expect(state.phase).toBe("with_crew");
+            expect(state.position).toEqual({ x_m: 50, z_m: 100 });
+        }
+    });
+
+    it("is with the crew at once when the rover never leaves", () => {
+        const stay: WalkDetour = {
+            ...detour,
+            rover_drive: {
+                path_positions: [ROVER],
+                depart_at_sim_seconds: 160,
+                arrive_at_sim_seconds: 160,
+                meet_position: ROVER,
+                is_estimate: true,
+            },
+        };
+        expect(roverStateAt(stay, ROVER, 159).phase).toBe("parked");
+        expect(roverStateAt(stay, ROVER, 160).phase).toBe("with_crew");
+    });
+});
+
+
+
+
 describe("demo scenario on the real data (D-030)", () => {
     let data: ProcessedData;
     let routingGrid: RoutingGrid;
@@ -264,11 +337,18 @@ describe("demo scenario on the real data (D-030)", () => {
         return (event as { at_sim_seconds: number }).at_sim_seconds;
     }
 
-    it("fires the storm after the first samples, on the way to the third Knot, then reroutes to the rover", () => {
+    it("fires the watch at a Knot, the storm on the way to the third Knot, then the rover meets the astronaut", () => {
         const walkStart = eventTime("walk_started");
         const timeline = buildWalkTimeline(plan, data.knots, data.meta.staging_point, walkStart);
+        const watchAt = eventTime("space_weather_watch");
         const stormAt = eventTime("solar_particle_event_alert");
         const rerouteAt = eventTime("reroute_to_shelter");
+        expect(stormAt - watchAt).toBe(30 * 60);
+
+        // The watch comes while the astronaut is working at the second Knot (Boxwork ridge).
+        const atWatch = walkStateAt(timeline, null, data.meta.staging_point, watchAt);
+        expect(atWatch.phase).toBe("at_knot");
+        expect(atWatch.knot_id).toBe(plan.legs[1].to_knot_id);
 
         // Every task at the first two Knots is done before the storm, and at least one took a sample,
         // so the demo shows the carried load (and the Thread) change before the alert.
@@ -285,18 +365,56 @@ describe("demo scenario on the real data (D-030)", () => {
             expect(state.knot_id).toBe(plan.legs[2].to_knot_id);
         }
 
-        // The detour back to the rover from the reroute point, timed like rerouteWalkTo.
+        // The detour to the rover from the reroute point, built like rerouteWalkTo.
         const from = walkStateAt(timeline, null, data.meta.staging_point, rerouteAt).position;
         const rover = data.meta.staging_point;
         const route = computeRoutePlan(routingGrid, "fast", from, rover);
         expect(route).not.toBeNull();
         const parameters = loadParametersFromMeta(data.meta.parameters);
         const factor = loadFactor(carriedLoadKg(data.knots, done, parameters), parameters);
-        const homeAt = rerouteAt + (route as { walking_time_s: number }).walking_time_s * factor;
+        const walkBackS = (route as { walking_time_s: number }).walking_time_s * factor;
+        const homeAt = rerouteAt + walkBackS;
+
+        const path = smoothWalkPath([from, ...(route as { path_positions: { x_m: number; z_m: number }[] }).path_positions]);
+        const meet = computeRoverMeet(path, walkBackS, rerouteAt);
+        const pathLengthM = path.slice(1).reduce((sum, point, index) => sum + Math.hypot(point.x_m - path[index].x_m, point.z_m - path[index].z_m), 0);
+
+        // Boarding happens earlier than the old walk all the way back, and both arrive together.
+        expect(meet.meet_at_sim_seconds).toBeLessThan(homeAt);
+        expect(meet.meet_at_sim_seconds).toBeGreaterThan(rerouteAt);
+        expect(meet.rover_arrive_at_sim_seconds).toBeCloseTo(meet.meet_at_sim_seconds, 6);
+        expect(meet.rover_depart_at_sim_seconds).toBeCloseTo(rerouteAt + 120, 6);
+        expect(meet.meet_distance_m + meet.rover_drive_distance_m).toBeCloseTo(pathLengthM, 6);
+
+        const detour: WalkDetour = {
+            started_at_sim_seconds: rerouteAt,
+            path_positions: meet.astronaut_path,
+            walking_time_s: meet.astronaut_walk_time_s,
+            target_kind: "shelter",
+            target_id: "shelter_rover",
+            target_label: "Rover (meets you)",
+            phase_on_arrival: "sheltering",
+            rover_drive: {
+                path_positions: meet.rover_path,
+                depart_at_sim_seconds: meet.rover_depart_at_sim_seconds,
+                arrive_at_sim_seconds: meet.rover_arrive_at_sim_seconds,
+                meet_position: meet.meet_position,
+                is_estimate: true,
+            },
+            is_estimate: true,
+        };
+        expect(walkStateAt(timeline, detour, rover, meet.meet_at_sim_seconds + 1).phase).toBe("sheltering");
+        expect(walkStateAt(timeline, detour, rover, meet.meet_at_sim_seconds - 1).phase).toBe("walking");
+        expect(roverStateAt(detour, rover, rerouteAt + 60).phase).toBe("parked");
+        expect(roverStateAt(detour, rover, meet.meet_at_sim_seconds + 1).phase).toBe("with_crew");
 
         console.log(
-            `demo: walk ${walkStart} s, tasks done before the storm ${done.join(", ")}, storm ${stormAt} s, reroute ${rerouteAt} s, ` +
-                `in the rover at est. ${(homeAt / 60).toFixed(1)} min (walk back est. ${((homeAt - rerouteAt) / 60).toFixed(1)} min, load factor ${factor.toFixed(3)})`,
+            `demo: walk ${walkStart} s, watch ${watchAt} s (at ${atWatch.knot_id}), storm ${stormAt} s, reroute ${rerouteAt} s, ` +
+                `tasks done before the storm ${done.join(", ")}, load factor ${factor.toFixed(3)}; ` +
+                `old walk back est. ${(walkBackS / 60).toFixed(1)} min (home at ${(homeAt / 60).toFixed(1)} min); ` +
+                `rover meet at est. ${(meet.meet_at_sim_seconds / 60).toFixed(1)} min, astronaut walks ${meet.meet_distance_m.toFixed(0)} m of ${pathLengthM.toFixed(0)} m ` +
+                `(${(meet.astronaut_walk_time_s / 60).toFixed(1)} min), rover drives ${meet.rover_drive_distance_m.toFixed(0)} m ` +
+                `(departs ${meet.rover_depart_at_sim_seconds} s, arrives ${meet.rover_arrive_at_sim_seconds.toFixed(0)} s)`,
         );
         // Home within the planned 5 h 30 min (contracts.md 4.6 rule 3), well before the suit limit.
         expect(homeAt).toBeLessThan(plan.plan_time_limit_s);
@@ -340,14 +458,24 @@ describe("demo scenario on the real data (D-030)", () => {
                         const route = computeRoutePlan(routingGrid, "fast", from, data.meta.staging_point);
                         if (route !== null) {
                             const factor = loadFactor(carriedLoadKg(data.knots, done, parameters), parameters);
+                            // Like rerouteWalkTo: the rover drives out and meets the astronaut on the way.
+                            const path = smoothWalkPath([from, ...route.path_positions]);
+                            const meet = computeRoverMeet(path, route.walking_time_s * factor, event.at_sim_seconds);
                             detour = {
                                 started_at_sim_seconds: event.at_sim_seconds,
-                                path_positions: [from, ...route.path_positions],
-                                walking_time_s: route.walking_time_s * factor,
+                                path_positions: meet.astronaut_path,
+                                walking_time_s: meet.astronaut_walk_time_s,
                                 target_kind: "shelter",
                                 target_id: "shelter_rover",
-                                target_label: "Rover shelter",
+                                target_label: "Rover (meets you)",
                                 phase_on_arrival: "sheltering",
+                                rover_drive: {
+                                    path_positions: meet.rover_path,
+                                    depart_at_sim_seconds: meet.rover_depart_at_sim_seconds,
+                                    arrive_at_sim_seconds: meet.rover_arrive_at_sim_seconds,
+                                    meet_position: meet.meet_position,
+                                    is_estimate: true,
+                                },
                                 is_estimate: true,
                             };
                             log.push(`detour ${detour.walking_time_s.toFixed(6)} s from ${from.x_m.toFixed(6)},${from.z_m.toFixed(6)}`);
@@ -379,3 +507,67 @@ describe("demo scenario on the real data (D-030)", () => {
         expect(smoothFrames[smoothFrames.length - 1]).toContain("sheltering");
     });
 });
+
+
+
+
+describe("smoothWalkPath (no zigzag on 8-connected cell paths)", () => {
+    it("keeps the ends and straight lines exactly", () => {
+        const straight = [0, 2, 4, 6, 8, 10].map((x) => ({ x_m: x, z_m: 0 }));
+        expect(smoothWalkPath(straight)).toEqual(straight);
+    });
+
+    it("flattens a diagonal staircase to within a few tenths of a metre of the true line", () => {
+        const staircase = [];
+        let x = 0;
+        let z = 0;
+        for (let step = 0; step < 40; step++) {
+            staircase.push({ x_m: x, z_m: z });
+            x += 2;
+            if (step % 2 === 1) {
+                z -= 2;
+            }
+        }
+        const smoothed = smoothWalkPath(staircase);
+        expect(smoothed[0]).toEqual(staircase[0]);
+        expect(smoothed[smoothed.length - 1]).toEqual(staircase[staircase.length - 1]);
+        // True line direction: 2 east per 1 north. Distance of inner points from that line.
+        for (let index = 6; index < smoothed.length - 6; index++) {
+            const point = smoothed[index];
+            const distanceFromLine = Math.abs(point.x_m * 0.5 + point.z_m) / Math.hypot(0.5, 1);
+            expect(distanceFromLine).toBeLessThan(0.8);
+        }
+    });
+});
+
+
+
+
+describe("look-ahead heading (D-032 follow-up)", () => {
+    // Rover -> Knot east of the rover, then a 270 degree turn: the next leg goes back west and north.
+    const turnPlan = makePlan();
+    turnPlan.legs[1].path_positions = [{ x_m: 100, z_m: 0 }, { x_m: 100, z_m: -100 }];
+
+    it("faces the next leg while still at the Knot, before setting off", () => {
+        const timeline = buildWalkTimeline(turnPlan, [KNOT_A], ROVER, 1000);
+        const atKnot = walkStateAt(timeline, null, ROVER, 1120);
+        expect(atKnot.phase).toBe("at_knot");
+        expect(atKnot.heading_deg).toBeCloseTo(0, 6);
+    });
+
+    it("faces the first leg while waiting at the rover", () => {
+        const timeline = buildWalkTimeline(turnPlan, [KNOT_A], ROVER, 1000);
+        expect(walkStateAt(timeline, null, ROVER, 500).heading_deg).toBeCloseTo(90, 6);
+    });
+
+    it("starts turning before the corner, not after it", () => {
+        const timeline = buildWalkTimeline(turnPlan, [KNOT_A], ROVER, 1000);
+        // 5 m before the Knot on the first leg, the point 10 m ahead is already past the corner.
+        const nearCorner = walkStateAt(timeline, null, ROVER, 1095);
+        expect(nearCorner.phase).toBe("walking");
+        expect(nearCorner.heading_deg).not.toBeNull();
+        expect(nearCorner.heading_deg as number).toBeLessThan(90);
+        expect(HEADING_LOOK_AHEAD_M).toBeGreaterThan(5);
+    });
+});
+

@@ -2,7 +2,7 @@
 
 **Astronaut Route Intelligence And Data for Navigation & Exploration** (crew shorthand: "Ari")
 
-A map and suit display for one astronaut on one Marswalk: real NASA data, a planned route, and a guaranteed way home.
+A map and suit display for one astronaut on one Marswalk: Real NASA data, safe routes, a science plan, and a live boundary showing how far they can go and still get home.
 
 > The boxwork is a labyrinth. Every labyrinth needs a thread.
 
@@ -11,241 +11,93 @@ Built by Team Stuff for the NASA hackathon challenge "Interplanetary Survival Gu
 
 ## The problem
 
-Mars maps are built for planets, not for one walk. NASA's Mars Trek and the USGS global geologic map work at regional or global scale, and the tools that plan human spacewalks have been tested on Earth analogs and the Moon, not on a real Mars patch. On a ~2 km Marswalk (the Artemis III excursion radius) in Gale Crater, 18% of the ground is steeper than 25°, and no tool ties real Mars terrain, radiation, weather and the oxygen left into one answer to "can I still get home?". Apollo recalculated walkback limits during each EVA; nothing today does that continuously on a display for the crew.
+When astronauts walk on Mars they ask three questions, "where can I safely go, how much science can I do, and can I still get home?" They walk to do science in stiff suits, carrying tools and samples, with limited time and oxygen, on steep and broken ground. Yet every Mars map today was built for scientists studying a whole planet, not for the person standing on it. On our ~2 km Marswalk patch, 18% of the ground is steeper than 25°.
 
 
-## Existing solutions and the gap
+## What exists and what is missing
 
-- Map portals (planet scale, for scientists): Mars Trek, the USGS global geologic map (1:20,000,000), JMARS. Gap: global scale, no walking time, no consumables, no suit view. [Mars Trek](https://trek.nasa.gov/mars/jpl/config/textAbout.html), [USGS](https://www.usgs.gov/publications/digital-global-geologic-map-mars-chronostratigraphic-ages-topographic-and-crater), [JMARS](https://jmars.mars.asu.edu/what-jmars)
+- Map portals (planet scale, for scientists): Mars Trek, the USGS global geologic map, JMARS. Gap: global scale, no walking time, no consumables, no suit view. [Mars Trek](https://trek.nasa.gov/mars/jpl/config/textAbout.html), [USGS](https://www.usgs.gov/publications/digital-global-geologic-map-mars-chronostratigraphic-ages-topographic-and-crater), [JMARS](https://jmars.mars.asu.edu/what-jmars)
 - Rover mission tools (robots, ground teams): MMGIS and OnSight. Gap: team platforms for robotic missions, with no human metabolic cost or return logic, and OnSight is limited to federal staff and contractors. [MMGIS](https://github.com/NASA-AMMOS/MMGIS), [OnSight](https://software.nasa.gov/software/NPO-50830-1)
 - Human EVA tools: Minerva (xGDS, SEXTANT, Playbook), used in BASALT analog EVAs. Gap: its authors report unusable time estimates, a constant walking speed, no terrain traversability, and poor fit for replanning during an EVA. [Marquez 2019](https://pmc.ncbi.nlm.nih.gov/articles/PMC6442304), [xGDS](https://software.nasa.gov/software/ARC-17174-1)
 - LunaNet: a proposed Moon communications and navigation network. Gap: it tells you where you are, not which ground is safe. [NTRS](https://ntrs.nasa.gov/citations/20200001555)
 
-The gap: no tool we found combines real Mars terrain data, a suit-calibrated walking cost, live consumables, and a continuously updated safe-return boundary for one astronaut on one walk, offline, in both a habitat view and a suit view.
-
-For the full differentiation and the evidence that ARIADNE would work, see [docs/system_design.md](docs/system_design.md#design-rationale).
+The gap: no tool we found combines real Mars terrain data, a suit-calibrated walking cost, consumables, and a continuously updated safe-return boundary for one astronaut on one walk, offline, in both a habitat view and a suit view. Details: [docs/system_design.md](docs/system_design.md#design-rationale).
 
 
-## The idea
+## ARIADNE
 
-In Greek myth, Ariadne gave Theseus a thread so he could find his way out of the labyrinth. Our Marswalk site, the boxwork ridges of Gale Crater, is a natural labyrinth: networks of low intersecting ridges with sandy hollows between them. The core feature of ARIADNE is a thread of our own, a guaranteed way home.
+In Greek myth, Ariadne gave Theseus a thread so he could find his way out of the labyrinth. Our site, the boxwork ridges of Gale Crater, is a natural labyrinth, so ARIADNE gives the astronaut a thread of their own: the Thread, the boundary of everywhere they can go and still walk back to the rover in time.
 
-Pitch opener: every Mars map today is made for scientists studying a planet. Nobody has built one for the astronaut standing on it, asking "can I still get home?". ARIADNE gives one astronaut one Marswalk and a thread that always leads back.
+Features, grouped under the three questions (built means working in the app today):
 
+Where can I safely go?
+- No-go terrain from the 1 m HiRISE terrain model: steep slopes, large rocks, rough ground (built).
+- Fast, safe and smooth (any-angle, Theta*) routes, with rerouting when a hazard changes (built).
+- Alerts that come with an action, for example "Solar storm: the rover is driving out to meet you. [ROUTE]", with a storm watch and countdown 30 min ahead.
+- Conditions: weather replay, radiation, Mars time (in progress, Stage 3).
 
-## Site and scenario
+How much science can I do?
+- Knots: science stops with real Curiosity photos and the tasks to do there 
+- Science plan and science budget: walking time with the load carried, and what still fits before the crew must turn back 
+- Task check-off on the Suit HUD 
 
-- **Region:** Gale Crater (~154 km), shown on the Planning Table as a static regional context image.
-- **Marswalk patch:** a ~2 × 2 km area where Curiosity's boxwork region on lower Mount Sharp meets the western edge of the Gediz Vallis channel. Bounds (planetocentric, east-positive): north -4.7809, south -4.8124, west 137.3771, east 137.4114, about 2,024 m east-west × 1,869 m north-south (see [D-017](docs/decisions.md)).
-- **Scenario:** a pressurised rover drives the crew from the habitat to a staging point in the patch, then the crew walks in a pair. The Thread is computed relative to the staging point (the rover).
-- **Staging point:** lat -4.78877, lon 137.39023, one of the flattest spots in the patch and about halfway between the two targets, the Gediz Vallis sulfur field and the boxwork (about 1.1 km to each, about 2.0 km apart; see [D-018](docs/decisions.md)).
-- **"Real-time" means replay:** no one is on Mars, so ARIADNE replays real historical data on a simulation clock with a speed multiplier, plus a scripted scenario, and says so openly. The weather is REMS sol 4760 (26 December 2025 UTC). The scripted event is the May 2024 solar storm that Curiosity's RAD measured on sol 4190, so the two come from different dates (see [D-025](docs/decisions.md)).
+Can I still get home?
+- The Thread, scaled by the load carried and recalculated as time passes 
+- Suit HUD with at most 3 numbers at once 
 
+Two views of the same map:
+- Planning Table: the habitat and rover display, a big map with all layers, used to plan 
+- Labyrinth view: the 3D terrain of the Marswalk 
 
-## Features
-
-- **Planning Table:** the habitat/rover display. A big map with all layers, used to plan the route.
-- **Suit HUD:** the minimal in-suit display: compass bar, next Knot, Thread margin, O2, alerts. At most about 3 numbers at once.
-- **Labyrinth view:** the 3D terrain view of the Marswalk site.
-- **The Thread:** the safe-return ring. The boundary of everywhere the astronaut can reach and still walk back to the staging point within the planned Marswalk time minus a reserve, with the load they carry. It shrinks as they walk.
-- **Knots:** science waypoints along the route, with real Curiosity photos, science notes and the tasks to do there (imaging, samples, measurements).
-- **Science plan:** choose the Knots and tasks, see the walking time with the load carried, and a science budget that says what fits before the crew must turn back.
-- **Route planning with rerouting:** fast, safe and smooth (any-angle, Theta*) route options, and fast replanning when a hazard changes.
-- **Conditions panel:** local time, sun position and time to sunset, weather, radiation dose budget.
-- **Actionable alerts:** every alert comes with an action, for example "Solar storm: shelter at Knot B, 340 m, 6 min. [ROUTE]".
-- **Provenance:** every displayed value is traceable (dataset, product ID, resolution, timestamp, uncertainty). Model-derived values are labelled "est.".
-
-Out of scope: voice assistant, live Mars data, other sites or a global map, mapping libraries and game engines. Stretch: Mars Climate Database forecast, relay orbiter passes (SPICE), SAM-based rock detection.
+Shelters are the rover and terrain overhangs, never Knots. Every displayed value is traceable (dataset, product ID, resolution, timestamp, uncertainty) and model-derived values are labelled "est.".
 
 
-## Data layers
+## A Marswalk in 60 seconds
 
-- Core: HiRISE orthoimage and DTM (slope, roughness), Curiosity RAD radiation, Curiosity REMS weather, Curiosity ground photos.
-- Added: CRISM mineralogy, THEMIS thermal inertia (context only, coarse), shadow-based rock detection from HiRISE (offline, estimates).
-- Support: NASA DONKI space weather events, Mars24 time and sun position (NASA GISS).
-- Stretch: Mars Climate Database forecast (LMD), SPICE relay passes.
+1. On the Planning Table, plan all 5 Knots: total est. 5 h 03 min of the 5 h 30 min limit, with an est. 27 min science budget left. The plan says GO
+2. The crew walks out from the rover along the fast route. The Thread is drawn around the rover
+3. At each Knot the crew collects samples. Samples add load, and the Thread shrinks
+4. A space weather watch warns that a radiation storm is likely in about 30 min, with a live countdown
+5. The May 2024 solar storm that Curiosity measured arrives. The science plan stops, and the pressurised rover drives out along the route back while the astronaut walks towards it
+6. They meet halfway (est. about 19 min sooner than walking all the way back), the astronaut boards, and the samples are safe
+
+The astronaut's position is simulated for the demo, and the weather and storm are a replay of real historical data (see "Honest limits").
+
+![Stage 1 output: no-go zones, rocks, Knots, rover and Thread contours on the HiRISE photo](docs/images/stage1_overlay_check.png)
+
+Stage 1 output preview: no-go zones, rocks, Knots, rover and Thread contours on the HiRISE photo.
+
+
+## Why this site and this scenario
+
+- Two of Curiosity's headline discoveries are about 2 km apart: pure sulfur in Gediz Vallis and the groundwater boxwork ridges. One walk can visit both.
+- HiRISE covers the patch at 1 m with no gaps, so	 the terrain model is detailed enough for walking.
+- Curiosity's own photos and measurements let us check the map against reality.
+- The scenario follows Artemis planning: a pressurised rover drives the crew to a staging point, then they walk in pairs. How far a crew may walk is limited by what a suit can walk back. The staging point is about 1.1 km from each target, inside the Artemis III 2 km excursion radius (D-003, D-018, D-020).
+
+
+## Why you can trust it
+
+- The terrain model's slopes match Curiosity's own measured tilt: median 8.8° against 8.4° at 205 stops.
+- The app's walking times match the pipeline's within 0.0006% (largest relative difference 5.6e-6 over every Knot to rover route).
+
+Honest limits:
+- The data is a replay of real historical measurements, not live.
+- Walking speed, load and task times are estimates, labelled "est.".
+- The astronaut's position is simulated. Mars has no GPS; a real mission would use rover radio ranging, visual odometry or a future navigation network.
+
+
+## Data we use
+
+- HiRISE terrain model and photo: where the safe ground is, and the 3D view.
+- Curiosity REMS (weather) and RAD (radiation) replay, plus NASA DONKI space weather: conditions and the solar storm.
+- Curiosity photos and science blog posts: the Knots.
+- CRISM minerals and THEMIS thermal inertia: context only, low confidence.
 
 Product IDs, URLs, resolutions, licences, processing and status for every dataset are in [docs/data_sources.md](docs/data_sources.md).
 
 
-## Getting started
-
-Windows, macOS and Linux all work. Commands are for a bash-like shell (on Windows use Git Bash or PowerShell).
-
-Who needs what:
-- Everyone: install git and clone the repo. Update your `dev-{firstname}` branch from `dev` before starting.
-- Malissa (Stage 2) and Letta (Stage 3): you only need `data/processed/`. It is committed to git (D-022), so a normal `git pull` gets it. No Python, no `uv` and no raw data needed.
-- Lawrence (Stage 1 pipeline): you need `uv` and the raw data (about 1.1 GB, see "Raw data").
-
-
-### Pipeline setup
-
-Install `uv` (the Python package and project manager) from https://docs.astral.sh/uv/getting-started/installation/ then go to the pipeline folder:
-
-```bash
-cd pipeline
-```
-
-Install Python (3.11 or newer; `uv` fetches one if missing) and all dependencies, creating `pipeline/.venv`:
-
-```bash
-uv sync
-```
-
-Run every later command from `pipeline/` unless stated otherwise.
-
-
-### Raw data
-
-Raw data is git-ignored and only needed to run the pipeline. Put each file at the path below (relative to the repo root). Full provenance is in [docs/data_sources.md](docs/data_sources.md).
-
-- HiRISE DTM, `data/raw/hirise/DTEEC_009149_1750_009294_1750_U01.IMG` (~390 MB), plus its label `DTEEC_009149_1750_009294_1750_U01.LBL` in the same folder: https://hirise-pds.lpl.arizona.edu/PDS/DTM/PSP/ORB_009100_009199/PSP_009149_1750_PSP_009294_1750/DTEEC_009149_1750_009294_1750_U01.IMG
-- HiRISE orthoimage, `data/raw/hirise/PSP_009149_1750_RED_A_01_ORTHO.JP2` (~388 MB): https://hirise-pds.lpl.arizona.edu/PDS/DTM/PSP/ORB_009100_009199/PSP_009149_1750_PSP_009294_1750/PSP_009149_1750_RED_A_01_ORTHO.JP2
-- THEMIS thermal inertia, Gale crop of the 100 m mosaic, `data/raw/themis/THEMIS_TI_Mosaic_Quant_30S120E_100mpp_gale_crop.tif` (small). Source mosaic: https://astrogeology.usgs.gov/search/map/themis_thermal_inertia_mosaic_quantitative_30s120e_100mpp (the crop is cut from it around Gale Crater).
-- CRISM MTRDR summary parameters (SR), each as `.img`, `.hdr`, `.lbl` and `.xml` (~130 MB per `.img`), in `data/raw/crism/`: `frt0000b6f1_07_sr165j_mtr3.*` (observation FRT0000B6F1, primary) and `frt000058a3_07_sr165j_mtr3.*` (observation FRT000058A3, cross-check). Source: https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/
-- Curiosity RAD and REMS files, in `data/raw/msl_environment/` (`rad/`, `rad_spe_sol4190/`, `rems/`), for the environment timeline. Sources: PDS Geosciences Node (RAD) https://pds-geosciences.wustl.edu/ and PDS Atmospheres Node (REMS) https://pds-atmospheres.nmsu.edu/
-- Gale regional image: nothing to download. It is read over HTTP at run time from the USGS Viking MDIM 2.1 mosaic (https://planetarymaps.usgs.gov/mosaic/Mars_Viking_MDIM21_ClrMosaic_global_232m.tif), so the run needs internet.
-
-HiRISE files are large and the server can drop the connection. Resume an interrupted download with `curl -C -`, for example for the orthoimage:
-
-```bash
-curl -C - -L -o data/raw/hirise/PSP_009149_1750_RED_A_01_ORTHO.JP2 "https://hirise-pds.lpl.arizona.edu/PDS/DTM/PSP/ORB_009100_009199/PSP_009149_1750_PSP_009294_1750/PSP_009149_1750_RED_A_01_ORTHO.JP2"
-```
-
-There is no fetch script yet; download by hand.
-
-
-### Run the pipeline
-
-From `pipeline/`:
-
-```bash
-uv run python run.py
-```
-
-It first checks the walking-time test vectors, then runs each step and prints a timestamped line per step. It takes a few minutes; the Gale image is read over the network. It writes to `data/processed/` (formats in [docs/contracts.md](docs/contracts.md), section 2):
-- `meta.json`
-- `heightmap.bin`, `slope_degrees.bin`, `roughness_m.bin`, `traversal_penalty.bin`, `return_field.bin`, `sky_view_factor.bin`, `thermal_inertia.bin` (float32 grids)
-- `mineralogy_class.bin`, `viewshed_rover.bin` (uint8 grids)
-- `texture_hirise.jpg`, `gale_context.jpg`
-- `rocks.json`, `knots.json`, `shelters.json`, `environment_timeline.json`
-
-Processed files are committed to git (D-022), so commit them on your branch when the output changes.
-
-
-### Run the validator
-
-From `pipeline/`:
-
-```bash
-uv run python validate/run.py
-```
-
-It prints one line per check, starting with `PASS` or `FAIL` and the reason, then a final `SUMMARY:` line. The exit code is 0 only if every check passes (the Stage 1 gate needs this). Optional: `--processed-dir PATH` checks another folder. On an empty or partial `data/processed/` it fails, which is expected.
-
-
-### Run the tests
-
-From `pipeline/`:
-
-```bash
-uv run pytest
-```
-
-Add `-q` for short output. pytest is configured in `pipeline/pyproject.toml`. No raw data or network is needed: the tests use small synthetic inputs. They cover the 8 walking-time test vectors (contracts.md 4.5), the validator, the Gale regional crop, rock detection, sky-view and shelters, and the CRISM mineralogy classes.
-
-
-### App setup
-
-Install Node.js 20 or newer (24 LTS recommended) from https://nodejs.org/ then go to the app folder:
-
-```bash
-cd app
-```
-
-Install the exact pinned dependencies (creates `app/node_modules`):
-
-```bash
-npm ci
-```
-
-Run every later command from `app/`. Each of `dev`, `build` and `test` first copies the files the app reads from `data/processed/` into `app/public/data/` (git-ignored), so pull `dev` first to get the data.
-
-Start the app with hot reload at http://localhost:5173:
-
-```bash
-npm run dev
-```
-
-Run the tests (walking-time and load factor vectors, routing, the Knot-to-rover cross-check on the real data, the science plan, layers, the Thread, the clock):
-
-```bash
-npm test
-```
-
-Type-check without building:
-
-```bash
-npm run typecheck
-```
-
-Build the static site into `app/dist/` and print its size (raw and gzip) against the ~30 MB budget:
-
-```bash
-npm run build
-```
-
-```bash
-npm run payload
-```
-
-Serve the production build locally to check it:
-
-```bash
-npm run preview
-```
-
-`roughness_m.bin` is not copied into the app: it is not displayed and leaving it out keeps the payload inside the budget. To ship another processed file, add it to `app/scripts/copyProcessedData.mjs`.
-
-
-### Troubleshooting
-
-- `ModuleNotFoundError: No module named 'ariadne_pipeline'`: you are not in `pipeline/`. Run `cd pipeline` first and use `uv run ...`.
-- `uv: command not found`: install `uv` and open a new terminal so it is on your PATH.
-- `run.py` stops early with a missing file error: a raw input is not at the exact path listed in "Raw data". A HiRISE file that is too small means the download dropped; resume it with `curl -C -`.
-- The regional (Gale) step fails or hangs: it needs internet to read the USGS mosaic. Check your connection and run again.
-- The validator prints many `FAIL ... missing file` lines: `data/processed/` is empty or partial. Run the pipeline, or `git pull` to get the committed files.
-- `copy-data: ... meta.json not found` when starting the app: `data/processed/` is missing. Pull `dev` to get it.
-- The app shows "Could not load the Marswalk data": run `npm run copy-data` from `app/` and reload the page.
-
-
-## Team and workflow
-
-Roles:
-- Lawrence Lian Anak Matius Ding (Team Leader, Person A): Stage 1, data and algorithms pipeline. Branch `dev-lawrence`.
-- Malissa (Person B): Stage 2, app shell, Labyrinth view, Planning Table, runtime routing, Thread rendering. Branch `dev-malissa`.
-- Letta (Person C): Stage 3, Suit HUD, alerts, Knot cards, simulation clock and scenario engine, CRT polish, demo and pitch. Branch `dev-letta`.
-
-Work runs in sequential stages (0, 1, 2, 3). A stage starts only when the previous gate is passed: contract validator passes, visual check done, handoff checklist ticked, human sign-off.
-
-Branch flow:
-- `main` is production and `dev` is integration. Only Lawrence merges into them.
-- Update your `dev-{firstname}` branch from `dev` before starting.
-- Work and commit only on your own branch.
-- When your gate passes, push your branch and tell Lawrence.
-- Lawrence merges into `dev`, runs the integration check, then merges `dev` into `main`.
-
-Each teammate uses an agentic coding tool whose main agent can delegate to sub-agents. All rules for agents and humans are in [AGENTS.md](AGENTS.md).
-
-
-## Status
-
-Current stage, gate checklists, known issues and next steps: [docs/handoff.md](docs/handoff.md).
-
-
 ## Space Apps submission
-
-Prerequisite: every team member must be added to the team on spaceappchallenge.org before submitting. Deadline: 14 November 2026, 12 pm.
 
 Tagline:
 
@@ -259,38 +111,60 @@ Project summary (197 words; the form suggests 50 to 200):
 >
 > Exploration succeeds only when explorers return with discoveries. ARIADNE balances both at every step.
 
-Update "we are building" to "we built" once Stages 2 and 3 are merged.
 
+## For developers
 
-## Documentation map
+To set up, run and test everything, see [docs/getting_started.md](docs/getting_started.md). All rules for agents and humans are in [AGENTS.md](AGENTS.md), and the current stage, gate checklists and next steps are in [docs/handoff.md](docs/handoff.md).
 
+Roles:
+- Lawrence Lian Anak Matius Ding (Team Leader): Stage 1, data and algorithms pipeline. Branch `dev-lawrence`.
+- Malissa: Stage 2, app shell, Labyrinth view, Planning Table, routing, Thread. Branch `dev-malissa`.
+- Letta: Stage 3, Suit HUD, alerts, simulation clock, demo and pitch. Branch `dev-letta`.
+
+Branch flow:
+- Work only on your own `dev-{firstname}` branch, updated from `dev` before you start.
+- When your stage gate passes, push and tell Lawrence.
+- Lawrence merges into `dev`, runs the integration check, then merges `dev` into `main`.
+
+Documentation map:
 - [AGENTS.md](AGENTS.md): the single instruction file for every agent and human (read order, directory map, ownership, git workflow, rules).
 - [CLAUDE.md](CLAUDE.md): only imports `AGENTS.md` for Claude Code.
-- [docs/system_design.md](docs/system_design.md): architecture, local grid, components, algorithms, UX principles, visual identity, design rationale.
+- [docs/getting_started.md](docs/getting_started.md): setup, run and test commands for the pipeline and the app.
+- [docs/system_design.md](docs/system_design.md): architecture, local grid, components, algorithms, UX principles, design rationale.
 - [docs/contracts.md](docs/contracts.md): exact file formats between stages, walking-time formula, test vectors.
 - [docs/data_sources.md](docs/data_sources.md): every dataset with product ID, URL, resolution, licence and status.
 - [docs/decisions.md](docs/decisions.md): append-only decision log.
-- [docs/handoff.md](docs/handoff.md): current stage, gate checklists, known issues, hand-off notes and next steps.
+- [docs/handoff.md](docs/handoff.md): current stage, gate checklists, known issues and next steps.
 - [docs/development_conventions.md](docs/development_conventions.md): code, doc and git conventions.
-- [docs/log/person_a.md](docs/log/person_a.md): session log for Lawrence (Person A).
-- [docs/log/person_b.md](docs/log/person_b.md): session log for Malissa (Person B).
-- [docs/log/person_c.md](docs/log/person_c.md): session log for Letta (Person C).
-- [docs/images/stage1_overlay_check.png](docs/images/stage1_overlay_check.png): Stage 1 output preview (no-go zones, rocks, Knots, rover, Thread contours on the HiRISE photo).
+- [docs/log/person_a.md](docs/log/person_a.md), [docs/log/person_b.md](docs/log/person_b.md), [docs/log/person_c.md](docs/log/person_c.md): session logs for Lawrence, Malissa and Letta.
+
+Repository map:
+- `docs/`: design, contracts, data sources, decisions, handoff, per-person logs and images.
+- `pipeline/`: Python data pipeline (Stage 1). Python via `uv`: rasterio (GDAL), numpy, scipy, scikit-image.
+- `app/`: React, Vite, TypeScript, Zustand, Tailwind and React Three Fiber (Stages 2 and 3), built. It is a static site; the hosting platform is not decided yet. The app works only in a local metre grid.
+- `data/`: `raw/` (git-ignored downloads), `processed/` (pipeline outputs, committed), `reference/` (app reference data such as the real solar storm dose curve).
 
 
-## Repository map
+## License and data credits
 
-- `AGENTS.md`, `CLAUDE.md`: agent instructions (full directory map in [AGENTS.md](AGENTS.md)).
-- `docs/`: design, contracts, data sources, decisions, handoff and per-person logs.
-- `pipeline/`: Python data pipeline (Person A), Stage 1 code and tests. Python via `uv`, GDAL/rasterio, numpy, richdem, scikit-image.
-- `app/`: React, Vite, TypeScript, Zustand, Tailwind and React Three Fiber (Persons B and C), placeholder for now. Static hosting (Netlify). The app works only in a local metre grid.
-- `data/`: `raw/` (git-ignored downloads) and `processed/` (pipeline outputs, committed).
+The ARIADNE code is under the MIT License. See [LICENSE](LICENSE).
 
+The data and images are not covered by the MIT License. They stay under their providers' terms. NASA data and imagery are generally not copyrighted in the United States, but NASA asks for credit and does not endorse this project. Use the credit line given for each source below.
 
-## Credits and data
+Datasets and images:
 
-ARIADNE uses data and tools from NASA/JPL (Mars Trek, Curiosity RAD and REMS via the Planetary Data System, DONKI), the USGS, and the University of Arizona HiRISE team (HiRISE images and DTMs).
+- HiRISE orthoimage `PSP_009149_1750_RED_A_01_ORTHO` (texture, and the input to rock detection). Credit: NASA/JPL/University of Arizona.
+- HiRISE terrain model `DTEEC_009149_1750_009294_1750_U01` (slope, roughness and the 3D view). Credit: NASA/JPL/University of Arizona.
+- MRO CRISM summary parameters `FRT0000B6F1_07_SR165J_MTR3` and `FRT000058A3_07_SR165J_MTR3` (mineral context). Credit: NASA/JPL/JHUAPL MRO CRISM team, via the PDS Geosciences Node. Summary parameters: Viviano-Beck et al. (2014), JGR Planets 119, doi:10.1002/2014JE004627.
+- THEMIS thermal inertia mosaic `THEMIS_TI_Mosaic_Quant_30S120E_100mpp` (context). Credit: Mars Odyssey THEMIS, ASU/USGS (USGS Astropedia, public domain). Please also cite Fergason, Christensen and Kieffer (2006), JGR 111, E12004, doi:10.1029/2006JE002735, and Edwards et al. (2011), JGR 116, E10009.
+- Curiosity REMS weather, `RME_820012645RMD47600000000_______P1` (sol 4760), dataset `MSL-M-REMS-5-MODRDR-V1.0`. Credit: NASA/JPL-Caltech, MSL REMS (CAB, Spain), via the NASA PDS Atmospheres Node.
+- Curiosity RAD radiation, `RAD_RDR_2025_360_10_42_4760_V00` (sol 4760) and `RAD_RDR_2024_140_18_30_4190_V00` (sol 4190), dataset `MSL-M-RAD-3-RDR-V1.0`. Credit: NASA/JPL-Caltech, MSL RAD (SwRI, DLR), via the NASA PDS Planetary Plasma Interactions Node.
+- NASA DONKI space weather, CME `2024-05-20T05:36:00-CME-001`. Credit: NASA CCMC DONKI. Event facts: NASA/JPL news.
+- Curiosity Navcam photos (14 images, sols 4210 to 4650, in `app/public/knots/`), from the NASA Curiosity raw image archive, https://mars.nasa.gov/msl-raw-images/. Credit: NASA/JPL-Caltech.
+- Curiosity traverse waypoints `MSL_waypoints.json` (stop positions and sols). Credit: NASA/JPL-Caltech. Source: https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/MSL_waypoints.json
+- Gale regional image from the Viking MDIM 2.1 colorized global mosaic, `Mars_Viking_MDIM21_ClrMosaic_global_232m`. Credit: NASA/JPL/USGS Astrogeology Science Center (public domain).
+- Sun position and Mars time, Mars24 algorithm (no dataset). Credit: NASA GISS.
 
-- All data is used according to the terms of its provider.
-- Licences and attributions are tracked per dataset in [docs/data_sources.md](docs/data_sources.md).
-- ARIADNE is a hackathon project and is not an official NASA product.
+Product IDs, processing and status for each dataset are in [docs/data_sources.md](docs/data_sources.md).
+
+This project is not affiliated with or endorsed by NASA.

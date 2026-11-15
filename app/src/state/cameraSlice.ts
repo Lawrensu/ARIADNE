@@ -9,7 +9,14 @@
 
 import type { StateCreator } from "zustand";
 
+import { shortestAngleDeltaDeg } from "../scene/navigationCamera";
 import type { AriadneState } from "./store";
+
+
+
+// Smaller changes of the view heading are not written to the store (0.2 degrees is far below what the
+// compass shows: its number rounds to whole degrees).
+const VIEW_HEADING_WRITE_THRESHOLD_DEG = 0.2;
 
 
 
@@ -39,6 +46,12 @@ export interface CameraSlice {
     // in the visible part of the map.
     followScreenOffsetXPx: number;
     setFollowScreenOffsetXPx: (offsetPx: number) => void;
+
+    // The first-person camera's own smoothed heading in degrees (0 = north, clockwise), written every
+    // frame by FirstPersonCamera, or null when no first-person camera is mounted. The visor compass
+    // shows this, so it shows what the astronaut actually sees.
+    viewHeadingDeg: number | null;
+    setViewHeadingDeg: (headingDeg: number | null) => void;
 }
 
 
@@ -51,6 +64,23 @@ export const createCameraSlice: StateCreator<AriadneState, [], [], CameraSlice> 
     followPausedByUser: false,
     lastMapInteractionAtRealSeconds: null,
     followScreenOffsetXPx: 0,
+    viewHeadingDeg: null,
+
+    // Called every frame by the first-person camera: writes only when the heading moved by more than
+    // VIEW_HEADING_WRITE_THRESHOLD_DEG (or to or from null), so subscribers are not woken needlessly.
+    setViewHeadingDeg: (headingDeg) => {
+        const current = get().viewHeadingDeg;
+        if (headingDeg === null || current === null) {
+            if (current !== headingDeg) {
+                set({ viewHeadingDeg: headingDeg });
+            }
+            return;
+        }
+        if (Math.abs(shortestAngleDeltaDeg(current, headingDeg)) <= VIEW_HEADING_WRITE_THRESHOLD_DEG) {
+            return;
+        }
+        set({ viewHeadingDeg: headingDeg });
+    },
 
     setFollowScreenOffsetXPx: (offsetPx) => {
         if (get().followScreenOffsetXPx === offsetPx) {

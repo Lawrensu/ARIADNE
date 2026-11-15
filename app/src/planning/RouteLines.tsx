@@ -9,6 +9,7 @@ import { useMemo } from "react";
 
 import { LINE_CASING_COLOUR, LINE_CASING_EXTRA_WIDTH_PX, LINE_CASING_OPACITY, LINE_RENDER_ORDER, MAP_COLOURS } from "../scene/mapStyle";
 import { MapLabel } from "../scene/MapLabel";
+import { lineLiftM, useSceneLineStyle } from "../scene/sceneLineStyle";
 import { useScreenSpaceDashes } from "../scene/useScreenSpaceDashes";
 import type { RouteOptionId, RoutePlan } from "../state/routeSlice";
 import { useAriadneStore } from "../state/store";
@@ -54,9 +55,9 @@ const LABEL_SAMPLE_WIDTH_PX = 26;
 
 
 
-function routeScenePoints(plan: RoutePlan, frame: TerrainFrame): [number, number, number][] {
+function routeScenePoints(plan: RoutePlan, frame: TerrainFrame, liftM: number): [number, number, number][] {
     return plan.path_positions.map((position) => {
-        const y = sampleTerrainSceneY(frame, position.x_m, position.z_m) + ROUTE_LIFT_ABOVE_TERRAIN_M;
+        const y = sampleTerrainSceneY(frame, position.x_m, position.z_m) + liftM;
         return [position.x_m, y, position.z_m] as [number, number, number];
     });
 }
@@ -64,7 +65,9 @@ function routeScenePoints(plan: RoutePlan, frame: TerrainFrame): [number, number
 
 function RouteLine({ plan, isSelected }: { plan: RoutePlan; isSelected: boolean }) {
     const { frame } = useTerrain();
-    const points = useMemo(() => routeScenePoints(plan, frame), [plan, frame]);
+    const lineStyle = useSceneLineStyle();
+    const liftM = lineLiftM(ROUTE_LIFT_ABOVE_TERRAIN_M, lineStyle);
+    const points = useMemo(() => routeScenePoints(plan, frame, liftM), [plan, frame, liftM]);
 
     if (points.length < 2) {
         return null;
@@ -90,7 +93,8 @@ function RouteLine({ plan, isSelected }: { plan: RoutePlan; isSelected: boolean 
                 points={points}
                 color={LINE_CASING_COLOUR}
                 lineWidth={lineWidth + LINE_CASING_EXTRA_WIDTH_PX}
-                depthTest={false}
+                depthTest={lineStyle.depth_test}
+                depthWrite={false}
                 renderOrder={LINE_RENDER_ORDER.route_casing + renderOffset}
                 transparent
                 opacity={LINE_CASING_OPACITY}
@@ -103,7 +107,8 @@ function RouteLine({ plan, isSelected }: { plan: RoutePlan; isSelected: boolean 
                 dashed
                 dashSize={pattern.dash_px}
                 gapSize={pattern.gap_px}
-                depthTest={false}
+                depthTest={lineStyle.depth_test}
+                depthWrite={false}
                 renderOrder={LINE_RENDER_ORDER.route_line + renderOffset}
                 transparent
                 opacity={1}

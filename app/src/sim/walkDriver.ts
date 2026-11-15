@@ -22,19 +22,22 @@ import type { SciencePlan } from "../state/scienceSlice";
 import { useAriadneStore } from "../state/store";
 import type { AriadneState } from "../state/store";
 import type { WalkPhase } from "../state/walkSlice";
+import { computeRoverMeet } from "./roverMeet";
 import { dueEvents, SOLAR_STORM_SCENARIO } from "./scenarioEngine";
 import type { ScenarioEvent } from "./scenarioEngine";
 import type { WalkTimeline } from "./walkTimeline";
-import { buildWalkTimeline, earlyDepartureShiftSeconds, tasksFinishedBetween, walkStateAt } from "./walkTimeline";
+import { buildWalkTimeline, smoothWalkPath, earlyDepartureShiftSeconds, tasksFinishedBetween, walkStateAt } from "./walkTimeline";
 
 
 
-// Simulated seconds per real second while the demo plays (one sim hour per real minute).
-export const DEMO_SIM_SPEED = 60;
+// Simulated seconds per real second while the demo plays: real time (1x); raise the speed in the clock controls.
+export const DEMO_SIM_SPEED = 1;
 // A new breadcrumb point every this many metres walked.
 const TRAIL_SPACING_M = 8;
 const ASTRONAUT_ENDPOINT_ID = "astronaut_position";
 const SHELTERED_ALERT_ID = "walk_arrived_in_shelter";
+const ROVER_SHELTER_ID = "shelter_rover";
+const STAGING_POINT_KIND = "staging_point";
 
 
 
@@ -112,10 +115,37 @@ export async function rerouteWalkTo(target: RouteEndpoint, atSimSeconds: number)
         return;
     }
 
-    const path: LocalPosition[] = [from, ...route.path_positions];
+    // The walked path is smoothed like the plan legs (walkTimeline.ts smoothWalkPath).
+    const path: LocalPosition[] = smoothWalkPath([from, ...route.path_positions]);
     const lastPoint = path[path.length - 1];
     if (lastPoint.x_m !== target.position.x_m || lastPoint.z_m !== target.position.z_m) {
         path.push(target.position);
+    }
+
+    const loadedWalkingTimeS = route.walking_time_s * currentLoadFactor(after, processedData);
+
+    // The rover is the shelter: it drives out and meets the astronaut on the way (D-033, roverMeet.ts).
+    const isRoverTarget = target.endpoint_id === ROVER_SHELTER_ID || target.endpoint_kind === STAGING_POINT_KIND;
+    if (isRoverTarget) {
+        const meet = computeRoverMeet(path, loadedWalkingTimeS, atSimSeconds);
+        after.setWalkDetour({
+            started_at_sim_seconds: atSimSeconds,
+            path_positions: meet.astronaut_path,
+            walking_time_s: meet.astronaut_walk_time_s,
+            target_kind: target.endpoint_kind,
+            target_id: target.endpoint_id,
+            target_label: "Rover (meets you)",
+            phase_on_arrival: "sheltering",
+            rover_drive: {
+                path_positions: meet.rover_path,
+                depart_at_sim_seconds: meet.rover_depart_at_sim_seconds,
+                arrive_at_sim_seconds: meet.rover_arrive_at_sim_seconds,
+                meet_position: meet.meet_position,
+                is_estimate: true,
+            },
+            is_estimate: true,
+        });
+        return;
     }
 
     let phaseOnArrival: WalkPhase = "sheltering";
@@ -126,7 +156,7 @@ export async function rerouteWalkTo(target: RouteEndpoint, atSimSeconds: number)
     after.setWalkDetour({
         started_at_sim_seconds: atSimSeconds,
         path_positions: path,
-        walking_time_s: route.walking_time_s * currentLoadFactor(after, processedData),
+        walking_time_s: loadedWalkingTimeS,
         target_kind: target.endpoint_kind,
         target_id: target.endpoint_id,
         target_label: target.label,
@@ -141,7 +171,7 @@ function severityForEvent(eventType: string): AlertSeverity {
     if (eventType === "solar_particle_event_alert") {
         return "no_go";
     }
-    if (eventType === "reroute_to_shelter") {
+    if (eventType === "reroute_to_shelter" || eventType === "space_weather_watch") {
         return "caution";
     }
     return "go";
@@ -250,7 +280,10 @@ function runScenarioStep(previousSimSeconds: number, simSeconds: number): number
 }
 
 
-function shelteredMessage(targetId: string, targetLabel: string): string {
+function shelteredMessage(targetId: string, targetLabel: string, isRoverDrive: boolean): string {
+    if (isRoverDrive) {
+        return "Aboard the rover: sheltered. Hold until the dose rate falls.";
+    }
     if (targetId === "shelter_rover") {
         return "Sheltered in the rover.";
     }
@@ -319,7 +352,7 @@ function runWalkStep(previousSimSeconds: number, simSeconds: number): void {
             alert_id: SHELTERED_ALERT_ID,
             alert_type: "sheltered",
             severity: "go",
-            what_happened: shelteredMessage(detour.target_id, detour.target_label),
+            what_happened: shelteredMessage(detour.target_id, detour.target_label, detour.rover_drive != null),
             recommended_action: "Stay inside until the dose rate falls; check it under Conditions.",
             distance_m: 0,
             time_s: 0,

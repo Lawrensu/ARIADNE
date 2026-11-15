@@ -8,6 +8,8 @@ import { Html } from "@react-three/drei";
 import type { ReactNode } from "react";
 
 import { MAP_COLOURS } from "../scene/mapStyle";
+import { roverPhaseWord } from "../scene/markers";
+import { useRoverState } from "../scene/RoverMarker";
 import { useAriadneStore } from "../state/store";
 import { sampleTerrainSceneY } from "../terrain/terrainFrame";
 import { useTerrain } from "../terrain/TerrainContext";
@@ -115,11 +117,19 @@ function FloatingMarker({ shape, name, x_m, z_m, colour, isEmphasised }: Floatin
 export function VisorWorldMarkers({ target }: VisorWorldMarkersProps) {
     const processedData = useAriadneStore((state) => state.processedData);
     const walkDetour = useAriadneStore((state) => state.walkDetour);
+    const roverState = useRoverState();
 
-    if (processedData === null) {
+    if (processedData === null || roverState === null) {
         return null;
     }
-    const rover = processedData.meta.staging_point;
+    // The rover plate follows the live rover (parked, driving, or with the crew), D-033.
+    const rover = roverState.position;
+    let roverName = "Rover";
+    const roverWord = roverPhaseWord(roverState.phase);
+    if (roverWord !== "") {
+        roverName = `Rover ${roverWord}`;
+    }
+    const isRoverAway = roverState.phase !== "parked";
 
     // The rover is the shelter target when rerouted to it: show one marker, not two.
     let isRoverTheTarget = false;
@@ -139,7 +149,7 @@ export function VisorWorldMarkers({ target }: VisorWorldMarkersProps) {
                     isEmphasised={true}
                 />
             )}
-            {target !== null && target.kind === "shelter" && (
+            {target !== null && target.kind === "shelter" && !(isRoverTheTarget && isRoverAway) && (
                 <FloatingMarker
                     shape={isRoverTheTarget ? "rover" : "shelter"}
                     name={target.label}
@@ -149,10 +159,21 @@ export function VisorWorldMarkers({ target }: VisorWorldMarkersProps) {
                     isEmphasised={true}
                 />
             )}
+            {isRoverTheTarget && isRoverAway && (
+                // The rover is the target and has left its parking place: one emphasised plate on the live rover.
+                <FloatingMarker
+                    shape="rover"
+                    name={roverName}
+                    x_m={rover.x_m}
+                    z_m={rover.z_m}
+                    colour={MAP_COLOURS.no_go}
+                    isEmphasised={true}
+                />
+            )}
             {!isRoverTheTarget && (
                 <FloatingMarker
                     shape="rover"
-                    name="Rover"
+                    name={roverName}
                     x_m={rover.x_m}
                     z_m={rover.z_m}
                     colour={MAP_COLOURS.phosphor_green}

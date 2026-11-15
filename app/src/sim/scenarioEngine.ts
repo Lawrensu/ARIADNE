@@ -161,3 +161,70 @@ export function minutesSinceStormOnset(simElapsedSeconds: number): number {
     const onsetSeconds = solarStormOnsetSimSeconds(SOLAR_STORM_SCENARIO);
     return (simElapsedSeconds - onsetSeconds) / SECONDS_PER_MINUTE;
 }
+
+
+
+
+// Storm countdown for the HUDs (D-033), from the scenario's space weather watch and storm alert events.
+// "none": no watch yet. "watch": a space weather watch is on, the storm is expected at
+// storm_at_sim_seconds. "active": the storm has started.
+export type StormCountdownPhase = "none" | "watch" | "active";
+
+
+export interface StormCountdown {
+    phase: StormCountdownPhase;
+    storm_at_sim_seconds: number | null;
+    // Seconds until the expected storm (watch phase), else null. Estimate.
+    seconds_to_storm: number | null;
+    is_estimate: true;
+}
+
+
+function firstEventOfType(scenario: ScenarioDefinition, eventType: string): ScenarioEvent | null {
+    for (const event of scenario.events) {
+        if (event.event_type === eventType) {
+            return event;
+        }
+    }
+    return null;
+}
+
+
+// "none" before the watch or while the scenario is not running; "watch" from the watch until the
+// storm alert; "active" from the alert on. The expected storm time comes from the watch payload
+// (storm_expected_at_sim_seconds), falling back to the alert time. Without a watch event the phase
+// goes straight from "none" to "active".
+export function stormCountdownAt(scenario: ScenarioDefinition, simSeconds: number, isScenarioRunning: boolean): StormCountdown {
+    const watchEvent = firstEventOfType(scenario, "space_weather_watch");
+    const alertEvent = firstEventOfType(scenario, "solar_particle_event_alert");
+
+    let stormAt: number | null = null;
+    if (watchEvent !== null && typeof watchEvent.payload.storm_expected_at_sim_seconds === "number") {
+        stormAt = watchEvent.payload.storm_expected_at_sim_seconds;
+    } else if (alertEvent !== null) {
+        stormAt = alertEvent.at_sim_seconds;
+    }
+
+    const none: StormCountdown = { phase: "none", storm_at_sim_seconds: stormAt, seconds_to_storm: null, is_estimate: true };
+    if (!isScenarioRunning || !Number.isFinite(simSeconds)) {
+        return none;
+    }
+
+    // The alert time is the boundary between "watch" and "active"; the payload time only feeds the countdown.
+    let activeFromSeconds = stormAt;
+    if (alertEvent !== null) {
+        activeFromSeconds = alertEvent.at_sim_seconds;
+    }
+    if (activeFromSeconds !== null && simSeconds >= activeFromSeconds) {
+        return { phase: "active", storm_at_sim_seconds: stormAt, seconds_to_storm: null, is_estimate: true };
+    }
+    if (watchEvent !== null && simSeconds >= watchEvent.at_sim_seconds && stormAt !== null) {
+        return {
+            phase: "watch",
+            storm_at_sim_seconds: stormAt,
+            seconds_to_storm: Math.max(stormAt - simSeconds, 0),
+            is_estimate: true,
+        };
+    }
+    return none;
+}

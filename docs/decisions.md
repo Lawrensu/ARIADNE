@@ -374,6 +374,20 @@ Rules:
 - Alternatives considered: third-person visor; display-only visor with keyboard keys; separate unsynced pages; `/` opening the tablet directly.
 - Affects docs: app/design/visual_direction.md, docs/system_design.md, docs/handoff.md, README.md
 
+
+### D-033: Storm watch 30 minutes ahead; the rover drives out to meet the astronaut
+
+- Date: 2026-11-15
+- Status: accepted (Lawrence)
+- Decision:
+  1. The scenario adds a "space_weather_watch" event 30 minutes before the solar storm (4900 s, storm at 6700 s). From the watch the tablet and the visor show a live countdown ("STORM IN 14 MIN est."), then "STORM ACTIVE".
+  2. When the storm arrives, the science plan stops and the pressurised rover drives out along the astronaut's route back (est. about 7 km/h after about 2 min to start) while the astronaut walks towards it; they meet where both arrive at the same time, the astronaut boards and shelters in the rover. A [ROUTE] to the rover shelter does the same.
+  3. The rover moves on the tablet map, in the visor world and on the visor minimap; rover numbers are labelled est.
+  4. The default simulation speed is real time (1x), for the clock and for "Run demo scenario"; the presenter raises it in the clock controls.
+- Why: Real solar flares are seen minutes to an hour before the protons arrive, so a watch is plausible and gives the crew time to stay close to the route back. A pressurised rover is a mobile shelter (Artemis-style surface operations), and driving out shortens the astronaut's exposure compared with walking all the way back.
+- Alternatives considered: countdown for the presenter only; a 15 minute watch; walking back to the parked rover (D-030); the nearest shelter of any kind (overhangs protect poorly).
+- Affects docs: docs/contracts.md 3.15 (new event_type values, format unchanged), docs/system_design.md, docs/handoff.md, README.md (demo story)
+
 ## Open questions (Stage 0)
 
 Status 2026-11-14: questions 1 to 10 and 12 to 21 are resolved by D-017 to D-025. Question 11 (colour palette) stays with Person C.

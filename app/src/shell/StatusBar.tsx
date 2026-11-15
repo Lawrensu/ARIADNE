@@ -17,6 +17,7 @@ import { computeConsumablesState, SIM_SPEED_PRESETS } from "../sim/clock";
 import { environmentSampleAt, formatMarsLocalTime } from "../sim/environment";
 import { useAriadneStore } from "../state/store";
 import { HAZARD_STATE_LABELS, hazardStateColour, StateShape } from "../theme/StateBadge";
+import { StormCountdownChip } from "./StormCountdownChip";
 
 
 
@@ -253,6 +254,7 @@ export function StatusBar() {
         >
             <MarsTimeCell />
             <ClockCell />
+            <StormCountdownChip />
             <SuitReadings />
         </footer>
     );

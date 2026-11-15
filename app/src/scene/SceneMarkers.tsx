@@ -20,8 +20,11 @@ import {
     currentObjectiveMarkerId,
     isMarkerEmphasised,
     markerIdForTarget,
+    ROVER_MARKER_ID,
+    roverMarkerLabel,
     shouldShowMarkerLabel,
 } from "./markers";
+import { RoverDriveLine, RoverParkedMarker, useRoverState } from "./RoverMarker";
 
 
 
@@ -155,7 +158,20 @@ function MarkerPin({
 
 export function SceneMarkers({ onMarkerSelect }: { onMarkerSelect?: MarkerSelectHandler }) {
     const { processedData } = useTerrain();
-    const markers = useMemo(() => buildSceneMarkers(processedData), [processedData]);
+    const plannedMarkers = useMemo(() => buildSceneMarkers(processedData), [processedData]);
+    // The rover marker follows roverStateAt: parked at the staging point, driving, or with the crew (D-033).
+    const rover = useRoverState();
+    const markers = useMemo(() => {
+        if (rover === null) {
+            return plannedMarkers;
+        }
+        return plannedMarkers.map((marker) => {
+            if (marker.marker_id !== ROVER_MARKER_ID) {
+                return marker;
+            }
+            return { ...marker, label: roverMarkerLabel(rover.phase), position: { ...rover.position } };
+        });
+    }, [plannedMarkers, rover]);
     const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);
 
     const walkDetour = useAriadneStore((state) => state.walkDetour);
@@ -193,6 +209,8 @@ export function SceneMarkers({ onMarkerSelect }: { onMarkerSelect?: MarkerSelect
 
     return (
         <>
+            <RoverParkedMarker />
+            <RoverDriveLine />
             {markers.map((marker) => (
                 <MarkerPin
                     key={marker.marker_id}

@@ -10,6 +10,7 @@ import { runDemoScenario, startWalkNow } from "../sim/walkDriver";
 import { useAriadneStore } from "../state/store";
 import type { WalkPhase } from "../state/walkSlice";
 import { selectMode } from "./modes";
+import { formatNextScenarioEvent } from "./stormCountdownText";
 import { useDismiss } from "./useDismiss";
 
 
@@ -52,10 +53,22 @@ function ScenarioStatusLine() {
         walkText = `To ${walkDetour.target_label}`;
     }
 
+    // For the presenter: what fires next and when (simulation time).
+    let nextEventText: string | null = null;
+    if (scenarioStatus === "running" && progress.next_event_at_sim_seconds !== null) {
+        const nextEvent = SOLAR_STORM_SCENARIO.events[scenarioEventIndex];
+        if (nextEvent !== undefined) {
+            nextEventText = formatNextScenarioEvent(nextEvent.event_type, progress.next_event_at_sim_seconds);
+        }
+    }
+
     return (
         <dl className="grid grid-cols-[5.5rem_1fr] gap-x-2 gap-y-1 text-sm">
             <dt className="text-ariadne-dim">Scenario</dt>
-            <dd className="text-ariadne-data">{scenarioText}</dd>
+            <dd>
+                <span className="text-ariadne-data">{scenarioText}</span>
+                {nextEventText !== null && <span className="block text-xs text-ariadne-dim">{nextEventText}</span>}
+            </dd>
             <dt className="text-ariadne-dim">You</dt>
             <dd>
                 <span className="text-ariadne-data">{walkText}</span>

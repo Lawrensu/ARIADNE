@@ -34,7 +34,7 @@ Evidence it works:
 - DTM slope matches Curiosity's measured tilt at 205 stops (median 8.8° vs 8.4°), so slope rules are trustworthy (D-019).
 - All 5 Knots are 11 to 26 minutes' walk from the rover, and 79.4% of the patch is reachable from it.
 - Walking speed is anchored to Apollo's maximum nominal suited speed (~1.0 m/s). Consumables follow Artemis 8 hour EVA planning (D-020).
-- Built only from public NASA data, checked by a validator (46 of 46 checks) and 63 tests.
+- Built only from public NASA data, checked by a validator (47 of 47 checks) and 68 tests.
 
 Honest limits:
 
@@ -72,6 +72,56 @@ Honest limits:
 Data flows one way: pipeline to processed files to app. The app never writes back and never reads raw data.
 
 
+## Technology stack
+
+ARIADNE is two parts. A Python pipeline turns NASA data into small files once, offline. A static web app reads those files. There is no server, no database and no accounts, so the demo cannot fail on a network or a backend (D-014). Every choice below serves the goals in "Goals" (light, accurate, hard to break), one astronaut on one ~2 × 2 km patch, a team of three, and 48 hours. Versions are from `pipeline/pyproject.toml` and `app/package.json`.
+
+
+### Pipeline (Python, run once)
+
+- **Python with uv.** One lockfile and one command (`uv run`) give all three teammates the same environment. Python 3.11 or newer.
+- **rasterio (GDAL).** Reads the HiRISE, THEMIS and CRISM rasters and crops and resamples them onto the local grid. This is the only georeferencing step in the project (D-005).
+- **pyproj.** The PROJ projection library behind rasterio's CRS handling, declared directly so the projection definitions are pinned. All lat/lon to grid conversion happens in the pipeline, so the app never needs it (D-005).
+- **numpy and scipy.** Grids as arrays, `scipy.ndimage` for filtering and `scipy.sparse.csgraph` Dijkstra for the return field. Fast and proven, with no custom numerics to get wrong.
+- **scikit-image.** Labels connected regions for the shadow-based rock detection.
+- **pillow.** Writes the texture and the regional image the app displays.
+- **pytest.** 68 tests, including the walking-time test vectors that the app must also pass.
+- **Contract validator** (`pipeline/validate/run.py`). 47 checks against docs/contracts.md. It is the gate to Stage 2 and stops the two halves drifting apart (D-012).
+
+
+### App (static site)
+
+- **React 19 and TypeScript 5.** A component model for the many panels, and strict types on every grid and contract field, so a wrong index or unit is caught at build time.
+- **Vite 7.** Fast dev server and a plain static build; Web Workers and the Tailwind plugin work without extra configuration.
+- **Three.js through React Three Fiber 9, with drei 10.** One rendering stack for the 2D map (orthographic camera), the Labyrinth view and the visor (D-005, and "Out of scope and rejected options"). drei supplies cameras and controls, so there is less 3D plumbing to write. `@react-three/postprocessing` gives the CRT look.
+- **Zustand 5.** One small store in slices that three people extend in separate files without merge conflicts (D-024). No provider boilerplate.
+- **Tailwind CSS 4.** Styling stays inside each component, and the theme tokens (colours, spacing, type) live in one CSS file. The whole look changed in one redesign (D-031) without a CSS cascade to untangle.
+- **d3-contour 4.** Marching squares for the Thread: the ring is the contour of the return field at the remaining time, cheap enough to redraw every tick. Only this one d3 module is used, not the whole library.
+- **Web Workers.** A*, Theta*, D* Lite (`app/src/routing/`) and the Thread contour (`app/src/thread/`) run off the main thread, so the 3D view never stalls while a route is planned.
+- **Self-hosted fonts (`@fontsource`).** VT323 for the terminal look and IBM Plex Mono for text and data. They ship with the build, with no font CDN, so the app works offline (D-029).
+- **BroadcastChannel.** The tablet and visor windows in one browser share one walk (`app/src/sync/`). It is built into the browser, needs no server, and nothing leaves the device (D-032).
+- **Path routing without a router library.** Three addresses (`/`, `/tablet`, `/visor`) are matched by a small function on `window.location.pathname` (`app/src/routes/`). Fewer dependencies and less to break.
+- **Vitest 4.** Shares the Vite config and toolchain. Tests the routing algorithms, the contour mapping, the sync logic and the shared walking-time vectors.
+- **Static hosting, Vercel-ready.** `app/vercel.json` rewrites every path to `index.html`, so `/tablet` and `/visor` open directly. Any static host works. The payload is measured as transferred (gzip) and sits within the ~30 MB budget (D-028).
+
+
+### Data formats
+
+- **Raw little-endian binary grids plus JSON** (docs/contracts.md). Grids are headerless `float32` or `uint8`, row-major, with no-data as `NaN`. JSON carries the small structured parts (`meta.json`, Knots, timeline, scenario).
+- **Why.** The browser turns a grid into a typed array with no parsing and no format library. The files are plain and easy to validate, and they compress well, so the gzip payload stays small (D-028). Processed files are committed to git (D-022).
+
+
+### What we deliberately did not use
+
+See also "Out of scope and rejected options" for engines and tools rejected during design.
+
+- **A backend or database.** Everything is precomputed and replayed (D-014). Fewer moving parts, works offline, nothing to host or secure.
+- **A map library (Leaflet, Mapbox, MapLibre).** There are no Earth tiles to serve, and the patch is a metric local grid (D-005). The 2D map is the same R3F scene with an orthographic camera.
+- **A router library.** Three fixed pages do not need one.
+- **A CSS framework beyond Tailwind.** One styling system, one set of tokens.
+- **Cloud sync between devices.** The two displays sync inside one browser only (D-032), with no account, server or network.
+
+
 ## Local grid coordinate system
 
 The app uses one coordinate system, the local grid. Everything handed to the app is in metres on this grid.
@@ -100,9 +150,9 @@ pipeline/
   ariadne_pipeline/         package; absolute imports, e.g. from ariadne_pipeline.terrain import slope_degrees
   content/
     knots_content.json      Knot science text and photo credits (D-023)
-  tests/                    pytest suite (63 tests)
+  tests/                    pytest suite (68 tests)
   validate/
-    run.py                  contract validator (46 checks)
+    run.py                  contract validator (47 checks)
 ```
 
 `run.py` first checks the walking test vectors, then runs these steps in order. Module names are in `ariadne_pipeline/`.
@@ -306,7 +356,7 @@ Example: "Solar storm: shelter at Knot B, 340 m, 6 min. [ROUTE]". An alert witho
 No one is on Mars, so the app does not claim live data. It replays real historical data on a simulation clock with a speed multiplier (D-014, D-025).
 
 - **Replay.** REMS sol 4760 and RAD dose rate drive the environment readings over the sim clock.
-- **Scenario.** A scripted event runs on the same clock: a solar particle event alert mid-walk (the May 2024 storm RAD measured). The alert fires, the astronaut is rerouted to the pressurised rover (the safest shelter; overhangs are est. fallbacks, D-030), and the Thread updates.
+- **Scenario.** A scripted event runs on the same clock: a solar particle event alert mid-walk (the May 2024 storm RAD measured). A space weather watch comes 30 min earlier with a countdown (D-033). When the alert fires the science plan stops and the pressurised rover (the safest shelter; overhangs are est. fallbacks, D-030) drives out along the route back while the astronaut walks towards it; they meet where both arrive at the same time and the astronaut boards (est. rover speed about 7 km/h after about 2 min to start, `app/src/sim/roverMeet.ts`).
 - **Two displays (D-032).** `/tablet` is the planning and navigation interface (D-031); `/visor` is the helmet heads-up display: first-person terrain from eye height with a minimal overlay (compass, three readings, next step, alert with ROUTE, task check-off, minimap). `/` is a chooser. Two windows in the same browser share one walk through a BroadcastChannel (`app/src/sync/`): the window the user last acted in leads the clock, scenario events, task check-off and reroutes; the others mirror it. In 2D, following zooms in on the astronaut; in 3D the camera chases the figure from behind.
 - **Simulated position ("you are here", D-030).** Mars has no GPS, so the demo simulates the astronaut: they walk a frozen copy of the science plan on the clock (each leg in its planned time, a stay at each Knot for the planned tasks), tasks are checked off when their planned time ends, and a reroute walks the routed path with the current load factor. The map shows a marker with heading and a breadcrumb trail, labelled "sim.". The run depends only on simulation time, so it is identical every time (`app/src/sim/walkTimeline.ts`, `walkDriver.ts`).
 - **Honesty.** The UI and pitch state the sources openly, including that the weather sol and the storm come from different dates.

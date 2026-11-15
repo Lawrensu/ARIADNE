@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Shelter } from "../data/contracts";
 import type { ScenarioDefinition, ScenarioEvent } from "./scenarioEngine";
-import { dueEvents, nearestShelter, scenarioProgress, SOLAR_STORM_SCENARIO } from "./scenarioEngine";
+import { dueEvents, nearestShelter, scenarioProgress, SOLAR_STORM_SCENARIO, stormCountdownAt } from "./scenarioEngine";
 
 
 
@@ -176,7 +176,7 @@ describe("nearestShelter", () => {
 describe("the shipped scenario", () => {
     it("matches contracts.md 3.15 and is ordered by time", () => {
         expect(SOLAR_STORM_SCENARIO.scenario_id).toBe("solar_particle_event_reroute");
-        expect(SOLAR_STORM_SCENARIO.events).toHaveLength(3);
+        expect(SOLAR_STORM_SCENARIO.events).toHaveLength(4);
 
         for (let index = 1; index < SOLAR_STORM_SCENARIO.events.length; index++) {
             const previous = SOLAR_STORM_SCENARIO.events[index - 1];
@@ -198,5 +198,73 @@ describe("the shipped scenario", () => {
             .map((event) => event.payload.shelter_id);
         // The pressurised rover is the shelter (D-030): overhangs give weak protection.
         expect(shelterIds).toEqual(["shelter_rover", "shelter_rover"]);
+    });
+
+    it("has a space weather watch 30 minutes before the storm alert", () => {
+        const watch = SOLAR_STORM_SCENARIO.events.find((event) => event.event_type === "space_weather_watch");
+        const alert = SOLAR_STORM_SCENARIO.events.find((event) => event.event_type === "solar_particle_event_alert");
+        expect(watch).toBeDefined();
+        expect(alert).toBeDefined();
+        expect(watch?.at_sim_seconds).toBe(4900);
+        expect(watch?.payload.storm_expected_at_sim_seconds).toBe(alert?.at_sim_seconds);
+        expect((alert?.at_sim_seconds ?? 0) - (watch?.at_sim_seconds ?? 0)).toBe(30 * 60);
+    });
+});
+
+
+
+describe("stormCountdownAt", () => {
+    it("is none before the watch", () => {
+        const countdown = stormCountdownAt(SOLAR_STORM_SCENARIO, 4899, true);
+        expect(countdown.phase).toBe("none");
+        expect(countdown.seconds_to_storm).toBeNull();
+        expect(countdown.storm_at_sim_seconds).toBe(6700);
+        expect(countdown.is_estimate).toBe(true);
+    });
+
+    it("counts down from the watch to the storm", () => {
+        const atWatch = stormCountdownAt(SOLAR_STORM_SCENARIO, 4900, true);
+        expect(atWatch.phase).toBe("watch");
+        expect(atWatch.seconds_to_storm).toBe(1800);
+        const later = stormCountdownAt(SOLAR_STORM_SCENARIO, 6000, true);
+        expect(later.phase).toBe("watch");
+        expect(later.seconds_to_storm).toBe(700);
+        expect(later.storm_at_sim_seconds).toBe(6700);
+    });
+
+    it("is active from the storm alert on", () => {
+        for (const at of [6700, 6760, 9000]) {
+            const countdown = stormCountdownAt(SOLAR_STORM_SCENARIO, at, true);
+            expect(countdown.phase).toBe("active");
+            expect(countdown.seconds_to_storm).toBeNull();
+        }
+    });
+
+    it("is none while the scenario is not running", () => {
+        expect(stormCountdownAt(SOLAR_STORM_SCENARIO, 6000, false).phase).toBe("none");
+        expect(stormCountdownAt(SOLAR_STORM_SCENARIO, 7000, false).phase).toBe("none");
+    });
+
+    it("falls back to the alert time without a watch payload", () => {
+        const scenario = testScenario([
+            { ...testEvent(100, "space_weather_watch"), payload: {} },
+            testEvent(400, "solar_particle_event_alert"),
+        ]);
+        const countdown = stormCountdownAt(scenario, 150, true);
+        expect(countdown.phase).toBe("watch");
+        expect(countdown.storm_at_sim_seconds).toBe(400);
+        expect(countdown.seconds_to_storm).toBe(250);
+    });
+
+    it("goes straight from none to active without a watch event", () => {
+        const scenario = testScenario([testEvent(400, "solar_particle_event_alert")]);
+        expect(stormCountdownAt(scenario, 300, true).phase).toBe("none");
+        expect(stormCountdownAt(scenario, 400, true).phase).toBe("active");
+    });
+
+    it("is none for a scenario with no storm", () => {
+        const countdown = stormCountdownAt(testScenario([]), 100, true);
+        expect(countdown.phase).toBe("none");
+        expect(countdown.storm_at_sim_seconds).toBeNull();
     });
 });

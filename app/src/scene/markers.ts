@@ -3,6 +3,7 @@
 
 import type { LocalPosition } from "../data/contracts";
 import type { ProcessedData } from "../data/loadProcessed";
+import type { RoverPhase } from "../sim/walkTimeline";
 
 
 
@@ -19,6 +20,28 @@ export interface SceneMarker {
 
 export const ROVER_MARKER_ID = "staging_point";
 export const ROVER_MARKER_LABEL = "Rover (staging point)";
+
+
+// While the rover is not parked its label says what it is doing: "ROVER driving", "ROVER crew aboard".
+// Parked keeps the staging point label, so today's map is unchanged.
+export function roverPhaseWord(phase: RoverPhase): string {
+    if (phase === "driving") {
+        return "driving";
+    }
+    if (phase === "with_crew") {
+        return "crew aboard";
+    }
+    return "";
+}
+
+
+export function roverMarkerLabel(phase: RoverPhase): string {
+    const word = roverPhaseWord(phase);
+    if (word === "") {
+        return ROVER_MARKER_LABEL;
+    }
+    return `ROVER ${word}`;
+}
 
 
 

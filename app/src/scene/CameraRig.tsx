@@ -37,6 +37,7 @@ import {
     FIRST_PERSON_EYE_HEIGHT_M,
     FIRST_PERSON_FOV_DEG,
     FIRST_PERSON_HEADING_TIME_CONSTANT_SECONDS,
+    FIRST_PERSON_MAX_TURN_RATE_DEG_PER_SECOND,
     FIRST_PERSON_NEAR_M,
     NAVIGATION_VIEW_ACROSS_M,
     computeChaseRig,
@@ -45,13 +46,16 @@ import {
     glideZoom,
     keepAboveTerrain,
     navigationZoom,
+    stepHeadingTowardsDeg,
 } from "./navigationCamera";
 import { labyrinthStartPosition, orthographicZoomToFit, patchFraming } from "./sceneMath";
 
 
 
 const PLANNING_TABLE_CAMERA_HEIGHT_M = 4000;
-const MAX_POLAR_ANGLE_RAD = 1.35;
+// Orbit tilt limit (radians from straight down). 1.45 keeps the camera above the horizon and leaves
+// margin over the chase pose (about 1.32), so the controls never fight the chase camera.
+const MAX_POLAR_ANGLE_RAD = 1.45;
 // One zoom button tap scales the view by this factor (in: closer, out: farther).
 const ZOOM_STEP_FACTOR = 1.5;
 // Planning Table zoom limits, relative to the zoom that fits the whole patch.
@@ -481,6 +485,7 @@ export function LabyrinthCamera() {
         const snap = snapChaseRef.current;
         snapChaseRef.current = false;
 
+        // astronautHeadingDeg is the look-ahead travel heading (sim/walkTimeline.ts), already smooth.
         const headingDeg = smoothHeading(state.astronautHeadingDeg, followFrame.deltaSeconds, snap);
         const rig = computeChaseRig({
             position: followFrame.position,
@@ -637,6 +642,13 @@ export function FirstPersonCamera() {
     const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
     const smoothedHeadingDegRef = useRef<number | null>(null);
 
+    // The visor compass falls back to the look-ahead heading once this camera is gone.
+    useEffect(() => {
+        return () => {
+            useAriadneStore.getState().setViewHeadingDeg(null);
+        };
+    }, []);
+
     let startPosition: LocalPosition = { x_m: 0, z_m: 0 };
     if (processedData !== null) {
         startPosition = processedData.meta.staging_point;
@@ -657,17 +669,23 @@ export function FirstPersonCamera() {
             return;
         }
 
+        // astronautHeadingDeg is the look-ahead travel heading (sim/walkTimeline.ts). The view turns
+        // towards it like a head: eased, and never faster than the maximum turn rate, so a big turn
+        // sweeps across the visor compass instead of snapping.
         const previousHeading = smoothedHeadingDegRef.current;
-        let headingDeg = state.astronautHeadingDeg;
+        const travelHeadingDeg = state.astronautHeadingDeg;
+        let headingDeg = travelHeadingDeg;
         if (previousHeading !== null) {
-            headingDeg = dampAngleDeg(
+            headingDeg = stepHeadingTowardsDeg(
                 previousHeading,
-                state.astronautHeadingDeg,
+                travelHeadingDeg,
                 deltaSeconds,
+                FIRST_PERSON_MAX_TURN_RATE_DEG_PER_SECOND,
                 FIRST_PERSON_HEADING_TIME_CONSTANT_SECONDS,
             );
         }
         smoothedHeadingDegRef.current = headingDeg;
+        state.setViewHeadingDeg(headingDeg);
 
         const pose = computeFirstPersonPose({
             position,

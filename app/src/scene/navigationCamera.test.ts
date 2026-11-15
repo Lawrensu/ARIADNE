@@ -16,6 +16,7 @@ import {
     navigationZoom,
     normalizeHeadingDeg,
     shortestAngleDeltaDeg,
+    stepHeadingTowardsDeg,
 } from "./navigationCamera";
 
 
@@ -133,11 +134,22 @@ describe("computeChaseRig", () => {
         expect(rig.lookAtPosition.x).toBeCloseTo(100 + CHASE_LOOK_AHEAD_M);
     });
 
-    it("uses the terrain height at the camera position", () => {
-        const slope = (_x: number, z: number) => z * 0.1;
-        const rig = computeChaseRig({ position: { x_m: 0, z_m: 100 }, headingDeg: 0, scale: 1, sampleTerrainY: slope });
-        const cameraZ = 100 + CHASE_DISTANCE_BEHIND_M;
-        expect(rig.cameraPosition.y).toBeCloseTo(cameraZ * 0.1 + CHASE_HEIGHT_ABOVE_TERRAIN_M);
+    it("takes its height from the astronaut's ground, not the bumps under the camera", () => {
+        const bumpy = (x: number, z: number) => {
+            if (x === 0 && z === 100) {
+                return 20;
+            }
+            return 20 + Math.sin(z * 3) * 1.5;
+        };
+        const rig = computeChaseRig({ position: { x_m: 0, z_m: 100 }, headingDeg: 0, scale: 1, sampleTerrainY: bumpy });
+        expect(rig.cameraPosition.y).toBeCloseTo(20 + CHASE_HEIGHT_ABOVE_TERRAIN_M);
+        expect(rig.lookAtPosition.y).toBeCloseTo(20 + 1.2);
+    });
+
+    it("rises over a ridge behind the astronaut", () => {
+        const ridgeBehind = (_x: number, z: number) => (z > 120 ? 60 : 0);
+        const rig = computeChaseRig({ position: { x_m: 0, z_m: 100 }, headingDeg: 0, scale: 1, sampleTerrainY: ridgeBehind });
+        expect(rig.cameraPosition.y).toBeGreaterThanOrEqual(60 + CHASE_MIN_CLEARANCE_M);
     });
 
     it("stays above the astronaut's terrain when the ground behind is a deep hollow", () => {
@@ -189,5 +201,59 @@ describe("computeFirstPersonPose", () => {
         const horizontal = pose.lookAtPosition.x;
         const pitchDeg = (Math.atan2(drop, horizontal) * 180) / Math.PI;
         expect(pitchDeg).toBeCloseTo(FIRST_PERSON_PITCH_DOWN_DEG);
+    });
+});
+
+
+
+function simulateTurn(startDeg: number, targetDeg: number, framesPerSecond: number, seconds: number): number {
+    let heading = startDeg;
+    const deltaSeconds = 1 / framesPerSecond;
+    const frames = Math.round(seconds * framesPerSecond);
+    for (let frame = 0; frame < frames; frame++) {
+        heading = stepHeadingTowardsDeg(heading, targetDeg, deltaSeconds, 120, 0.3);
+    }
+    return heading;
+}
+
+
+describe("stepHeadingTowardsDeg", () => {
+    it("wraps across 359 to 1 the short way", () => {
+        const next = stepHeadingTowardsDeg(359, 1, 0.05, 120, 0.3);
+        expect(next < 5 || next > 355).toBe(true);
+        expect(shortestAngleDeltaDeg(359, next)).toBeGreaterThan(0);
+    });
+
+    it("takes the short way round for a 270 degree target turn (90 degrees the other way)", () => {
+        const next = stepHeadingTowardsDeg(0, 270, 0.05, 120, 0.3);
+        expect(shortestAngleDeltaDeg(0, next)).toBeLessThan(0);
+        expect(shortestAngleDeltaDeg(0, next)).toBeGreaterThan(-90);
+    });
+
+    it("caps a big turn at the maximum rate", () => {
+        const next = stepHeadingTowardsDeg(0, 180, 0.1, 120, 0.3);
+        expect(next).toBeCloseTo(12, 5);
+    });
+
+    it("sweeps a 180 degree turn over about 1.5 to 2.5 s at 60 fps", () => {
+        const after1s = shortestAngleDeltaDeg(simulateTurn(0, 180, 60, 1), 180);
+        const after3s = shortestAngleDeltaDeg(simulateTurn(0, 180, 60, 3), 180);
+        expect(Math.abs(after1s)).toBeGreaterThan(40);
+        expect(Math.abs(after3s)).toBeLessThan(1);
+    });
+
+    it("gives the same result at 30 and 144 fps within a degree or two", () => {
+        const slow = simulateTurn(0, 150, 30, 1.5);
+        const fast = simulateTurn(0, 150, 144, 1.5);
+        expect(Math.abs(shortestAngleDeltaDeg(slow, fast))).toBeLessThan(2);
+    });
+
+    it("settles small corrections without the cap", () => {
+        const settled = simulateTurn(10, 14, 60, 2);
+        expect(settled).toBeCloseTo(14, 1);
+    });
+
+    it("does not move when no time has passed", () => {
+        expect(stepHeadingTowardsDeg(40, 200, 0, 120, 0.3)).toBe(40);
     });
 });

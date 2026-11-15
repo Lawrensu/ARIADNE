@@ -33,6 +33,20 @@ export interface WalkDetour {
     target_label: string;
     // Phase once the target is reached: "sheltering" for a shelter (the rover counts), "at_knot" for a Knot.
     phase_on_arrival: WalkPhase;
+    // Set when the pressurised rover drives out to meet the astronaut (D-033); the detour path then ends
+    // at the meeting point, where the astronaut boards. Optional so older detours stay valid.
+    rover_drive?: RoverDrive | null;
+    is_estimate: true;
+}
+
+
+// The rover's drive from where it is parked to the meeting point (D-033). Local grid metres, est.
+export interface RoverDrive {
+    // From the parked rover to the meeting point, in driving order.
+    path_positions: LocalPosition[];
+    depart_at_sim_seconds: number;
+    arrive_at_sim_seconds: number;
+    meet_position: LocalPosition;
     is_estimate: true;
 }
 
