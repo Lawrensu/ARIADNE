@@ -8,6 +8,8 @@ A map and suit display for one astronaut on one Marswalk: Real NASA data, safe r
 
 Built by Team Stuff for the NASA hackathon challenge "Interplanetary Survival Guide: Martian Map" (14 to 15 November 2026).
 
+Deployed URL: https://ariadne-kappa.vercel.app/
+
 
 ## The problem
 
