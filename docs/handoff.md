@@ -88,12 +88,12 @@ Evidence re-verified on 2026-11-14 after merging contract v1.1.0 and adding the 
 - [x] Tasks can be checked off at a Knot; samples taken add to the carried load and the Thread updates: Knot card and HUD sheet call `setTaskCompleted`; in the demo walk, tasks are checked off when their planned time ends (`app/src/sim/walkTimeline.test.ts`, 1.2 kg rock chip at Boxwork ridge before the storm).
 - [ ] Every number has provenance: the HUD, Knot cards, Mars clock and alerts carry "est." badges and provenance popovers, but no full audit of every number on every panel has been done.
 - [x] Responsive (D-029): no horizontal scroll at 375, 768 and 1280 px (Letta's `npm run browser-check`, screenshots in `docs/images/stage3/`); 375 and 1280 px re-checked after the D-030 overlays (scroll width equals the viewport).
-- [x] Easy to navigate (D-029): rail plus four tabs (Plan, Route, Layers, Time) with one main action each, Reset view in the status strip and the HUD, `screenSpacePanning` in `app/src/scene/CameraRig.tsx` (Letta's browser check: drag right, left, up, down, then reset).
+- [x] Easy to navigate (D-029, D-031): one tab bar (MAP, PLAN, VISOR, DATA), map always full screen, control row with zoom, Center on me, Reset view, 2D/3D and LAYERS; panning in every direction (Malissa's `npm run browser-check`, exit 0, 18:20).
 - [x] Fonts self-hosted (D-029): VT323 and IBM Plex Mono from `@fontsource`, bundled into `dist/assets/` by `npm run build`; no font CDN.
 - [x] Alerts come with actions: every alert shows what happened, the action, distance and est. walk time from the astronaut, and a one-tap [ROUTE] that reroutes the walk (`app/src/alerts/AlertStack.tsx`, also on the map).
-- [ ] The scenario runs end-to-end, identically twice: end-to-end run seen in the browser (walk, storm alert, reroute, "Sheltered in the rover"); frame-rate independence proven by `walkTimeline.test.ts` ("runs identically whatever the frame step sizes"). Still to do: two browser runs back to back with the pane visible.
+- [x] The scenario runs end-to-end, identically twice: Malissa's `npm run browser-check` (exit 0): storm 6701 / 6707 s, reroute 6760 / 6760 s, sheltered 8441 / 8445 s (the few seconds are frame timing, events fire on sim time); frame-rate independence in `walkTimeline.test.ts`; full run also seen on `/visor` (Lawrence, 2026-11-14).
 - [ ] Demo recorded.
-- [ ] Log entry written: Stage 3 is finished by Lawrence, so the entry is in `docs/log/person_a.md` (2026-11-14, Stage 3 takeover); Letta's agent wrote none.
+- [x] Log entry written: Stage 3 was finished by Lawrence and Malissa, so the entries are in `docs/log/person_a.md` and `docs/log/person_b.md`; Letta's agent wrote none.
 - [ ] Person C's branch pushed, merged into `dev` by Lawrence; integration check passed: the work is on `dev-lawrence` (Letta's branch merged there); merge into `dev` after the demo checks.
 - [ ] `dev` merged into `main` for the demo.
 - [ ] Human sign-off.
@@ -206,6 +206,11 @@ Lawrence's integration changes on top of Stage 2 (2026-11-14, D-028):
 - Integration check on `dev` after the merge: validator 47 of 47, pipeline tests 68, app tests 133, typecheck clean, build works, payload 19.19 MB gzip, browser: Plan all Knots GO 5 h 03 min with 27 min left; Rover to Boxwork hollow fast 35 min, safe 36 min, smooth 31 min; Labyrinth view; no console errors.
 
 
+Two displays (Lawrence, 2026-11-14, D-032):
+- `/` chooser, `/tablet` (D-031 interface, VISOR tab opens `/visor` in a new window), `/visor` (first-person helmet HUD). Open both in two windows of the same browser: they share one walk (`app/src/sync/`); the window you last acted in leads. Keep both windows visible: a hidden window's clock pauses.
+- Hosting: `app/vercel.json` rewrites every path to `index.html`; `vite preview` already does this locally.
+- Checks on `dev-lawrence` after D-032: `npm test` 358 passed (32 files), typecheck clean, build works, payload 26.70 MB gzip, no console errors on `/tablet` and `/visor`. The headless `npm run browser-check` needs Chrome and could not run on Lawrence's machine; its default address is now `/tablet`.
+
 Stage 3 notes for the demo (Lawrence, 2026-11-14, D-030):
 - Letta's agent pushed one work-in-progress commit (`ba5515a`, "Free limit reached for opencode"): theme and fonts, shell with rail and tabs, Suit HUD, Knot cards with photos, alerts targets, Mars24, environment and storm replay, scenario engine, browser check script. None of the HUD, Knot card, Mars clock or alerts UI was mounted yet, and there was no scenario runner.
 - Lawrence's agent mounted them and added: `app/src/sim/walkTimeline.ts` (pure walk maths), `app/src/sim/walkDriver.ts` (scenario runner, simulated walk, reroute, "Run demo scenario"), `app/src/alerts/AlertStack.tsx`, `app/src/scene/AstronautMarker.tsx` (marker with heading and breadcrumb trail), `app/src/shell/WalkDemoPanel.tsx`, new walk fields in `app/src/state/walkSlice.ts`. The scenario now shelters at the rover (D-030).
@@ -215,6 +220,7 @@ Stage 3 notes for the demo (Lawrence, 2026-11-14, D-030):
 
 ## Next steps
 
-1. Lawrence: run the demo twice in a visible browser window (tick the scenario box), record it, and tick "Demo recorded".
-2. Lawrence: commit on `dev-lawrence`, merge into `dev`, run the integration check (validator, pipeline tests, app tests, build, payload, browser), then merge `dev` into `main` for the demo and sign off Stage 3.
-3. Letta: review the merged app and her visual direction; update `dev-letta` from `dev` before any further change.
+1. Lawrence: approve the commit draft, commit on `dev-lawrence`, push.
+2. Lawrence: record the demo (tablet and visor side by side, "Run demo scenario" from the gear menu or the visor DEMO strip, 300x), tick "Demo recorded".
+3. Lawrence: merge `dev-lawrence` into `dev`, integration check (validator, pipeline tests, app tests, build, payload, `npm run browser-check` on a machine with Chrome), then `dev` into `main`, sign off Stage 3.
+4. Optional: the "Every number has provenance" audit; README pass and new screenshots for D-031 and D-032.

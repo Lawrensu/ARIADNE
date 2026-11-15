@@ -11,7 +11,7 @@
 //
 // Usage: start the app first (`npm run dev`), then run `npm run browser-check` from app/.
 // Output: docs/images/stage3/redesign_{phone,tablet,desktop}.png and a JSON summary on stdout.
-// CHROME_PATH can override the Chrome executable, APP_URL the page URL, SCREENSHOT_PREFIX the file
+// CHROME_PATH can override the Chrome executable, APP_URL the page URL (default /tablet), SCREENSHOT_PREFIX the file
 // name prefix ("redesign_" by default; the Stage 3 shell screenshots before D-031 had none).
 
 import { spawn } from "node:child_process";
@@ -26,7 +26,8 @@ import { setTimeout as delay } from "node:timers/promises";
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(SCRIPT_DIR, "../..");
 const OUTPUT_DIR = path.join(REPO_ROOT, "docs", "images", "stage3");
-const APP_URL = process.env.APP_URL ?? "http://localhost:5173/";
+// The root "/" is the chooser page (D-031 follow-up); the tablet app lives at "/tablet".
+const APP_URL = process.env.APP_URL ?? "http://localhost:5173/tablet";
 const CHROME_PATH = process.env.CHROME_PATH ?? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 const DEBUG_PORT = 9333;
 const SCREENSHOT_PREFIX = process.env.SCREENSHOT_PREFIX ?? "redesign_";

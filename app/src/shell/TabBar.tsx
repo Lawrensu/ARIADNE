@@ -1,12 +1,12 @@
 // Mode tab bar across the top (owner: Lawrence, redesign D-031, app/design/visual_direction.md 6.2).
-// Gear (system menu), then MAP, PLAN, SUIT and DATA as large uppercase tabs, and a REPLAY badge on
+// Gear (system menu), then MAP, PLAN, VISOR and DATA as large uppercase tabs, and a REPLAY badge on
 // the right. The active tab is filled phosphor green and sits on the frame line below it, so the two
 // read as one shape. This is the only way to move between modes (rule 6.1.2).
 
 import { useCallback, useRef, useState } from "react";
 
 import { useAriadneStore } from "../state/store";
-import { MODE_TAB_LABELS, MODE_TABS, selectMode, useShownMode } from "./modes";
+import { MODE_TAB_LABELS, MODE_TABS, selectMode, useShownMode, VISOR_HREF, VISOR_TAB } from "./modes";
 import { SystemMenu } from "./SystemMenu";
 import { useDismiss } from "./useDismiss";
 
@@ -62,8 +62,8 @@ function ModeTabs() {
 
     return (
         <nav className="flex min-w-0 flex-1 items-end gap-0.5 px-1 sm:gap-1 sm:px-2" aria-label="Modes">
-            {MODE_TABS.map((mode) => {
-                const isActive = mode === shownMode;
+            {MODE_TABS.map((tab) => {
+                const isActive = tab === shownMode;
                 // -mb-px lets the tab cover the frame line, so the filled tab joins it (the notch).
                 let className =
                     "ariadne-display -mb-px flex h-12 min-w-0 flex-1 items-center justify-center border border-b-0 px-0.5 text-xl leading-none sm:w-24 sm:flex-none sm:px-1 sm:text-2xl lg:w-28 lg:text-[1.75rem] ";
@@ -72,15 +72,29 @@ function ModeTabs() {
                 } else {
                     className += "border-transparent text-ariadne-muted hover:border-ariadne-border hover:text-ariadne-text";
                 }
+                if (tab === VISOR_TAB) {
+                    // The visor is its own page, opened in a new window so both stay on screen.
+                    return (
+                        <a
+                            key={tab}
+                            href={VISOR_HREF}
+                            target="_blank"
+                            rel="noopener"
+                            className={className}
+                        >
+                            {MODE_TAB_LABELS[tab]}
+                        </a>
+                    );
+                }
                 return (
                     <button
-                        key={mode}
+                        key={tab}
                         type="button"
                         className={className}
                         aria-current={isActive ? "page" : undefined}
-                        onClick={() => selectMode(mode)}
+                        onClick={() => selectMode(tab)}
                     >
-                        {MODE_TAB_LABELS[mode]}
+                        {MODE_TAB_LABELS[tab]}
                     </button>
                 );
             })}

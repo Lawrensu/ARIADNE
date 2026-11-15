@@ -14,8 +14,10 @@
 // the astronaut every frame. Dragging, wheel zooming or rotating the map (the controls' "start"
 // event) or Reset view pauses it; it resumes after FOLLOW_RESUME_DELAY_SECONDS without a touch, or at
 // once on "Center on me". Zoom buttons do not pause it, so zooming happens around the astronaut.
-// Following translates the camera and the controls target by the same step, so zoom, angle and
-// distance stay as the user left them and the zoom limits are never touched.
+// 2D following translates the camera and the controls target by the same step and, when following
+// starts or resumes (or on "Center on me"), glides the zoom in to a navigation zoom (about 250 m across).
+// 3D following is a chase camera behind the figure (navigationCamera.ts); zoom buttons scale its distance.
+// FirstPersonCamera is the visor's eye-level camera (no controls, no follow logic).
 
 import { MapControls, OrbitControls, OrthographicCamera, PerspectiveCamera } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -28,6 +30,22 @@ import type { ResetViewId } from "../state/viewResetSlice";
 import { sampleTerrainSceneY } from "../terrain/terrainFrame";
 import { useTerrain } from "../terrain/TerrainContext";
 import { FOLLOW_RESUME_DELAY_SECONDS, followBlendFraction, isFollowActive, shouldResumeFollowing } from "./followCamera";
+import {
+    CHASE_SCALE_MAX,
+    CHASE_SCALE_MIN,
+    CHASE_HEADING_TIME_CONSTANT_SECONDS,
+    FIRST_PERSON_EYE_HEIGHT_M,
+    FIRST_PERSON_FOV_DEG,
+    FIRST_PERSON_HEADING_TIME_CONSTANT_SECONDS,
+    FIRST_PERSON_NEAR_M,
+    NAVIGATION_VIEW_ACROSS_M,
+    computeChaseRig,
+    computeFirstPersonPose,
+    dampAngleDeg,
+    glideZoom,
+    keepAboveTerrain,
+    navigationZoom,
+} from "./navigationCamera";
 import { labyrinthStartPosition, orthographicZoomToFit, patchFraming } from "./sceneMath";
 
 
@@ -39,11 +57,13 @@ const ZOOM_STEP_FACTOR = 1.5;
 // Planning Table zoom limits, relative to the zoom that fits the whole patch.
 const PLANNING_TABLE_MIN_ZOOM_OF_FIT = 0.6;
 const PLANNING_TABLE_MAX_ZOOM_OF_FIT = 25;
-// "Center on me" on the Planning Table zooms in to at least this much of the fit zoom (about 450 m across).
-const CENTER_ON_ME_MIN_ZOOM_OF_FIT = 4;
 // Labyrinth view orbit distance limits, metres.
 const LABYRINTH_MIN_DISTANCE_M = 40;
 const LABYRINTH_MAX_DISTANCE_OF_PATCH_WIDTH = 2.5;
+// 2D follow zoom glide: time constant of the exponential zoom-in when following starts or resumes.
+const NAVIGATION_ZOOM_TIME_CONSTANT_SECONDS = 0.4;
+// 3D chase camera far plane and the vertical field of view of the map cameras.
+const MAP_PERSPECTIVE_FAR_M = 15000;
 
 
 
@@ -161,11 +181,28 @@ function followScreenOffsetWorld(
 }
 
 
+// What a camera that does not just translate with the astronaut (the 3D chase camera) is given each
+// followed frame. `offsetWorld` is the ground offset for a docked sheet (see followScreenOffsetWorld).
+interface FollowFrame {
+    camera: THREE.Camera;
+    controls: CameraControlsHandle;
+    position: LocalPosition;
+    deltaSeconds: number;
+    offsetWorld: { x: number; z: number };
+}
+
+
+type FollowApplier = (frame: FollowFrame) => void;
+
+
 function useFollowAstronaut(
     camera: THREE.Camera | null,
     controls: CameraControlsHandle | null,
     followTargetY: (position: LocalPosition) => number,
+    applyFollow: FollowApplier | null = null,
 ): FollowControlsHandlers {
+    const applyFollowRef = useRef(applyFollow);
+    applyFollowRef.current = applyFollow;
     // True between the controls' "start" and "end": following never resumes in the middle of a drag.
     const isDragInProgressRef = useRef(false);
     const followTargetYRef = useRef(followTargetY);
@@ -239,6 +276,10 @@ function useFollowAstronaut(
         // With a sheet docked over the left of the map, aim the camera a little left of the astronaut so
         // they sit in the middle of the part of the map that is still visible.
         const offsetWorld = followScreenOffsetWorld(camera, controls, viewportHeightPxRef.current, state.followScreenOffsetXPx);
+        if (applyFollowRef.current !== null) {
+            applyFollowRef.current({ camera, controls, position, deltaSeconds, offsetWorld });
+            return;
+        }
         const gapX = position.x_m - offsetWorld.x - target.x;
         const gapY = followTargetYRef.current(position) - target.y;
         const gapZ = position.z_m - offsetWorld.z - target.z;
@@ -290,10 +331,47 @@ export function PlanningTableCamera() {
         return Math.min(Math.max(zoom, minZoom), maxZoom);
     }
 
+    // Navigation zoom: about NAVIGATION_VIEW_ACROSS_M of terrain across the shorter screen side.
+    const navigationZoomValue = clampZoom(navigationZoom(viewportSize.width, viewportSize.height, NAVIGATION_VIEW_ACROSS_M));
+
+    // A zoom the camera glides to. Set when following starts or resumes and on "Center on me"; cleared
+    // when it is reached and whenever the user touches the map or taps a zoom button, so the glide
+    // never fights the user.
+    const zoomGlideTargetRef = useRef<number | null>(null);
+    const wasFollowingRef = useRef(false);
+
+    useFrame((_, deltaSeconds) => {
+        if (camera === null) {
+            return;
+        }
+        const isFollowing = useAriadneStore.getState().isFollowingAstronaut;
+        if (isFollowing && !wasFollowingRef.current) {
+            zoomGlideTargetRef.current = navigationZoomValue;
+        }
+        wasFollowingRef.current = isFollowing;
+
+        const glideTarget = zoomGlideTargetRef.current;
+        if (glideTarget === null) {
+            return;
+        }
+        const nextZoom = glideZoom(camera.zoom, glideTarget, deltaSeconds, NAVIGATION_ZOOM_TIME_CONSTANT_SECONDS);
+        camera.zoom = nextZoom;
+        camera.updateProjectionMatrix();
+        if (nextZoom === glideTarget) {
+            zoomGlideTargetRef.current = null;
+        }
+    });
+
+    const onControlsStart = useCallback(() => {
+        zoomGlideTargetRef.current = null;
+        followHandlers.onStart();
+    }, [followHandlers.onStart]);
+
     useZoomStepRequests((direction) => {
         if (camera === null) {
             return;
         }
+        zoomGlideTargetRef.current = null;
         if (direction > 0) {
             camera.zoom = clampZoom(camera.zoom * ZOOM_STEP_FACTOR);
         } else {
@@ -305,19 +383,20 @@ export function PlanningTableCamera() {
         }
     });
 
-    // Pans so the astronaut is in the middle (straight down, north up) and zooms in if the view is wider.
+    // Pans so the astronaut (or the rover before a walk) is in the middle, straight down, north up,
+    // and glides in to the navigation zoom.
     useCenterOnAstronautRequests((position) => {
         if (camera === null) {
             return;
         }
         camera.position.set(position.x_m, PLANNING_TABLE_CAMERA_HEIGHT_M, position.z_m);
-        camera.zoom = clampZoom(Math.max(camera.zoom, fitZoom * CENTER_ON_ME_MIN_ZOOM_OF_FIT));
         camera.updateProjectionMatrix();
         camera.lookAt(position.x_m, 0, position.z_m);
         if (controls !== null) {
             controls.target.set(position.x_m, 0, position.z_m);
             controls.update();
         }
+        zoomGlideTargetRef.current = navigationZoomValue;
     });
 
     return (
@@ -341,7 +420,7 @@ export function PlanningTableCamera() {
                     screenSpacePanning
                     minZoom={minZoom}
                     maxZoom={maxZoom}
-                    onStart={followHandlers.onStart}
+                    onStart={onControlsStart}
                     onEnd={followHandlers.onEnd}
                 />
             )}
@@ -373,17 +452,93 @@ export function LabyrinthCamera() {
 
     useViewReset("labyrinth_view", resetView);
 
-    // In 3D the orbit target sits on the terrain under the astronaut.
-    const followHandlers = useFollowAstronaut(camera, controls, (position) =>
-        sampleTerrainSceneY(frame, position.x_m, position.z_m),
+    // Chase camera state. The smoothed heading is what the camera sits behind; it follows the real
+    // heading with a damped angle, and keeps its last value while the astronaut stands still.
+    const smoothedHeadingDegRef = useRef<number | null>(null);
+    // Zoom buttons scale the chase distance and height while following.
+    const chaseScaleRef = useRef(1);
+    // The next chase frame places the camera behind the figure at once (mount, "Center on me").
+    const snapChaseRef = useRef(true);
+
+    function sampleTerrainY(x_m: number, z_m: number): number {
+        return sampleTerrainSceneY(frame, x_m, z_m);
+    }
+
+    function smoothHeading(targetHeadingDeg: number, deltaSeconds: number, snap: boolean): number {
+        const previous = smoothedHeadingDegRef.current;
+        let next = targetHeadingDeg;
+        if (previous !== null && !snap) {
+            next = dampAngleDeg(previous, targetHeadingDeg, deltaSeconds, CHASE_HEADING_TIME_CONSTANT_SECONDS);
+        }
+        smoothedHeadingDegRef.current = next;
+        return next;
+    }
+
+    // While following (a walk under way, not paused by the user) the camera chases the astronaut from
+    // behind, like car navigation in 3D. Camera and orbit target glide to the chase pose.
+    function applyChase(followFrame: FollowFrame) {
+        const state = useAriadneStore.getState();
+        const snap = snapChaseRef.current;
+        snapChaseRef.current = false;
+
+        const headingDeg = smoothHeading(state.astronautHeadingDeg, followFrame.deltaSeconds, snap);
+        const rig = computeChaseRig({
+            position: followFrame.position,
+            headingDeg,
+            scale: chaseScaleRef.current,
+            sampleTerrainY,
+        });
+        // With a sheet docked over the left of the map, aim left of the figure so it sits in the
+        // visible part of the map.
+        const wantedPosition = new THREE.Vector3(
+            rig.cameraPosition.x - followFrame.offsetWorld.x,
+            rig.cameraPosition.y,
+            rig.cameraPosition.z - followFrame.offsetWorld.z,
+        );
+        const wantedTarget = new THREE.Vector3(
+            rig.lookAtPosition.x - followFrame.offsetWorld.x,
+            rig.lookAtPosition.y,
+            rig.lookAtPosition.z - followFrame.offsetWorld.z,
+        );
+
+        let fraction = 1;
+        if (!snap) {
+            fraction = followBlendFraction(followFrame.camera.position.distanceTo(wantedPosition), followFrame.deltaSeconds);
+        }
+        followFrame.camera.position.lerp(wantedPosition, fraction);
+        followFrame.controls.target.lerp(wantedTarget, fraction);
+
+        // Gliding over a ridge must never push the camera into the ground.
+        const safePosition = keepAboveTerrain(
+            { x: followFrame.camera.position.x, y: followFrame.camera.position.y, z: followFrame.camera.position.z },
+            sampleTerrainY,
+        );
+        followFrame.camera.position.set(safePosition.x, safePosition.y, safePosition.z);
+        followFrame.camera.lookAt(followFrame.controls.target);
+    }
+
+    const followHandlers = useFollowAstronaut(
+        camera,
+        controls,
+        (position) => sampleTerrainSceneY(frame, position.x_m, position.z_m),
+        applyChase,
     );
 
     const minDistance = LABYRINTH_MIN_DISTANCE_M;
     const maxDistance = framing.width_m * LABYRINTH_MAX_DISTANCE_OF_PATCH_WIDTH;
 
     // Zoom in 3D moves the camera along its line of sight towards (or away from) the orbit target.
+    // While following, the chase distance and height scale instead, so the chase keeps the zoom.
     useZoomStepRequests((direction) => {
         if (camera === null || controls === null) {
+            return;
+        }
+        if (useAriadneStore.getState().isFollowingAstronaut) {
+            let nextScale = chaseScaleRef.current * ZOOM_STEP_FACTOR;
+            if (direction > 0) {
+                nextScale = chaseScaleRef.current / ZOOM_STEP_FACTOR;
+            }
+            chaseScaleRef.current = Math.min(Math.max(nextScale, CHASE_SCALE_MIN), CHASE_SCALE_MAX);
             return;
         }
         const offset = camera.position.clone().sub(controls.target);
@@ -399,16 +554,20 @@ export function LabyrinthCamera() {
         controls.update();
     });
 
-    // Moves the orbit target onto the astronaut and keeps the viewing angle and distance.
+    // Goes behind the astronaut (or the rover before a walk) at once. The request also resumes
+    // following, so during a walk the chase carries on from there.
     useCenterOnAstronautRequests((position) => {
         if (camera === null || controls === null) {
             return;
         }
-        const newTarget = new THREE.Vector3(position.x_m, sampleTerrainSceneY(frame, position.x_m, position.z_m), position.z_m);
-        const offset = camera.position.clone().sub(controls.target);
-        controls.target.copy(newTarget);
-        camera.position.copy(newTarget).add(offset);
+        const headingDeg = smoothHeading(useAriadneStore.getState().astronautHeadingDeg, 0, true);
+        const rig = computeChaseRig({ position, headingDeg, scale: chaseScaleRef.current, sampleTerrainY });
+        const safePosition = keepAboveTerrain(rig.cameraPosition, sampleTerrainY);
+        camera.position.set(safePosition.x, safePosition.y, safePosition.z);
+        controls.target.set(rig.lookAtPosition.x, rig.lookAtPosition.y, rig.lookAtPosition.z);
+        camera.lookAt(controls.target);
         controls.update();
+        snapChaseRef.current = true;
     });
 
     return (
@@ -418,7 +577,7 @@ export function LabyrinthCamera() {
                 makeDefault
                 fov={40}
                 near={5}
-                far={15000}
+                far={MAP_PERSPECTIVE_FAR_M}
                 position={[start.x, start.y, start.z]}
             />
             {camera !== null && (
@@ -435,5 +594,98 @@ export function LabyrinthCamera() {
                 />
             )}
         </>
+    );
+}
+
+
+
+// First-person camera for the helmet visor (D-032): eye height above the terrain at the astronaut's
+// position (the staging point before a walk), looking along the smoothed heading, pitched slightly
+// down so the ground ahead is visible. No controls: the visor is not a map.
+// The terrain mesh has a vertex every few metres, so between vertices it can sit above the bilinear
+// height under the astronaut. The eye uses the highest ground within one mesh step, so it never ends
+// up inside a slope (which shows a black screen).
+const FIRST_PERSON_GROUND_SAMPLE_RADIUS_M = 4;
+
+
+function highestNearbyTerrainY(frame: Parameters<typeof sampleTerrainSceneY>[0], x_m: number, z_m: number): number {
+    const radius = FIRST_PERSON_GROUND_SAMPLE_RADIUS_M;
+    const offsets = [
+        [0, 0],
+        [radius, 0],
+        [-radius, 0],
+        [0, radius],
+        [0, -radius],
+    ];
+    let highest = Number.NEGATIVE_INFINITY;
+    for (const [dx, dz] of offsets) {
+        const y = sampleTerrainSceneY(frame, x_m + dx, z_m + dz);
+        if (Number.isFinite(y) && y > highest) {
+            highest = y;
+        }
+    }
+    if (!Number.isFinite(highest)) {
+        return sampleTerrainSceneY(frame, x_m, z_m);
+    }
+    return highest;
+}
+
+
+export function FirstPersonCamera() {
+    const { frame } = useTerrain();
+    const processedData = useAriadneStore((state) => state.processedData);
+    const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+    const smoothedHeadingDegRef = useRef<number | null>(null);
+
+    let startPosition: LocalPosition = { x_m: 0, z_m: 0 };
+    if (processedData !== null) {
+        startPosition = processedData.meta.staging_point;
+    }
+    const startEyeY = sampleTerrainSceneY(frame, startPosition.x_m, startPosition.z_m) + FIRST_PERSON_EYE_HEIGHT_M;
+
+    useFrame((_, deltaSeconds) => {
+        const camera = cameraRef.current;
+        if (camera === null) {
+            return;
+        }
+        const state = useAriadneStore.getState();
+        let position: LocalPosition | null = state.astronautPosition;
+        if (position === null && state.processedData !== null) {
+            position = state.processedData.meta.staging_point;
+        }
+        if (position === null) {
+            return;
+        }
+
+        const previousHeading = smoothedHeadingDegRef.current;
+        let headingDeg = state.astronautHeadingDeg;
+        if (previousHeading !== null) {
+            headingDeg = dampAngleDeg(
+                previousHeading,
+                state.astronautHeadingDeg,
+                deltaSeconds,
+                FIRST_PERSON_HEADING_TIME_CONSTANT_SECONDS,
+            );
+        }
+        smoothedHeadingDegRef.current = headingDeg;
+
+        const pose = computeFirstPersonPose({
+            position,
+            headingDeg,
+            sampleTerrainY: (x_m, z_m) => highestNearbyTerrainY(frame, x_m, z_m),
+        });
+        camera.position.set(pose.eyePosition.x, pose.eyePosition.y, pose.eyePosition.z);
+        camera.lookAt(pose.lookAtPosition.x, pose.lookAtPosition.y, pose.lookAtPosition.z);
+    });
+
+    return (
+        <PerspectiveCamera
+            ref={cameraRef}
+            makeDefault
+            fov={FIRST_PERSON_FOV_DEG}
+            near={FIRST_PERSON_NEAR_M}
+            far={MAP_PERSPECTIVE_FAR_M}
+            position={[startPosition.x_m, startEyeY, startPosition.z_m]}
+        />
     );
 }

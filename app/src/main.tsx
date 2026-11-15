@@ -7,7 +7,7 @@ import "@fontsource/vt323/latin-400.css";
 import "@fontsource/ibm-plex-mono/latin-400.css";
 import "@fontsource/ibm-plex-mono/latin-600.css";
 
-import { App } from "./App";
+import { RouteSwitch } from "./routes/RouteSwitch";
 import { useAriadneStore } from "./state/store";
 import "./index.css";
 
@@ -28,6 +28,6 @@ if (rootElement === null) {
 
 createRoot(rootElement).render(
     <StrictMode>
-        <App />
+        <RouteSwitch />
     </StrictMode>,
 );

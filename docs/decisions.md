@@ -361,6 +361,19 @@ Rules:
 - Alternatives considered: map with a single drawer and no tabs; keeping the grey orthoimage with green overlays; opening in 3D (slower on phones, harder to plan on).
 - Affects docs: app/design/visual_direction.md, docs/system_design.md, docs/handoff.md, README.md (screenshots later)
 
+### D-032: Two displays (tablet and helmet visor), synced; navigation-style cameras
+
+- Date: 2026-11-14
+- Status: accepted (Lawrence)
+- Decision:
+  1. The app shows two of the challenge's suggested formats at their own addresses: `/tablet` (the D-031 interface the crew carries) and `/visor` (a heads-up display projected on the helmet visor). `/` is a chooser. In the tablet the SUIT tab is replaced by a VISOR link that opens `/visor`.
+  2. The visor shows the terrain in first person from eye height along the walking heading, with a minimal overlay: compass strip, three readings (next Knot or shelter distance, Thread margin est., O2 est.), next step, newest alert with on-screen ROUTE and DISMISS buttons, task check-off at a Knot, and a north-up minimap.
+  3. Two windows of the same browser (tablet and visor) share one live walk through a BroadcastChannel: one window leads (clock, scenario events, task check-off, reroutes) and the others mirror it. Nothing leaves the browser.
+  4. Cameras behave like car navigation: following (and Center on me) zooms in on the astronaut in 2D; in 3D the camera chases the astronaut figure from behind along the heading.
+- Why: The challenge names a tablet, a visor HUD and a habitat display as formats; showing two of them, synced, demonstrates how one map serves both planning and walking. On-screen visor buttons keep the demo usable with a mouse; a real suit would use voice or wrist controls.
+- Alternatives considered: third-person visor; display-only visor with keyboard keys; separate unsynced pages; `/` opening the tablet directly.
+- Affects docs: app/design/visual_direction.md, docs/system_design.md, docs/handoff.md, README.md
+
 ## Open questions (Stage 0)
 
 Status 2026-11-14: questions 1 to 10 and 12 to 21 are resolved by D-017 to D-025. Question 11 (colour palette) stays with Person C.

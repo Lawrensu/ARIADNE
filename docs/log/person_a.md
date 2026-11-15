@@ -76,3 +76,13 @@ Instructions:
 - Broken or open: two back-to-back browser runs not done (the browser pane stopped firing animation frames while hidden); demo not recorded; "every number has provenance" not audited; README, getting_started.md and AGENTS.md rewrite still uncommitted (held on Lawrence's request); the replay starts at LMST 00:00 (known issue 15). Nothing committed or pushed in this session.
 - Next step: run the demo twice in a visible window and record it; commit on `dev-lawrence`; merge into `dev`, integration check, then `main`.
 - Delegated to sub-agents (what, and how the result was checked): `app/src/scene/AstronautMarker.tsx` to a Sonnet sub-agent with a full brief; reviewed the code, typecheck and tests passed, and the marker with its trail was seen moving in the preview.
+
+
+### 2026-11-14 evening | Claude Code (Opus) | Continue Malissa's handoff; tablet and visor displays (D-032)
+
+- Changed: fast-forwarded `dev-lawrence` to Malissa's `96c710b`. D-032: routes `/` (chooser), `/tablet`, `/visor` (`app/src/routes/`, `main.tsx`, `app/vercel.json`); VISOR tab replaces SUIT; helmet visor page (`app/src/visor/`); navigation cameras (`app/src/scene/navigationCamera.ts`: 2D follow zooms to 250 m, 3D chase 30 m behind and 14 m up, first-person camera at 1.7 m); window sync (`app/src/sync/`, `state/syncSlice.ts`, leader checks in `sim/clock.ts` and `sim/walkDriver.ts`). Review fixes: first-person eye above the highest ground within 4 m (black screen at the start), next-Knot distance and time count down along the planned leg (`hudMath.remainingLegFraction`, tablet and visor), tablet mounts `useSessionSync()`. Docs: D-032, visual_direction.md section 7, system_design.md, handoff.md.
+- Verified (how): from `app/`: `npm test` 358 passed (32 files), typecheck clean, build works, payload 26.70 MB gzip. Production preview: chooser; visor at 1280 and 375 px (no horizontal scroll, terrain visible, demo run to "Sheltered in the rover"); tablet 2D follow zoomed on the astronaut and 3D chase behind the figure; visor and tablet tabs synced (same objective and clock); no console errors.
+- Broken or open: headless `npm run browser-check` not run here (no Chrome installed); demo not recorded; provenance audit not done; README and screenshots not updated for D-031 and D-032; README, AGENTS.md and getting_started.md still held uncommitted; nothing committed in this session yet.
+- Next step: commit and push `dev-lawrence`, record the demo, integration into `dev` and `main`.
+- Delegated to sub-agents (what, and how the result was checked): cameras (Sonnet), visor page (Sonnet), window sync (Sonnet), routes (Haiku), visor phone polish and browser-check address (Haiku); each reviewed, tests and build run, and checked in the preview.
+

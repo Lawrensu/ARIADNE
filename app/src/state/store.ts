@@ -23,6 +23,8 @@ import { create } from "zustand";
 
 import type { AlertsSlice } from "./alertsSlice";
 import type { CameraSlice } from "./cameraSlice";
+import type { SyncSlice } from "./syncSlice";
+import { createSyncSlice } from "./syncSlice";
 import { createCameraSlice } from "./cameraSlice";
 import { createAlertsSlice } from "./alertsSlice";
 import type { DataSlice } from "./dataSlice";
@@ -68,7 +70,8 @@ export type AriadneState = DataSlice &
     AlertsSlice &
     ScenarioSlice &
     CameraSlice &
-    InspectSlice;
+    InspectSlice &
+    SyncSlice;
 
 
 
@@ -88,4 +91,5 @@ export const useAriadneStore = create<AriadneState>()((...args) => ({
     ...createScenarioSlice(...args),
     ...createCameraSlice(...args),
     ...createInspectSlice(...args),
+    ...createSyncSlice(...args),
 }));

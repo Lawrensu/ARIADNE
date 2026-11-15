@@ -143,3 +143,14 @@ Lawrence's direction: inspired by a retro field-terminal map (one monochrome pho
 - Lines: the Thread is the brightest line (solid, glowing); the science plan is parchment dashed; routes use phosphor green with distinct dash patterns and labels for fast, safe and smooth.
 - Markers are glyphs: diamond Knot, square rover, triangle shelter, circle-with-arrow you. Labels show only for Knots, the rover, the current objective and a hovered or selected marker; shelters show their label on hover or when an alert targets them.
 - Default view: flat, north-up 2D. 3D is one tap away.
+
+
+## 7. Two displays: tablet and helmet visor (D-032, 2026-11-14)
+
+The challenge suggests a habitat display, a tablet the crew carries, or a heads-up display on the helmet visor. ARIADNE shows two of them, synced:
+
+- `/` chooser: two large cards, TABLET and VISOR, and one tip line ("Open both in two windows: they stay in sync").
+- `/tablet`: the section 6 interface. The SUIT tab is replaced by VISOR, which opens `/visor` in a new window.
+- `/visor`: first person from eye height (1.7 m) along the walking heading, pitched about 8 degrees down, with a mostly transparent overlay: header (wordmark, SYNCED or SOLO, TABLET link, DEMO), compass strip with next-target and sun markers, a floating plate over the next Knot (or the shelter while rerouted), exactly three readings (next Knot or shelter distance, Thread margin est., O2 est.), a next-step line, the newest alert with 64 px ROUTE and DISMISS buttons, TASK DONE at a Knot, and a north-up minimap. Thin phosphor lines, glow on numbers only, a faint vignette and visor edge; the centre of view stays clear. A real suit would use voice or wrist buttons; on-screen buttons keep the demo usable with a mouse.
+- Cameras like car navigation: following (and Center on me) zooms in to about 250 m across in 2D; in 3D the camera chases the figure from about 30 m behind and 14 m above, turning smoothly with the heading.
+- Sync: two windows of the same browser share one walk over a BroadcastChannel; the window the user last acted in leads (clock, scenario events, task check-off, reroutes) and the others mirror it. Nothing leaves the browser.

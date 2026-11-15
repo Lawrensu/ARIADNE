@@ -20,6 +20,7 @@ import { recomputeSciencePlan } from "./science/sciencePlanService";
 import { SciencePlanLines } from "./science/ui/SciencePlanLines";
 import { useSimClockDriver } from "./sim/clock";
 import { useWalkAndScenarioDriver } from "./sim/walkDriver";
+import { useSessionSync } from "./sync/sessionSync";
 import { LegendSheet } from "./shell/LegendSheet";
 import { MapOverlays } from "./shell/MapOverlays";
 import { StatusBar } from "./shell/StatusBar";
@@ -114,6 +115,8 @@ function selectMarkerAsRouteEndpoint(marker: SceneMarker): void {
 function MainView() {
     useSimClockDriver();
     useWalkAndScenarioDriver();
+    // Shares the walk with a /visor window in the same browser (D-032).
+    useSessionSync();
 
     return (
         <div className="flex h-full w-full flex-col overflow-hidden bg-ariadne-background text-ariadne-text">

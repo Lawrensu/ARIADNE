@@ -255,7 +255,7 @@ export interface NextKnotSelection {
     knot: Knot | null;
     // "science_plan": first incomplete plan stop. "nearest_knot": Euclidean fallback. "none": no Knots.
     source: "science_plan" | "nearest_knot" | "none";
-    // Distance shown on the HUD: the plan leg when it exists, else the straight-line distance.
+    // Distance shown on the HUD: what is left of the plan leg when it exists, else the straight-line distance.
     distanceM: number;
     walkTimeSeconds: number;
     straightLineDistanceM: number;
@@ -310,6 +310,45 @@ function findPlanLegForKnot(plan: SciencePlan | null, knotId: string): SciencePl
         }
     }
     return null;
+}
+
+
+// Within this distance of a leg's path the astronaut counts as walking that leg (metres).
+const ON_LEG_PATH_TOLERANCE_M = 30;
+
+
+// Remaining fraction (0 to 1) of a planned leg from the astronaut's position: the distance still to
+// walk along the leg's path divided by the whole path length. 1 when the astronaut is not on the path
+// (for example still at the start, or on a detour), so the full planned leg is shown.
+export function remainingLegFraction(path: LocalPosition[], position: LocalPosition): number {
+    if (path.length < 2 || !Number.isFinite(position.x_m) || !Number.isFinite(position.z_m)) {
+        return 1;
+    }
+    let nearestIndex = 0;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+    for (let index = 0; index < path.length; index++) {
+        const distance = Math.hypot(path[index].x_m - position.x_m, path[index].z_m - position.z_m);
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestIndex = index;
+        }
+    }
+    if (nearestDistance > ON_LEG_PATH_TOLERANCE_M) {
+        return 1;
+    }
+    let totalLength = 0;
+    let remainingLength = 0;
+    for (let index = 1; index < path.length; index++) {
+        const pieceLength = Math.hypot(path[index].x_m - path[index - 1].x_m, path[index].z_m - path[index - 1].z_m);
+        totalLength += pieceLength;
+        if (index > nearestIndex) {
+            remainingLength += pieceLength;
+        }
+    }
+    if (totalLength === 0) {
+        return 0;
+    }
+    return Math.min(Math.max(remainingLength / totalLength, 0), 1);
 }
 
 
@@ -383,17 +422,23 @@ export function selectNextKnot(input: NextKnotInput): NextKnotSelection {
     const bearing = bearingDegrees(input.position.x_m, input.position.z_m, knot.x_m, knot.z_m);
     const leg = findPlanLegForKnot(input.sciencePlan, knot.knot_id);
 
+    // On the leg, distance and time count down along the planned path (D-032); before it, the whole leg.
+    let legFraction = 1;
+    if (leg !== null) {
+        legFraction = remainingLegFraction(leg.path_positions, input.position);
+    }
+
     let distanceM = straightLineDistanceM;
     let isDistanceFromPlan = false;
     if (leg !== null && Number.isFinite(leg.horizontal_distance_m) && leg.horizontal_distance_m >= 0) {
-        distanceM = leg.horizontal_distance_m;
+        distanceM = leg.horizontal_distance_m * legFraction;
         isDistanceFromPlan = true;
     }
 
     let walkTimeSecondsForKnot = Number.NaN;
     let isWalkTimeFromPlan = false;
     if (leg !== null && Number.isFinite(leg.walking_time_s) && leg.walking_time_s >= 0) {
-        walkTimeSecondsForKnot = leg.walking_time_s;
+        walkTimeSecondsForKnot = leg.walking_time_s * legFraction;
         isWalkTimeFromPlan = true;
     } else {
         walkTimeSecondsForKnot = straightLineWalkSeconds(distanceM, input.parameters, input.loadFactor);

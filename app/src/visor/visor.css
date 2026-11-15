@@ -1,0 +1,205 @@
+/* Visor look (owner: Lawrence, D-032): light projected on curved glass. Thin phosphor lines, a glow
+   on numbers only, a faint vignette and visor edge. The world stays visible; panels are nearly
+   transparent. Colours come from theme/tokens.css. */
+
+.visor-root {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: var(--ariadne-screen-black);
+    color: var(--ariadne-phosphor-white);
+}
+
+/* The 3D world fills the whole visor. */
+.visor-world {
+    position: absolute;
+    inset: 0;
+    isolation: isolate;
+}
+
+/* Everything projected on the glass sits above the world and lets pointer events through except the
+   controls, which switch them back on with .visor-hit. */
+.visor-glass {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: max(10px, env(safe-area-inset-top)) 16px max(10px, env(safe-area-inset-bottom));
+    gap: 8px;
+}
+
+.visor-hit {
+    pointer-events: auto;
+}
+
+/* Vignette plus a faint curved visor edge. Purely decorative, never above text. */
+.visor-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 20;
+    background: radial-gradient(ellipse 75% 70% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+.visor-edge {
+    position: absolute;
+    inset: 6px;
+    pointer-events: none;
+    z-index: 21;
+    border: 1px solid rgba(92, 232, 127, 0.18);
+    border-radius: 9% / 16%;
+    box-shadow:
+        inset 0 0 40px rgba(92, 232, 127, 0.07),
+        inset 0 0 90px rgba(0, 0, 0, 0.5);
+}
+
+/* Thin phosphor panel: nearly transparent, one hairline. */
+.visor-panel {
+    background: rgba(5, 10, 6, 0.38);
+    border: 1px solid rgba(92, 232, 127, 0.45);
+}
+
+.visor-panel-caution {
+    border-color: var(--ariadne-caution);
+}
+
+.visor-panel-no-go {
+    border-color: var(--ariadne-no-go);
+}
+
+/* Small text gets a dark halo so it reads over bright terrain; numbers get the green glow. */
+.visor-text {
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.95), 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.visor-number {
+    font-family: var(--ariadne-font-display);
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-shadow: 0 0 10px rgba(92, 232, 127, 0.7), 0 0 22px rgba(92, 232, 127, 0.35), 0 0 3px rgba(0, 0, 0, 0.9);
+}
+
+.visor-label {
+    font-family: var(--ariadne-font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    color: var(--ariadne-muted-green);
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.95), 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+/* 64 px on-screen buttons (glove-friendly). */
+.visor-button {
+    pointer-events: auto;
+    min-height: 64px;
+    min-width: 64px;
+    padding: 0 16px;
+    font-family: var(--ariadne-font-display);
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ariadne-phosphor-green);
+    background: rgba(5, 10, 6, 0.55);
+    border: 1px solid var(--ariadne-phosphor-green);
+    border-radius: 0;
+    cursor: pointer;
+    text-shadow: 0 0 8px rgba(92, 232, 127, 0.5);
+}
+
+.visor-button:hover:not(:disabled) {
+    background: rgba(92, 232, 127, 0.18);
+}
+
+.visor-button:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.visor-button-quiet {
+    color: var(--ariadne-muted-green);
+    border-color: rgba(92, 232, 127, 0.45);
+    text-shadow: none;
+}
+
+/* Header controls: glove-sized, at least 48 px high. */
+.visor-chip {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 12px;
+    font-family: var(--ariadne-font-display);
+    font-size: 22px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ariadne-phosphor-green);
+    background: rgba(5, 10, 6, 0.45);
+    border: 1px solid rgba(92, 232, 127, 0.55);
+    border-radius: 0;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.visor-chip:hover {
+    background: rgba(92, 232, 127, 0.18);
+}
+
+.visor-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    font-family: var(--ariadne-font-display);
+    font-size: 20px;
+    letter-spacing: 0.08em;
+    border: 1px solid currentColor;
+    background: rgba(5, 10, 6, 0.45);
+}
+
+/* Header badges: small on phone so the wordmark, sync badge and two chips fit one row at 375 px. */
+.visor-badge-small {
+    padding: 1px 6px;
+    font-size: 16px;
+}
+
+.visor-badge-compact {
+    padding: 2px 6px;
+    font-size: 16px;
+}
+
+.visor-chip-compact {
+    padding: 0 8px;
+    font-size: 18px;
+}
+
+@media (min-width: 640px) {
+    .visor-badge-compact {
+        padding: 2px 8px;
+        font-size: 20px;
+    }
+
+    .visor-chip-compact {
+        padding: 0 12px;
+        font-size: 22px;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .visor-alert-pulse {
+        animation: visor-alert-pulse 1.6s ease-in-out infinite;
+    }
+}
+
+@keyframes visor-alert-pulse {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 107, 74, 0);
+    }
+    50% {
+        box-shadow: 0 0 24px 2px rgba(255, 107, 74, 0.35);
+    }
+}

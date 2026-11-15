@@ -22,6 +22,7 @@ import {
     selectNextKnot,
     threadMarginState,
 } from "./hudMath";
+import { remainingLegFraction } from "./hudMath";
 
 
 
@@ -402,5 +403,26 @@ describe("shelter walk countdown (D-030 reroute)", () => {
         expect(formatCountdownMinutes(61)).toBe("2 min");
         expect(formatCountdownMinutes(5)).toBe("1 min");
         expect(formatCountdownMinutes(0)).toBe("0 min");
+    });
+});
+
+
+
+
+describe("remainingLegFraction (D-032 live countdown)", () => {
+    const path = [{ x_m: 0, z_m: 0 }, { x_m: 50, z_m: 0 }, { x_m: 100, z_m: 0 }];
+
+    it("is 1 at the start of the leg and 0 at its end", () => {
+        expect(remainingLegFraction(path, { x_m: 0, z_m: 0 })).toBeCloseTo(1, 9);
+        expect(remainingLegFraction(path, { x_m: 100, z_m: 0 })).toBeCloseTo(0, 9);
+    });
+
+    it("counts down along the path", () => {
+        expect(remainingLegFraction(path, { x_m: 50, z_m: 1 })).toBeCloseTo(0.5, 9);
+    });
+
+    it("shows the whole leg when the astronaut is away from the path", () => {
+        expect(remainingLegFraction(path, { x_m: 50, z_m: 200 })).toBe(1);
+        expect(remainingLegFraction([], { x_m: 0, z_m: 0 })).toBe(1);
     });
 });

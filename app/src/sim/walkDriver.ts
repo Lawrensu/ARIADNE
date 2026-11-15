@@ -223,7 +223,8 @@ function applyScenarioEvent(event: ScenarioEvent, eventIndex: number): void {
 // Returns the simulation time the walk has been advanced to.
 function runScenarioStep(previousSimSeconds: number, simSeconds: number): number {
     const state = useAriadneStore.getState();
-    if (state.scenarioStatus !== "running") {
+    // Session sync (D-032): only the leader window fires scenario events.
+    if (state.isSessionLeader === false || state.scenarioStatus !== "running") {
         return previousSimSeconds;
     }
     const due = dueEvents(SOLAR_STORM_SCENARIO, state.scenarioEventIndex, simSeconds);
@@ -274,7 +275,7 @@ function runWalkStep(previousSimSeconds: number, simSeconds: number): void {
         processedData.meta.staging_point,
         simSeconds,
     );
-    if (shiftSeconds > 0) {
+    if (shiftSeconds > 0 && state.isSessionLeader) {
         state.shiftWalkStart(-shiftSeconds);
         state = useAriadneStore.getState();
     }
@@ -287,7 +288,7 @@ function runWalkStep(previousSimSeconds: number, simSeconds: number): void {
         state.setWalkPhase(walk.phase);
     }
 
-    if (timeline !== null && simSeconds > previousSimSeconds) {
+    if (state.isSessionLeader && timeline !== null && simSeconds > previousSimSeconds) {
         const finished = tasksFinishedBetween(timeline, state.walkDetour, previousSimSeconds, simSeconds);
         for (const taskId of finished) {
             state.setTaskCompleted(taskId, true);
@@ -313,7 +314,7 @@ function runWalkStep(previousSimSeconds: number, simSeconds: number): void {
     }
 
     const detour = state.walkDetour;
-    if (walk.phase === "sheltering" && detour !== null) {
+    if (state.isSessionLeader && walk.phase === "sheltering" && detour !== null) {
         useAriadneStore.getState().raiseAlert({
             alert_id: SHELTERED_ALERT_ID,
             alert_type: "sheltered",

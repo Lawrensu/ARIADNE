@@ -133,7 +133,10 @@ export function useSimClockDriver(): void {
 
         function onFrame(timestampMs: number) {
             const state = useAriadneStore.getState();
-            if (state.isSimPlaying === false || lastTimestampMs === null) {
+            if (state.isSessionLeader === false) {
+                // Session sync (D-032): a follower window takes its clock from the leader's anchor.
+                lastTimestampMs = null;
+            } else if (state.isSimPlaying === false || lastTimestampMs === null) {
                 // Not playing (or first frame after starting): only remember the time.
                 lastTimestampMs = state.isSimPlaying ? timestampMs : null;
             } else {

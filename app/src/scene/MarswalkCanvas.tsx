@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 
 import { useAriadneStore } from "../state/store";
 import { TerrainProvider } from "../terrain/TerrainContext";
-import { LabyrinthCamera, PlanningTableCamera } from "./CameraRig";
+import { FirstPersonCamera, LabyrinthCamera, PlanningTableCamera } from "./CameraRig";
 import { MAP_COLOURS } from "./mapStyle";
 import type { SceneMarker } from "./markers";
 import { SceneMarkers } from "./SceneMarkers";
@@ -15,13 +15,21 @@ import { TerrainMesh } from "./TerrainMesh";
 
 
 
+// "map": the Planning Table (2D) or Labyrinth view (3D) camera, from viewMode.
+// "first_person": the visor's eye-level camera that walks with the astronaut (D-032).
+export type MarswalkCameraKind = "map" | "first_person";
+
+
 export interface MarswalkCanvasProps {
     children?: ReactNode;
+    // Default "map". "first_person" renders the visor camera instead of the 2D/3D cameras and leaves
+    // viewMode untouched (D-032).
+    cameraKind?: MarswalkCameraKind;
     onMarkerSelect?: (marker: SceneMarker) => void;
 }
 
 
-export function MarswalkCanvas({ children, onMarkerSelect }: MarswalkCanvasProps) {
+export function MarswalkCanvas({ children, cameraKind = "map", onMarkerSelect }: MarswalkCanvasProps) {
     const processedData = useAriadneStore((state) => state.processedData);
     const viewMode = useAriadneStore((state) => state.viewMode);
 
@@ -40,7 +48,13 @@ export function MarswalkCanvas({ children, onMarkerSelect }: MarswalkCanvasProps
             <TerrainProvider processedData={processedData}>
                 <TerrainMesh />
                 <SceneMarkers onMarkerSelect={onMarkerSelect} />
-                {viewMode === "planning_table" ? <PlanningTableCamera key="planning_table" /> : <LabyrinthCamera key="labyrinth_view" />}
+                {cameraKind === "first_person" ? (
+                    <FirstPersonCamera key="first_person" />
+                ) : viewMode === "planning_table" ? (
+                    <PlanningTableCamera key="planning_table" />
+                ) : (
+                    <LabyrinthCamera key="labyrinth_view" />
+                )}
                 {children}
             </TerrainProvider>
         </Canvas>
