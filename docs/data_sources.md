@@ -125,7 +125,7 @@ DTM = digital terrain model, a height map.
 - Product ID: One per photo (image ID and sol), recorded in `knots.json`. Navcam Left B and Right B images, for example `NLB_771231076EDR_F1072496NCAM00260M_` (sol 4210)
 - Resolution: Points (individual images)
 - Licence and credit: NASA/JPL-Caltech
-- Processing: Pick images per Knot near the stop's sol, record URL, sol, camera, caption and credit in `knots.json`. The app copies the photos in with their credits so the demo works offline (D-024). Captions are written by us from the image content
+- Processing: Pick images per Knot near the stop's sol, record URL, sol, camera, caption and credit in `knots.json`. The app copies the photos in with their credits so the demo works offline (D-024). Captions are written by us from the image content, drafted with SI (AI coding assistant) help and reviewed by the team (see README.md, "Use of SI (AI) tools")
 - Status: In use, Stage 1, 2026-11-14
 
 

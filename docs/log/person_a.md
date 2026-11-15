@@ -86,3 +86,12 @@ Instructions:
 - Next step: commit and push `dev-lawrence`, record the demo, integration into `dev` and `main`.
 - Delegated to sub-agents (what, and how the result was checked): cameras (Sonnet), visor page (Sonnet), window sync (Sonnet), routes (Haiku), visor phone polish and browser-check address (Haiku); each reviewed, tests and build run, and checked in the preview.
 
+
+
+### 2026-11-15 18:00 | Claude Code | SI (AI) tool acknowledgement for the Space Apps rules
+
+- Changed: README.md new section "Use of SI (AI) tools" (Claude Code and opencode only; code, data, Knot content, docs; no SI images, audio or video in the repo; no NASA branding); docs/data_sources.md 3.5 notes the Knot captions were drafted with SI help; metadata in app/package.json (`aiAssistance`, description), pipeline/pyproject.toml (`[tool.ariadne] ai_assistance`, description) and an `ai-assistance` meta tag in app/index.html; one line in the app system menu. Also committed Lawrence's own README and LICENSE wording edits separately.
+- Verified (how): checked the repo for NASA logos, flags and patches (none; the favicon is a plain crosshair); app npm test 414 passed, typecheck clean, build works, the meta tag and menu line are in dist; pyproject.toml and package.json parse.
+- Broken or open: the promo video (made outside the repo) must carry a visible SI watermark, acknowledge any SI voice in its description and metadata, and show no NASA logos, flags or mission patches.
+- Next step: Space Apps submission text and data lists; record the demo.
+- Delegated to sub-agents (what, and how the result was checked): none.

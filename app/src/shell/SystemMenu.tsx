@@ -180,6 +180,9 @@ export function SystemMenu() {
             <p className="border-t border-ariadne-border pt-2 text-xs text-ariadne-dim">
                 ARIADNE. Public NASA data: HiRISE, MSL REMS and RAD, CRISM, THEMIS. Replayed, not live.
             </p>
+            <p className="text-xs text-ariadne-dim">
+                Built with SI (AI) coding assistants: Claude Code and opencode. Reviewed by the team.
+            </p>
         </div>
     );
 }

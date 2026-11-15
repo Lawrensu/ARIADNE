@@ -3,7 +3,8 @@
   "private": true,
   "version": "0.2.0",
   "type": "module",
-  "description": "ARIADNE app: Planning Table, Labyrinth view, routing and the Thread on the local grid.",
+  "description": "ARIADNE app: Planning Table, Labyrinth view, routing and the Thread on the local grid. Code written with SI (AI) coding assistants: Claude Code and opencode.",
+  "aiAssistance": "SI (AI) tools used: Claude Code (Anthropic Claude) and opencode (DeepSeek) as coding assistants for code, tests and docs, directed and reviewed by the team. No SI-generated images, audio or video. See README.md, 'Use of SI (AI) tools'.",
   "scripts": {
     "copy-data": "node scripts/copyProcessedData.mjs",
     "predev": "npm run copy-data",

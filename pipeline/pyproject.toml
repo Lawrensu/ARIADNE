@@ -1,7 +1,7 @@
 [project]
 name = "ariadne-pipeline"
 version = "1.0.0"
-description = "ARIADNE Stage 1: turns NASA Mars data into the local-grid files the app reads (see docs/contracts.md)."
+description = "ARIADNE Stage 1: turns NASA Mars data into the local-grid files the app reads (see docs/contracts.md). Code written with SI (AI) coding assistants: Claude Code and opencode."
 requires-python = ">=3.11"
 dependencies = [
     "numpy>=1.26",
@@ -21,3 +21,7 @@ package = false
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+
+[tool.ariadne]
+# NASA Space Apps SI (AI) acknowledgement; details in README.md, "Use of SI (AI) tools".
+ai_assistance = "SI (AI) tools used: Claude Code (Anthropic Claude) and opencode (DeepSeek) as coding assistants for the pipeline code, tests, Knot content and docs, directed and reviewed by the team. The data/processed files are produced by this code from public NASA data; the NASA measurements are not SI-generated."

@@ -147,6 +147,20 @@ Repository map:
 - `data/`: `raw/` (git-ignored downloads), `processed/` (pipeline outputs, committed), `reference/` (app reference data such as the real solar storm dose curve).
 
 
+## Use of SI (AI) tools
+
+Following the NASA Space Apps rules on Super Intelligence (SI) tools, this is where and how we used them. The only SI tools used for the project are Claude Code (Anthropic Claude models) and opencode (DeepSeek models), both as AI coding assistants. The team chose the site, the scenario and every design decision, directed the assistants, and reviewed their work.
+
+- Code: the pipeline (`pipeline/`) and the app (`app/`), including their tests, were written with the help of the AI coding assistants. Every change was checked with automated tests (68 pipeline tests, 414 app tests), the contract validator (47 checks), builds and visual checks
+- Data: the files in `data/processed/` were produced by that SI-assisted code from public NASA data. The measurements themselves (terrain, imagery, weather, radiation, photos) are NASA's and were not generated or altered by SI. Model parameters and estimates proposed with SI help, such as task durations and the dust opacity baseline, are labelled "est."
+- Content: the Knot photo captions, science notes and tasks (`pipeline/content/knots_content.json`) were drafted with SI help from the photos and NASA sources, and reviewed by the team
+- Documentation: the docs in this repository were drafted with SI help and reviewed by the team
+- Images, audio and video: the repository contains no SI-generated images, audio or video. The photos are real NASA images, and the pictures in `docs/images/` are screenshots of the app or plots made by our code. The promo video uses SI-generated footage and carries a visible SI watermark
+- No SI-generated content uses, contains or modifies NASA logos, flags, mission identifiers or other NASA branding
+
+The same acknowledgement is in the project metadata (`app/package.json`, `pipeline/pyproject.toml`, the `ai-assistance` meta tag in `app/index.html`) and in the app's system menu.
+
+
 ## License and data credits
 
 The ARIADNE code is under the MIT License. See [LICENSE](LICENSE).
