@@ -30,6 +30,7 @@ import {
     formatMeasurement,
     formatMinutesEstimate,
     formatScienceBudgetChip,
+    O2_READING_LABEL,
     nearestEnvironmentSample,
     normalizeBearing,
     remainingDetourWalkSeconds,
@@ -545,7 +546,7 @@ export function SuitHud({ alertSlot }: SuitHudProps) {
                                 provenance={readingProvenance.threadMargin}
                             />
                             <HudTile
-                                label="O2 h:mm"
+                                label={O2_READING_LABEL}
                                 value={hudNumbers.o2Text}
                                 state={hudNumbers.o2State}
                                 isEstimate

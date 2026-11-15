@@ -10,7 +10,7 @@
 
 import { useMemo } from "react";
 
-import { computeHudNumbers, formatDurationHm } from "../hud/hudMath";
+import { computeHudNumbers, formatDurationHhMm, formatDurationHm, O2_READING_LABEL, O2_READING_LABEL_SHORT } from "../hud/hudMath";
 import type { HudState } from "../hud/hudMath";
 import { carriedLoadKg, loadFactor, loadParametersFromMeta } from "../science/loadFactor";
 import { computeConsumablesState, SIM_SPEED_PRESETS } from "../sim/clock";
@@ -59,6 +59,8 @@ function PlayPauseIcon({ isPlaying }: { isPlaying: boolean }) {
 
 interface ReadingProps {
     label: string;
+    // Shown instead of label below the lg breakpoint (phones and tablets), when given.
+    shortLabel?: string;
     value: string;
     state: HudState;
     isEstimate: boolean;
@@ -70,7 +72,7 @@ interface ReadingProps {
 
 
 // Label on top and value below on narrow screens; one line from 1024 px.
-function Reading({ label, value, state, isEstimate, ariaLabel, widthRule }: ReadingProps) {
+function Reading({ label, shortLabel, value, state, isEstimate, ariaLabel, widthRule }: ReadingProps) {
     const colour = hazardStateColour(state);
     let widthClass = "flex-1 lg:flex-none";
     if (widthRule === "fit") {
@@ -80,7 +82,14 @@ function Reading({ label, value, state, isEstimate, ariaLabel, widthRule }: Read
         <div className={`${CELL_CLASS} ${widthClass}`} role="group" aria-label={ariaLabel}>
             <div className="flex min-w-0 flex-col leading-tight lg:flex-row lg:items-center lg:gap-2">
                 <span className="truncate text-xs uppercase tracking-wider text-ariadne-dim">
-                    {label}
+                    {shortLabel === undefined ? (
+                        label
+                    ) : (
+                        <>
+                            <span className="lg:hidden">{shortLabel}</span>
+                            <span className="hidden lg:inline">{label}</span>
+                        </>
+                    )}
                     {isEstimate && <span className="ml-1 normal-case tracking-normal">est.</span>}
                 </span>
                 <span className="flex min-w-0 items-center gap-0.5 whitespace-nowrap sm:gap-1" style={{ color: colour }}>
@@ -200,7 +209,7 @@ function SuitReadings() {
 
     const consumables = computeConsumablesState(simElapsedSeconds, parameters);
 
-    let o2Text = formatDurationHm(consumables.suit_remaining_s);
+    let o2Text = formatDurationHhMm(consumables.suit_remaining_s);
     let o2State: HudState = "no_go";
     let threadText = "unknown";
     let threadState: HudState = "no_go";
@@ -225,7 +234,8 @@ function SuitReadings() {
     return (
         <>
             <Reading
-                label="O2"
+                label={O2_READING_LABEL}
+                shortLabel={O2_READING_LABEL_SHORT}
                 value={o2Text}
                 state={o2State}
                 isEstimate

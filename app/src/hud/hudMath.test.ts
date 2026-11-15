@@ -11,6 +11,7 @@ import {
     formatCountdownMinutes,
     formatDistanceMetres,
     remainingDetourWalkSeconds,
+    formatDurationHhMm,
     formatDurationHm,
     formatMeasurement,
     formatMinutesEstimate,
@@ -351,7 +352,7 @@ describe("computeHudNumbers", () => {
         expect(numbers.threadState).toBe("caution");
         expect(numbers.distanceText).toBe("250 m");
         expect(numbers.distanceState).toBe("go");
-        expect(numbers.o2Text).toBe("4:10");
+        expect(numbers.o2Text).toBe("04:10");
         expect(numbers.o2State).toBe("go");
         expect(numbers.nextKnotWalkTimeText).toBe("6 min");
     });
@@ -372,7 +373,7 @@ describe("computeHudNumbers", () => {
         expect(numbers.threadState).toBe("no_go");
         expect(numbers.distanceText).toBe("unknown");
         expect(numbers.distanceState).toBe("no_go");
-        expect(numbers.o2Text).toBe("0:00");
+        expect(numbers.o2Text).toBe("00:00");
         expect(numbers.o2State).toBe("no_go");
         expect(numbers.nextKnotWalkTimeText).toBe("unknown");
     });
@@ -426,3 +427,18 @@ describe("remainingLegFraction (D-032 live countdown)", () => {
         expect(remainingLegFraction([], { x_m: 0, z_m: 0 })).toBe(1);
     });
 });
+
+
+
+
+describe("formatDurationHhMm (O2 readout)", () => {
+    it("always shows two-digit hours and minutes", () => {
+        expect(formatDurationHhMm(8 * 3600)).toBe("08:00");
+        expect(formatDurationHhMm(7 * 3600 + 59 * 60 + 30)).toBe("07:59");
+        expect(formatDurationHhMm(45 * 60)).toBe("00:45");
+        expect(formatDurationHhMm(0)).toBe("00:00");
+        expect(formatDurationHhMm(Number.NaN)).toBe("unknown");
+        expect(formatDurationHhMm(-1)).toBe("unknown");
+    });
+});
+

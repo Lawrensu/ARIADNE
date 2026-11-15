@@ -1,5 +1,5 @@
 // Visor readings (owner: Lawrence, D-032): exactly three numbers along the bottom of the glass:
-// distance to the next Knot (or the shelter), Thread margin (est.) and O2 h:mm (est.). Each shows
+// distance to the next Knot (or the shelter), Thread margin (est.) and O2 left as HH:MM (est.). Each shows
 // state as colour plus shape plus word (theme/StateBadge) and carries "est." Tapping a reading opens
 // its provenance. The numbers come from hud/hudMath.ts through useVisorReadings.
 
@@ -7,6 +7,7 @@ import { useState } from "react";
 
 import type { Provenance } from "../data/contracts";
 import type { HudNumbers, HudState } from "../hud/hudMath";
+import { O2_READING_LABEL } from "../hud/hudMath";
 import { EstimateBadge } from "../theme/EstimateBadge";
 import { ProvenanceDialog } from "../theme/ProvenancePopover";
 import { StateBadge } from "../theme/StateBadge";
@@ -42,9 +43,9 @@ function Reading({ label, value, state, isEstimate, provenance }: ReadingProps) 
                 aria-label={`${label}: ${value}${isEstimate ? ", estimate" : ""}. Show provenance.`}
                 onClick={() => setIsProvenanceOpen(true)}
             >
-                {/* Phone and tablet: the label stays on one line; the est. badge moves under the number. */}
+                {/* Phone and tablet: a long label may wrap to two lines; the est. badge moves under the number. */}
                 <span className="flex w-full min-w-0 items-center justify-center gap-1">
-                    <span className="visor-label truncate text-[20px]">{label}</span>
+                    <span className="visor-label text-center text-[20px] leading-tight">{label}</span>
                     {isEstimate && (
                         <span className="hidden lg:inline-flex">
                             <EstimateBadge />
@@ -130,7 +131,7 @@ export function VisorReadings({ numbers, target, simElapsedSeconds }: VisorReadi
                 isEstimate={true}
                 provenance={threadProvenance}
             />
-            <Reading label="O2 H:MM" value={numbers.o2Text} state={numbers.o2State} isEstimate={true} provenance={o2Provenance} />
+            <Reading label={O2_READING_LABEL} value={numbers.o2Text} state={numbers.o2State} isEstimate={true} provenance={o2Provenance} />
         </section>
     );
 }

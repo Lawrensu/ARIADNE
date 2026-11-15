@@ -100,6 +100,27 @@ export function formatDurationHm(totalSeconds: number): string {
 }
 
 
+// The label every O2 reading uses, so the hh:mm value cannot be mistaken for a clock time.
+export const O2_READING_LABEL = "O2 LEFT (HH:MM)";
+// The same, for tight spaces such as the tablet status bar on a phone.
+export const O2_READING_LABEL_SHORT = "O2 (HH:MM)";
+
+
+// "HH:MM" with two-digit hours for the O2 readout ("07:59", "00:45"); minutes rounded down.
+// Non-finite or negative is "unknown".
+export function formatDurationHhMm(totalSeconds: number): string {
+    if (!Number.isFinite(totalSeconds) || totalSeconds < 0) {
+        return "unknown";
+    }
+    const wholeSeconds = Math.floor(totalSeconds);
+    const hours = Math.floor(wholeSeconds / 3600);
+    const minutes = Math.floor((wholeSeconds % 3600) / 60);
+    const hoursText = hours < 10 ? `0${hours}` : `${hours}`;
+    const minutesText = minutes < 10 ? `0${minutes}` : `${minutes}`;
+    return `${hoursText}:${minutesText}`;
+}
+
+
 // Whole minutes, rounded down. Used for est. walk times and task durations.
 export function formatMinutesEstimate(totalSeconds: number): string {
     if (!Number.isFinite(totalSeconds) || totalSeconds < 0) {
@@ -518,7 +539,7 @@ export function computeHudNumbers(input: HudNumbersInput): HudNumbers {
         walkBackNowSeconds,
         timeLeftSeconds: input.timeLeftSeconds,
         o2RemainingSeconds: input.o2RemainingSeconds,
-        o2Text: formatDurationHm(input.o2RemainingSeconds),
+        o2Text: formatDurationHhMm(input.o2RemainingSeconds),
         o2State: o2State(input.o2RemainingSeconds),
         nextKnotWalkTimeText: formatMinutesEstimate(input.nextKnotWalkTimeSeconds),
     };
