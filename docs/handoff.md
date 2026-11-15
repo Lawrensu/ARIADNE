@@ -94,8 +94,8 @@ Evidence re-verified on 2026-11-14 after merging contract v1.1.0 and adding the 
 - [x] The scenario runs end-to-end, identically twice: Malissa's `npm run browser-check` (exit 0): storm 6701 / 6707 s, reroute 6760 / 6760 s, sheltered 8441 / 8445 s (the few seconds are frame timing, events fire on sim time); frame-rate independence in `walkTimeline.test.ts`; full run also seen on `/visor` (Lawrence, 2026-11-14).
 - [ ] Demo recorded.
 - [x] Log entry written: Stage 3 was finished by Lawrence and Malissa, so the entries are in `docs/log/person_a.md` and `docs/log/person_b.md`; Letta's agent wrote none.
-- [ ] Person C's branch pushed, merged into `dev` by Lawrence; integration check passed: the work is on `dev-lawrence` (Letta's branch merged there); merge into `dev` after the demo checks.
-- [ ] `dev` merged into `main` for the demo.
+- [x] Stage 3 work merged into `dev` by Lawrence (Letta's, Malissa's and Lawrence's work, all on `dev-lawrence`, fast-forward to `aa1a4d8`); integration check passed: pipeline 68 tests, validator 47 of 47, app 413 tests, typecheck clean, build works, payload 26.70 MB gzip (2026-11-15).
+- [x] `dev` merged into `main` for the demo (fast-forward to `aa1a4d8`, 2026-11-15).
 - [ ] Human sign-off.
 
 
@@ -220,7 +220,7 @@ Stage 3 notes for the demo (Lawrence, 2026-11-14, D-030):
 
 ## Next steps
 
-1. Lawrence: approve the commit draft, commit on `dev-lawrence`, push.
-2. Lawrence: record the demo (tablet and visor side by side, "Run demo scenario" from the gear menu or the visor DEMO strip, 300x), tick "Demo recorded".
-3. Lawrence: merge `dev-lawrence` into `dev`, integration check (validator, pipeline tests, app tests, build, payload, `npm run browser-check` on a machine with Chrome), then `dev` into `main`, sign off Stage 3.
-4. Optional: the "Every number has provenance" audit; README pass and new screenshots for D-031 and D-032.
+1. Lawrence: deploy `main` on Vercel (Root Directory `app`; see docs/getting_started.md "Build and deploy"), then open `/`, `/tablet` and `/visor` on the deployed site and check that the `.bin` data arrives compressed.
+2. Lawrence: run the demo on the deployed site (tablet and visor side by side, storm watch, rover rescue), record it, tick "Demo recorded".
+3. Optional: the "Every number has provenance" audit; new README screenshots of the tablet and the visor.
+4. Lawrence: Stage 3 human sign-off.
