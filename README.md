@@ -73,7 +73,7 @@ Stage 1 output preview: no-go zones, rocks, Knots, rover and Thread contours on 
 ## Why this site and this scenario
 
 - Two of Curiosity's headline discoveries are about 2 km apart: pure sulfur in Gediz Vallis and the groundwater boxwork ridges. One walk can visit both.
-- HiRISE covers the patch at 1 m with no gaps, so	 the terrain model is detailed enough for walking.
+- HiRISE covers the patch at 1 m with no gaps, so the terrain model is detailed enough for walking.
 - Curiosity's own photos and measurements let us check the map against reality.
 - The scenario follows Artemis planning: a pressurised rover drives the crew to a staging point, then they walk in pairs. How far a crew may walk is limited by what a suit can walk back. The staging point is about 1.1 km from each target, inside the Artemis III 2 km excursion radius (D-003, D-018, D-020).
 
@@ -84,17 +84,17 @@ Stage 1 output preview: no-go zones, rocks, Knots, rover and Thread contours on 
 - The app's walking times match the pipeline's within 0.0006% (largest relative difference 5.6e-6 over every Knot to rover route).
 
 Honest limits:
-- The data is a replay of real historical measurements, not live.
-- Walking speed, load and task times are estimates, labelled "est.".
-- The astronaut's position is simulated. Mars has no GPS; a real mission would use rover radio ranging, visual odometry or a future navigation network.
+- The data is a replay of real historical measurements, not live
+- Walking speed, load and task times are estimates, labelled "est."
+- The astronaut's position is simulated. Mars has no GPS; a real mission would use rover radio ranging, visual odometry or a future navigation network
 
 
 ## Data we use
 
-- HiRISE terrain model and photo: where the safe ground is, and the 3D view.
-- Curiosity REMS (weather) and RAD (radiation) replay, plus NASA DONKI space weather: conditions and the solar storm.
-- Curiosity photos and science blog posts: the Knots.
-- CRISM minerals and THEMIS thermal inertia: context only, low confidence.
+- HiRISE terrain model and photo: where the safe ground is, and the 3D view
+- Curiosity REMS (weather) and RAD (radiation) replay, plus NASA DONKI space weather: conditions and the solar storm
+- Curiosity photos and science blog posts: the Knots
+- CRISM minerals and THEMIS thermal inertia: context only, low confidence
 
 Product IDs, URLs, resolutions, licences, processing and status for every dataset are in [docs/data_sources.md](docs/data_sources.md).
 
@@ -138,12 +138,12 @@ Documentation map:
 - [docs/decisions.md](docs/decisions.md): append-only decision log.
 - [docs/handoff.md](docs/handoff.md): current stage, gate checklists, known issues and next steps.
 - [docs/development_conventions.md](docs/development_conventions.md): code, doc and git conventions.
-- [docs/log/person_a.md](docs/log/person_a.md), [docs/log/person_b.md](docs/log/person_b.md), [docs/log/person_c.md](docs/log/person_c.md): session logs for Lawrence, Malissa and Letta.
+- [docs/log/person_a.md](docs/log/person_a.md), [docs/log/person_b.md](docs/log/person_b.md), [docs/log/person_c.md](docs/log/person_c.md): session logs for each team members' agents
 
 Repository map:
 - `docs/`: design, contracts, data sources, decisions, handoff, per-person logs and images.
 - `pipeline/`: Python data pipeline (Stage 1). Python via `uv`: rasterio (GDAL), numpy, scipy, scikit-image.
-- `app/`: React, Vite, TypeScript, Zustand, Tailwind and React Three Fiber (Stages 2 and 3), built. It is a static site; the hosting platform is not decided yet. The app works only in a local metre grid.
+- `app/`: React, Vite, TypeScript, Zustand, Tailwind and React Three Fiber (Stages 2 and 3), built. It is a static site; the hosting platform is Vercel. The app works only in a local metre grid.
 - `data/`: `raw/` (git-ignored downloads), `processed/` (pipeline outputs, committed), `reference/` (app reference data such as the real solar storm dose curve).
 
 
